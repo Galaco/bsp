@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"encoding/binary"
+	"github.com/galaco/bsp/lumps/lumpdata"
 )
 
 /**
@@ -14,24 +15,6 @@ type ILump interface {
 	FromRaw([]byte, int32) ILump
 
 	GetData() interface{}
-}
-
-/**
-	Generic Lump
-	Used for non-existant lumps in the bsp structure (and lumps without an implementation
- */
-type Lump struct {
-	RawData []byte
-}
-
-func (lump Lump) FromRaw(raw []byte, length int32) ILump {
-	lump.RawData = raw
-
-	return lump
-}
-
-func (lump Lump) GetData() interface{} {
-	return lump.RawData
 }
 
 
@@ -56,13 +39,8 @@ func (lump EntData) GetData() interface{} {
 /**
 	Lump 1: Planes
  */
-type plane_t struct {
-	normal [3]float32 // normal vector
-	distance float32  // distance from origin
-	axisType int32	  // plane axis identifier
-}
 type Planes struct {
-	data []plane_t // MAP_MAX_PLANES = 65536
+	data []lumpdata.Plane // MAP_MAX_PLANES = 65536
 }
 
 func (lump Planes) FromRaw(raw []byte, length int32) ILump {
@@ -82,18 +60,9 @@ func (lump Planes) GetData() interface{} {
 /**
 	Lump 2: TexData
  */
-type texData_t struct {
-	reflectivity [3]float32
-	nameStringTableID int32
-	width int32
-	height int32
-	viewWidth int32
-	viewHeight int32
-}
 type TexData struct {
-	data []texData_t
+	data []lumpdata.TexData
 }
-
 func (lump TexData) FromRaw(raw []byte, length int32) ILump {
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -111,10 +80,10 @@ func (lump TexData) GetData() interface{} {
 /**
 	Lump 3: Vertex
  */
+
 type Vertex struct {
 	data [][3]float32
 }
-
 func (lump Vertex) FromRaw(raw []byte, length int32) ILump {
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -130,20 +99,31 @@ func (lump Vertex) GetData() interface{} {
 
 
 /**
+	Lump 4: Visibility
+ */
+type Visibility struct {
+	data []byte
+}
+
+func (lump Visibility) FromRaw(raw []byte, length int32) ILump {
+	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return lump
+}
+
+func (lump Visibility) GetData() interface{} {
+	return lump.data
+}
+
+
+/**
 	Lump 5: Node
  */
-type node_t struct{
-	planeNum int32
-	children [2]int32
-	mins [3]int16
-	maxs [3]int16
-	firstFace uint16
-	numFaces uint16
-	area int16
-	padding int16
-}
 type Node struct {
-	data []node_t // MAP_MAX_NODES = 65536
+	data []lumpdata.Node // MAP_MAX_NODES = 65536
 }
 
 func (lump Node) FromRaw(raw []byte, length int32) ILump {
@@ -163,14 +143,9 @@ func (lump Node) GetData() interface{} {
 /**
 	Lump 6: TexInfo
  */
- type texInfo_t struct {
- 	textureVecs [2][4]float32
- 	lightmapVecs [2][4]float32
- 	flags int32
- 	texData int32
- }
+
 type TexInfo struct {
-	data []texInfo_t
+	data []lumpdata.TexInfo
 }
 
 func (lump TexInfo) FromRaw(raw []byte, length int32) ILump {
@@ -191,28 +166,9 @@ func (lump TexInfo) GetData() interface{} {
 /**
 	Lump 7: Face
  */
-type face_t struct {
- 	planenum uint16
- 	side byte
- 	onNode byte
- 	firstEdge int32
- 	numEdges int16
- 	texInfo int16
- 	dispInfo int16
- 	surfaceFogVolumeID int16
- 	styles [4]byte
- 	lightofs int32
- 	area float32
- 	lightmapTextureMinsInLuxels [2]int32
- 	lightmapTextureSizeInLuxels [2]int32
- 	origFace int32
- 	numPrims uint16
- 	firstPrimID uint16
- 	smoothingGroups uint32
-}
 
 type Face struct {
-	data []face_t
+	data []lumpdata.Face
 }
 
 func (lump Face) FromRaw(raw []byte, length int32) ILump {
@@ -232,21 +188,8 @@ func (lump Face) GetData() interface{} {
 /**
 	Lump 10: Leaf
  */
-type leaf_t struct {
-	contents int32
-	cluster int16
-	area int8 // NOTE: Actually first 9 bits of a short, but not implemented
-	flags int8 // NOTE: Actually second 7 bits of a short, but not implemented
-	mins [3]int16
-	maxs [3]int16
-	firstLeafFace uint16
-	numLeafFaces uint16
-	firstLeafBrush uint16
-	numLeafBrushes uint16
-	leafWaterDataID int16
-}
 type Leaf struct {
-	data []leaf_t
+	data []lumpdata.Leaf
 }
 
 func (lump Leaf) FromRaw(raw []byte, length int32) ILump {
@@ -306,6 +249,27 @@ func (lump Surfedge) GetData() interface{} {
 
 
 /**
+	Lump 14: Model
+ */
+type Model struct {
+	data []lumpdata.Model
+}
+
+func (lump Model) FromRaw(raw []byte, length int32) ILump {
+	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return lump
+}
+
+func (lump Model) GetData() interface{} {
+	return lump.data
+}
+
+
+/**
 	Lump 16: LeafFace
  */
 type LeafFace struct {
@@ -350,13 +314,8 @@ func (lump LeafBrush) GetData() interface{} {
 /**
 	Lump 18: Brush
  */
- type brush_t struct {
- 	firstSize int32
- 	numSides  int32
- 	contents int32
- }
 type Brush struct {
-	data []brush_t
+	data []lumpdata.Brush
 }
 
 func (lump Brush) FromRaw(raw []byte, length int32) ILump {
@@ -376,14 +335,8 @@ func (lump Brush) GetData() interface{} {
 /**
 	Lump 19: BrushSide
  */
-type brushSide_t struct {
-	planeNum uint16
-	texInfo int16
-	dispInfo int16
-	bevel int16
-}
 type BrushSide struct {
-	data []brushSide_t // MAX_MAP_BRUSHSIDES = 65536
+	data []lumpdata.BrushSide // MAX_MAP_BRUSHSIDES = 65536
 }
 
 func (lump BrushSide) FromRaw(raw []byte, length int32) ILump {
@@ -399,6 +352,50 @@ func (lump BrushSide) GetData() interface{} {
 	return lump.data
 }
 
+
+/**
+	Lump 40: Pakfile
+ */
+type Pakfile struct {
+	data []byte
+}
+
+func (lump Pakfile) FromRaw(raw []byte, length int32) ILump {
+	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return lump
+}
+
+func (lump Pakfile) GetData() interface{} {
+	return lump.data
+}
+
+/**
+	Lump 35: GameDataLump
+	@TODO Isn't fully implemented
+ */
+type GameData struct {
+	data []byte
+}
+
+func (lump GameData) FromRaw(raw []byte, length int32) ILump {
+	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return lump
+}
+
+func (lump GameData) GetData() interface{} {
+	return lump.data
+}
+
+
+
 /**
 	Lump 43: TexdataStringData
  */
@@ -408,6 +405,7 @@ type TexdataStringData struct {
 
 func (lump TexdataStringData) FromRaw(raw []byte, length int32) ILump {
 	lump.data = string(raw[:length])
+
 	return lump
 }
 
@@ -445,13 +443,13 @@ func (lump TexDataStringTable) GetData() interface{} {
 
 
 /**
-	Lump :
+	Lump n:
  */
-type Generic struct {
+type Lump struct {
 	data []byte
 }
 
-func (lump Generic) FromRaw(raw []byte, length int32) ILump {
+func (lump Lump) FromRaw(raw []byte, length int32) ILump {
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
@@ -460,10 +458,9 @@ func (lump Generic) FromRaw(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump Generic) GetData() interface{} {
+func (lump Lump) GetData() interface{} {
 	return lump.data
 }
-
 
 
 
@@ -491,23 +488,22 @@ var lumpMap = [64]ILump{
 	Planes{},
 	TexData{},
 	Vertex{},
-	Lump{},
+	Visibility{},
 	Node{},
 	TexInfo{},
 	Face{},
 	Lump{},
 	Lump{},
-	Leaf{}, //10
+	Leaf{},
 	Lump{},
 	Edge{},
 	Surfedge{},
-	Lump{},
+	Model{},
 	Lump{},
 	LeafFace{},
 	LeafBrush{},
 	Brush{},
 	BrushSide{},
-	Lump{}, //20
 	Lump{},
 	Lump{},
 	Lump{},
@@ -517,17 +513,18 @@ var lumpMap = [64]ILump{
 	Lump{},
 	Lump{},
 	Lump{},
-	Lump{}, //30
 	Lump{},
 	Lump{},
 	Lump{},
 	Lump{},
 	Lump{},
 	Lump{},
+	GameData{},
 	Lump{},
 	Lump{},
 	Lump{},
-	Lump{}, //40
+	Lump{},
+	Lump{},
 	Lump{},
 	Lump{},
 	TexdataStringData{},
