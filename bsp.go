@@ -8,6 +8,8 @@ import (
 	"log"
 	"encoding/binary"
 	"github.com/galaco/bsp/lumps"
+	"fmt"
+	//"reflect"
 )
 
 type Bsp struct {
@@ -35,6 +37,8 @@ type HeaderLump struct {
 func Parse(file *os.File) Bsp {
 	bsp := Bsp{}
 
+	file.Seek(0,0)
+
 	fi,err := file.Stat()
 	if err != nil {
 		log.Fatal(err)
@@ -45,14 +49,10 @@ func Parse(file *os.File) Bsp {
 	reader := bytes.NewReader(fileData)
 
 	//Create Header
-	header := Header{}
-	header = readHeader(reader, header)
-	bsp.Header = header
+	bsp.Header = readHeader(reader, bsp.Header)
 
 	//Create lumps from header data
-	lumpData := [64]lumps.ILump{}
-	lumpData = readLumps(reader, header, lumpData)
-	bsp.Lumps = lumpData
+	bsp.Lumps = readLumps(reader, bsp.Header, bsp.Lumps)
 
 	return bsp
 }
@@ -80,24 +80,71 @@ func readHeader(reader *bytes.Reader, header Header) Header {
  */
 func readLumps(reader *bytes.Reader, header Header, lumpData [64]lumps.ILump) [64]lumps.ILump {
 	for index,lumpHeader := range header.Lumps {
-
-		//Skip if 0 length b/c nothing to read
-		if lumpHeader.Length == 0 {
-			continue
-		}
 		//Limit lump data to declared size
 		raw := make([]byte, lumpHeader.Length)
-		sectionReader := io.NewSectionReader(reader, int64(lumpHeader.Offset), int64(lumpHeader.Length))
 
 
-		_, err := sectionReader.Read(raw)
-		if err != nil {
-			log.Fatal(err)
+		// Skip reading for empty lump
+		if lumpHeader.Length > 0 {
+			sectionReader := io.NewSectionReader(reader, int64(lumpHeader.Offset), int64(lumpHeader.Length))
+			_, err := sectionReader.Read(raw)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 
-		lumpData[index] = lumps.GetLumpForIndex(index).FromRaw(raw, lumpHeader.Length)
-
+		lumpData[index] = lumps.GetLumpForIndex(index).FromBytes(raw, lumpHeader.Length)
 	}
 
 	return lumpData
+}
+
+/**
+	Write Bsp struct to []byte for export.
+ */
+func ToBytes(bsp Bsp) []byte {
+	// First we need to update the header to reflect any lump changes
+	// At the same time we can dump our lumps as bytes to write later
+	lumpBytes := make([][]byte, 64)
+	currentOffset := 1036 // Header always 1036bytes
+
+	for index,lump := range bsp.Lumps {
+		// We have to handle lump 35 (GameData differently)
+		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
+		// NOTE: There is no valid reason for this, as the lump can be located anywhere.
+		if index == 35 {
+			// @TODO Not yet handled
+			gamelump := (bsp.Lumps[index]).(lumps.Game)
+			gamelump.UpdateInternalOffsets(int32(currentOffset) - bsp.Header.Lumps[index].Offset)
+			lumpBytes[index] = gamelump.ToBytes()
+		} else {
+			lumpBytes[index] = lump.ToBytes()
+		}
+
+		lumpSize := len(lumpBytes[index])
+
+		fmt.Println(index, bsp.Header.Lumps[index].Length, lumpSize)
+
+
+		// Note these may not change, but we trust our new data more than the header
+		bsp.Header.Lumps[index].Length = int32(lumpSize)
+		bsp.Header.Lumps[index].Offset = int32(currentOffset)
+
+		currentOffset += lumpSize
+	}
+
+
+	// Now we can export our bsp
+	var buf bytes.Buffer
+
+	//Write Header
+	binary.Write(&buf, binary.LittleEndian, bsp.Header)
+
+	//Write lumps
+	for _,lumpData := range lumpBytes {
+		binary.Write(&buf, binary.LittleEndian, lumpData)
+
+	}
+
+	return buf.Bytes()
 }
