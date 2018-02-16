@@ -9,7 +9,6 @@ import (
 	"encoding/binary"
 	"github.com/galaco/bsp/lumps"
 	"fmt"
-	//"reflect"
 )
 
 type Bsp struct {
@@ -93,7 +92,22 @@ func readLumps(reader *bytes.Reader, header Header, lumpData [64]lumps.ILump) [6
 			}
 		}
 
+		/*
+		// Why is this here?
+		// For reasons (unknown), exported data length differs from imported.
+		// HOWEVER, the below snippet proves that all lumps import to export bytes are the same
+		// thus ensuring validity of the process.
 		lumpData[index] = lumps.GetLumpForIndex(index).FromBytes(raw, lumpHeader.Length)
+		result := lumpData[index].ToBytes()
+		fmt.Println("index, expected, actual")
+		fmt.Println(index, len(raw), len(result))
+		for i := range raw {
+			if raw[i] != result[i] {
+				fmt.Println(i, raw[i], result[i])
+				//break
+			}
+		}
+		*/
 	}
 
 	return lumpData
@@ -111,11 +125,9 @@ func ToBytes(bsp Bsp) []byte {
 	for index,lump := range bsp.Lumps {
 		// We have to handle lump 35 (GameData differently)
 		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
-		// NOTE: There is no valid reason for this, as the lump can be located anywhere.
 		if index == 35 {
-			// @TODO Not yet handled
-			gamelump := (bsp.Lumps[index]).(lumps.Game)
-			gamelump.UpdateInternalOffsets(int32(currentOffset) - bsp.Header.Lumps[index].Offset)
+			gamelump := bsp.Lumps[index].(lumps.Game)
+			gamelump = gamelump.UpdateInternalOffsets(int32(currentOffset) - bsp.Header.Lumps[index].Offset)
 			lumpBytes[index] = gamelump.ToBytes()
 		} else {
 			lumpBytes[index] = lump.ToBytes()
@@ -123,10 +135,6 @@ func ToBytes(bsp Bsp) []byte {
 
 		lumpSize := len(lumpBytes[index])
 
-		fmt.Println(index, bsp.Header.Lumps[index].Length, lumpSize)
-
-
-		// Note these may not change, but we trust our new data more than the header
 		bsp.Header.Lumps[index].Length = int32(lumpSize)
 		bsp.Header.Lumps[index].Offset = int32(currentOffset)
 

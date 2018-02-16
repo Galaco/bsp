@@ -21,8 +21,9 @@ type Game struct {
 }
 
 func (lump Game) FromBytes(raw []byte, length int32) ILump {
+	lump.LumpInfo.SetLength(length)
+
 	if len(raw) == 0 {
-		lump.LumpInfo.SetLength(0)
 		return lump
 	}
 
@@ -32,7 +33,7 @@ func (lump Game) FromBytes(raw []byte, length int32) ILump {
 
 	// Read header
 	lump.Header.GameLumps = make([]lumpdata.GameLump, lumpCount)
-	headerSize := 4 + (int32(unsafe.Sizeof(lumpdata.GameHeader{}))*int32(lumpCount))
+	headerSize := 4 + (int32(unsafe.Sizeof(lumpdata.GameLump{}))*int32(lumpCount))
 	err := binary.Read(bytes.NewBuffer(raw[4:headerSize]), binary.LittleEndian, &lump.Header.GameLumps)
 	if err != nil {
 		log.Fatal(err)
@@ -42,14 +43,12 @@ func (lump Game) FromBytes(raw []byte, length int32) ILump {
 	// @TODO We dont care about the contents right now
 	// In future we should create a set of lumps based on file version
 	// For now implementation just copies all lumps to preserve the file, similar to Unimplemented lumps
-	payloadLength := len(raw)-int(headerSize)
+	payloadLength := length-headerSize
 	lump.GameLumps = make([]byte, payloadLength)
 
 	err = binary.Read(
-		bytes.NewBuffer(raw[headerSize:payloadLength]),
+		bytes.NewBuffer(raw[headerSize:length]),
 		binary.LittleEndian, &lump.GameLumps)
-
-	lump.LumpInfo.SetLength(length)
 
 	return lump
 }
@@ -60,18 +59,23 @@ func (lump Game) GetData() interface{} {
 
 func (lump Game) ToBytes() []byte {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.Header)
-	binary.Write(&buf, binary.LittleEndian, lump.GameLumps)
-	return buf.Bytes()
+	binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount)
+	for _,lumpHeader := range lump.Header.GameLumps {
+		binary.Write(&buf, binary.LittleEndian, lumpHeader)
+	}
+	payload := append(buf.Bytes(), lump.GameLumps...)
+	return payload
 }
 
-func (lump Game) UpdateInternalOffsets(offsetAdjustment int32) {
+func (lump Game) UpdateInternalOffsets(offsetAdjustment int32) Game {
 	if offsetAdjustment == 0 {
-		return
+		return lump
 	}
 
 	for index,header := range lump.Header.GameLumps {
 		header.FileOffset += offsetAdjustment
 		lump.Header.GameLumps[index] = header
 	}
+
+	return lump
 }
