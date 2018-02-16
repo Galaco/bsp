@@ -83,8 +83,8 @@ type Face struct {
 type Leaf struct {
 	Contents int32
 	Cluster int16
-	Area int8 // NOTE: Actually first 9 bits of a short, but not implemented
-	Flags int8 // NOTE: Actually second 7 bits of a short, but not implemented
+	Area int16 // NOTE: Actually first 9 bits of a short, but not implemented
+	Flags int16 // NOTE: Actually second 7 bits of a short, but not implemented
 	Mins [3]int16
 	Maxs [3]int16
 	FirstLeafFace uint16
