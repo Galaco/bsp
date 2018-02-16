@@ -7,27 +7,6 @@ import (
 	"bytes"
 )
 
-
-func restParse(t *testing.T) {
-	f := GetTestFile()
-
-	file := Parse(f)
-
-	if file.Header.Id != 1347633750 {
-		t.Errorf("File identity incorrect, got: %d, expexted %d", file.Header.Id, 1347633750)
-	}
-
-	if file.Header.Version != 20 {
-		t.Errorf("File version incorrect, got: %d, expexted %d", file.Header.Version, 20)
-	}
-
-	if file.Header.Revision != 12491 {
-		t.Errorf("File revision incorrect, got: %d, expexted %d", file.Header.Revision, 12491)
-	}
-
-	f.Close()
-}
-
 func TestToBytes(t *testing.T) {
 	f := GetTestFile()
 
@@ -58,7 +37,7 @@ func TestToBytes(t *testing.T) {
 
 
 func GetTestFile() *os.File {
-	f, err := os.Open("ze_bioshock_v6_2.bsp")
+	f, err := os.Open("aim_office_battle.bsp")
 	if err!= nil {
 		log.Fatal(err)
 	}

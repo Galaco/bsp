@@ -8,7 +8,6 @@ import (
 	"log"
 	"encoding/binary"
 	"github.com/galaco/bsp/lumps"
-	"fmt"
 )
 
 type Bsp struct {
@@ -70,6 +69,9 @@ func readHeader(reader *bytes.Reader, header Header) Header {
 	}
 
 	err = binary.Read(bytes.NewBuffer(headerBytes[:]), binary.LittleEndian, &header)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return header
 }
@@ -92,22 +94,18 @@ func readLumps(reader *bytes.Reader, header Header, lumpData [64]lumps.ILump) [6
 			}
 		}
 
-		/*
+		lumpData[index] = lumps.GetLumpForIndex(index).FromBytes(raw, lumpHeader.Length)
 		// Why is this here?
 		// For reasons (unknown), exported data length differs from imported.
 		// HOWEVER, the below snippet proves that all lumps import to export bytes are the same
 		// thus ensuring validity of the process.
-		lumpData[index] = lumps.GetLumpForIndex(index).FromBytes(raw, lumpHeader.Length)
-		result := lumpData[index].ToBytes()
-		fmt.Println("index, expected, actual")
+		/*result := lumpData[index].ToBytes()
 		fmt.Println(index, len(raw), len(result))
 		for i := range raw {
 			if raw[i] != result[i] {
 				fmt.Println(i, raw[i], result[i])
-				//break
 			}
-		}
-		*/
+		}*/
 	}
 
 	return lumpData
