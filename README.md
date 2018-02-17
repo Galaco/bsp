@@ -60,6 +60,9 @@ func main() {
 
 ```
 
+## Real World usage examples
+Replace game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
+
 
 # Contributing
 If you know the underlying structure of a Lump that is currently implemented, please raise an issue or feel free to
