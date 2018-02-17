@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"log"
 	"unsafe"
-	"github.com/galaco/bsp/lumps/lumpdata"
+	datatypes "github.com/galaco/bsp/lumps/datatypes/game"
 )
 
 
@@ -16,7 +16,7 @@ import (
  */
 type Game struct {
 	LumpInfo
-	Header lumpdata.GameHeader
+	Header datatypes.Header
 	GameLumps []byte
 }
 
@@ -32,8 +32,8 @@ func (lump Game) FromBytes(raw []byte, length int32) ILump {
 	lump.Header = lump.Header.SetLumpCount(int32(lumpCount))
 
 	// Read header
-	lump.Header.GameLumps = make([]lumpdata.GameLump, lumpCount)
-	headerSize := 4 + (int32(unsafe.Sizeof(lumpdata.GameLump{}))*int32(lumpCount))
+	lump.Header.GameLumps = make([]datatypes.LumpDef, lumpCount)
+	headerSize := 4 + (int32(unsafe.Sizeof(datatypes.LumpDef{}))*int32(lumpCount))
 	err := binary.Read(bytes.NewBuffer(raw[4:headerSize]), binary.LittleEndian, &lump.Header.GameLumps)
 	if err != nil {
 		log.Fatal(err)

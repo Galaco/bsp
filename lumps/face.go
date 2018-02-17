@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	"github.com/galaco/bsp/lumps/lumpdata"
+	datatypes "github.com/galaco/bsp/lumps/datatypes/face"
 	"encoding/binary"
 	"bytes"
 	"log"
@@ -14,11 +14,11 @@ import (
 
 type Face struct {
 	LumpInfo
-	data []lumpdata.Face
+	data []datatypes.Face
 }
 
 func (lump Face) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]lumpdata.Face, length/int32(unsafe.Sizeof(lumpdata.Face{})))
+	lump.data = make([]datatypes.Face, length/int32(unsafe.Sizeof(datatypes.Face{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
