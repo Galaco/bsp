@@ -1,5 +1,6 @@
 package game
 
+import "github.com/galaco/bsp/lumps/datatypes/common"
 
 type Header struct {
 	LumpCount int32
@@ -29,8 +30,8 @@ type StaticPropLeafLump struct {
 	Leaf []uint16 // Slice length must equal leafEntries. Validation to be added
 }
 type StaticPropLump struct {
-	Origin [3]float32
-	Angles [3]float32
+	Origin common.Vector
+	Angles common.Vector
 	PropType uint16
 	FirstLeaf uint16
 	LeafCount uint16
@@ -39,7 +40,7 @@ type StaticPropLump struct {
 	Skin int32
 	FadeMinDist float32
 	FadeMaxDist float32
-	LightingOrigin [3]float32
+	LightingOrigin common.Vector
 	ForcedFadeScale float32
 	MinDXLevel uint16
 	MaxDXLevel uint16
