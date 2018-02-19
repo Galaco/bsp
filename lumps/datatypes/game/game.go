@@ -1,17 +1,18 @@
-package lumpdata
+package game
 
+import "github.com/galaco/bsp/lumps/datatypes/common"
 
-type GameHeader struct {
+type Header struct {
 	LumpCount int32
-	GameLumps []GameLump // Slice length must equal lumpCount. Validation to be added
+	GameLumps []LumpDef // Slice length must equal lumpCount. Validation to be added
 }
-func (header GameHeader) SetLumpCount(num int32) GameHeader{
+func (header Header) SetLumpCount(num int32) Header{
 	header.LumpCount = num
-	header.GameLumps = make([]GameLump, header.LumpCount)
+	header.GameLumps = make([]LumpDef, header.LumpCount)
 	return header
 }
 
-type GameLump struct {
+type LumpDef struct {
 	Id int32
 	Flags uint16
 	Version uint16
@@ -19,7 +20,7 @@ type GameLump struct {
 	FileLength int32
 }
 
-
+// Note: Nothing below here is actually implemented, as its primarily game/version specific data.
 type StaticPropDictLump struct {
 	DictEntries int32
 	Name []string // Slice length must equal dictEntries. Validation to be added
@@ -29,8 +30,8 @@ type StaticPropLeafLump struct {
 	Leaf []uint16 // Slice length must equal leafEntries. Validation to be added
 }
 type StaticPropLump struct {
-	Origin [3]float32
-	Angles [3]float32
+	Origin common.Vector
+	Angles common.Vector
 	PropType uint16
 	FirstLeaf uint16
 	LeafCount uint16
@@ -39,7 +40,7 @@ type StaticPropLump struct {
 	Skin int32
 	FadeMinDist float32
 	FadeMaxDist float32
-	LightingOrigin [3]float32
+	LightingOrigin common.Vector
 	ForcedFadeScale float32
 	MinDXLevel uint16
 	MaxDXLevel uint16

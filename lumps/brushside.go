@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	"github.com/galaco/bsp/lumps/lumpdata"
+	datatypes "github.com/galaco/bsp/lumps/datatypes/brushside"
 	"encoding/binary"
 	"bytes"
 	"log"
@@ -13,11 +13,11 @@ import (
  */
 type BrushSide struct {
 	LumpInfo
-	data []lumpdata.BrushSide // MAX_MAP_BRUSHSIDES = 65536
+	data []datatypes.BrushSide // MAX_MAP_BRUSHSIDES = 65536
 }
 
 func (lump BrushSide) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]lumpdata.BrushSide, length/int32(unsafe.Sizeof(lumpdata.BrushSide{})))
+	lump.data = make([]datatypes.BrushSide, length/int32(unsafe.Sizeof(datatypes.BrushSide{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
