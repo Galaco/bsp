@@ -2,7 +2,9 @@
 Go library for manipulating Source Engine .bsp map files.
 
 Note:
-Read and write support is available, but only BSP version 20 is currently supported.
+Read and write support is available, but only BSP version 20 is currently supported. Many lumps are not fully mapped, although support is increasing all the time. 
+
+
 The following lumps currently have a full implementation:
 
 ```
@@ -21,13 +23,28 @@ The following lumps currently have a full implementation:
 16: Leaffaces
 18: Brushes
 19: Brushsides
-35: Game (partially implemented)
+20: Areas
+21: AreaPortals
+36: LeafWaterData
 40: Pakfile
+42: Cubemaps
 43: texdatastringdata
 44: texdatastringtable
+45: Overlays
+46: OverlayFades
 ```
 
-Lump 35 (Game) is not currently fully supported, however the Lump offset can be safely changed
+The following lumps have some progress made towards them:
+
+```
+9: Occlusion
+15: WorldLights
+35: Game
+50: WaterOverlays
+51: LightMapPages | Leaf Ambient Index HDR
+52: LightMapPageInfos | Lead Ambient Index
+``` 
+
 All Lumps not listed above can be read and modified, but Lump data is treated as a `[]byte`.
 
 # Usage
@@ -65,6 +82,4 @@ Replace game_text newline placeholder characters (avoids Hammer crash) as a comp
 
 
 # Contributing
-If you know the underlying structure of a Lump that is currently implemented, please raise an issue or feel free to
-implement it yourself. Adding a new Lump is as trivial as defining the struct, and referencing it at its index in
-`lumps/lumps.go`.
+If you want to contribute, feel free to fork and raise a Pull Request for new additions.
