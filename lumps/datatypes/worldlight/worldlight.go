@@ -19,7 +19,7 @@ type WorldLight struct {
 	Intensity common.Vector
 	Normal common.Vector
 	Cluster int32
-	EmitType int8
+	Type int8
 	Style int32
 	Stopdot float32
 	Stopdot2 float32

@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"bytes"
 	"log"
+	"fmt"
 )
 /**
 	Lump 15: Worldlight
@@ -20,6 +21,8 @@ func (lump WorldLight) FromBytes(raw []byte, length int32) ILump {
 		return lump
 	}
 	lump.data = make([]datatypes.WorldLight, length/int32(unsafe.Sizeof(datatypes.WorldLight{})))
+	fmt.Println(len(lump.data))
+	fmt.Println(length)
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

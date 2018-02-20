@@ -14,8 +14,9 @@ The following lumps currently have a full implementation:
 3: Vertexes
 4: Visibility
 5: Nodes
-6: texinfo
+6: Texinfo
 7: Faces
+8: Lighting
 10: Leafs
 12: Edges
 13: Surfedges
@@ -28,8 +29,8 @@ The following lumps currently have a full implementation:
 36: LeafWaterData
 40: Pakfile
 42: Cubemaps
-43: texdatastringdata
-44: texdatastringtable
+43: Texdatastringdata
+44: Texdatastringtable
 45: Overlays
 46: OverlayFades
 ```

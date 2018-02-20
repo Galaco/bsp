@@ -1,5 +1,7 @@
 package leafambientlighting
 
+import "github.com/galaco/bsp/lumps/datatypes/common"
+
 type LeafAmbientLighting struct {
 	Cube CompressedLightCube
 	X byte
@@ -9,12 +11,5 @@ type LeafAmbientLighting struct {
 }
 
 type CompressedLightCube struct {
-	Color [6]ColorRGBExponent32
-}
-
-type ColorRGBExponent32 struct {
-	R byte
-	G byte
-	B byte
-	Exponent byte
+	Color [6]common.ColorRGBExponent32
 }

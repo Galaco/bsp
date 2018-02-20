@@ -8,11 +8,12 @@ import (
 	"log"
 	"encoding/binary"
 	"github.com/galaco/bsp/lumps"
+	"github.com/galaco/bsp/versions"
 )
 
 type Bsp struct {
-	Header Header
-	Lumps [64]lumps.ILump
+	header Header
+	lumps [64]lumps.ILump
 }
 
 type Header struct {
@@ -27,6 +28,15 @@ type HeaderLump struct {
 	Length int32
 	Version int32
 	Id [4]byte
+}
+
+func (bsp Bsp) GetLump(index int) lumps.ILump {
+	return bsp.lumps[index]
+}
+
+func (bsp Bsp) SetLump(index int, lump lumps.ILump) Bsp {
+	bsp.lumps[index] = lump
+	return bsp
 }
 
 /**
@@ -47,10 +57,10 @@ func Parse(file *os.File) Bsp {
 	reader := bytes.NewReader(fileData)
 
 	//Create Header
-	bsp.Header = readHeader(reader, bsp.Header)
+	bsp.header = readHeader(reader, bsp.header)
 
 	//Create lumps from header data
-	bsp.Lumps = readLumps(reader, bsp.Header, bsp.Lumps)
+	bsp.lumps = readLumps(reader, bsp.header, bsp.lumps)
 
 	return bsp
 }
@@ -94,7 +104,7 @@ func readLumps(reader *bytes.Reader, header Header, lumpData [64]lumps.ILump) [6
 			}
 		}
 
-		lumpData[index] = lumps.GetLumpForIndex(index).FromBytes(raw, lumpHeader.Length)
+		lumpData[index] = GetLumpForIndex(index, header.Version).FromBytes(raw, lumpHeader.Length)
 		// Why is this here?
 		// For reasons (unknown), exported data length differs from imported.
 		// HOWEVER, the below snippet proves that all lumps import to export bytes are the same
@@ -120,12 +130,12 @@ func ToBytes(bsp Bsp) []byte {
 	lumpBytes := make([][]byte, 64)
 	currentOffset := 1036 // Header always 1036bytes
 
-	for index,lump := range bsp.Lumps {
+	for index,lump := range bsp.lumps {
 		// We have to handle lump 35 (GameData differently)
 		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
 		if index == 35 {
-			gamelump := bsp.Lumps[index].(lumps.Game)
-			gamelump = gamelump.UpdateInternalOffsets(int32(currentOffset) - bsp.Header.Lumps[index].Offset)
+			gamelump := bsp.lumps[index].(lumps.Game)
+			gamelump = gamelump.UpdateInternalOffsets(int32(currentOffset) - bsp.header.Lumps[index].Offset)
 			lumpBytes[index] = gamelump.ToBytes()
 		} else {
 			lumpBytes[index] = lump.ToBytes()
@@ -133,8 +143,8 @@ func ToBytes(bsp Bsp) []byte {
 
 		lumpSize := len(lumpBytes[index])
 
-		bsp.Header.Lumps[index].Length = int32(lumpSize)
-		bsp.Header.Lumps[index].Offset = int32(currentOffset)
+		bsp.header.Lumps[index].Length = int32(lumpSize)
+		bsp.header.Lumps[index].Offset = int32(currentOffset)
 
 		currentOffset += lumpSize
 	}
@@ -144,7 +154,7 @@ func ToBytes(bsp Bsp) []byte {
 	var buf bytes.Buffer
 
 	//Write Header
-	binary.Write(&buf, binary.LittleEndian, bsp.Header)
+	binary.Write(&buf, binary.LittleEndian, bsp.header)
 
 	//Write lumps
 	for _,lumpData := range lumpBytes {
@@ -154,3 +164,21 @@ func ToBytes(bsp Bsp) []byte {
 
 	return buf.Bytes()
 }
+
+/**
+	Return an instance of a Lump for a given offset.
+ */
+func GetLumpForIndex(index int, version int32) lumps.ILump {
+	if index < 0 || index > 63 {
+		log.Fatal("Invalid lump index provided.")
+	}
+
+	switch version {
+	case 20:
+		return versions.GetVersion20Mapping()[index]
+	default:
+		log.Fatal("Bsp version not currently supported")
+	}
+	return nil
+}
+
