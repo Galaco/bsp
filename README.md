@@ -12,7 +12,6 @@ The following lumps currently have a full implementation:
 1: Planes
 2: Texdata
 3: Vertexes
-4: Visibility
 5: Nodes
 6: Texinfo
 7: Faces
@@ -38,6 +37,7 @@ The following lumps currently have a full implementation:
 The following lumps have some progress made towards them:
 
 ```
+4: Visibility
 9: Occlusion
 15: WorldLights
 35: Game

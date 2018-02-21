@@ -106,7 +106,7 @@ func readLumps(reader *bytes.Reader, header Header, lumpData [64]lumps.ILump) [6
 
 		lumpData[index] = GetLumpForIndex(index, header.Version).FromBytes(raw, lumpHeader.Length)
 		// Why is this here?
-		// For reasons (unknown), exported data length differs from imported.
+		// For reasons (4byte alignment?!), exported data length differs from imported.
 		// HOWEVER, the below snippet proves that all lumps import to export bytes are the same
 		// thus ensuring validity of the process.
 		/*result := lumpData[index].ToBytes()
@@ -147,6 +147,10 @@ func ToBytes(bsp Bsp) []byte {
 		bsp.header.Lumps[index].Offset = int32(currentOffset)
 
 		currentOffset += lumpSize
+
+		// Finally 4byte align each lump.
+		lumpBytes[index] = append(lumpBytes[index], make([]byte, currentOffset % 4)...)
+		currentOffset += currentOffset % 4
 	}
 
 
