@@ -1,9 +1,12 @@
-# bsp
+# Bsp
 Go library for manipulating Source Engine .bsp map files.
 
-Note:
-Read and write support is available, but only BSP version 20 is currently supported. Many lumps are not fully mapped, although support is increasing all the time. 
+### Features:
+* Read support for (probably) all documented bsp formats
+* Write support for (probably) all documented bsp formats.
+* Freely modify and resize any Lump data.
 
+##### Not all lumps are current supported, but can be freely read and modified, as they are treated as `[]byte`
 
 The following lumps currently have a full implementation:
 
@@ -34,19 +37,7 @@ The following lumps currently have a full implementation:
 46: OverlayFades
 ```
 
-The following lumps have some progress made towards them:
-
-```
-4: Visibility
-9: Occlusion
-15: WorldLights
-35: Game
-50: WaterOverlays
-51: LightMapPages | Leaf Ambient Index HDR
-52: LightMapPageInfos | Lead Ambient Index
-``` 
-
-All Lumps not listed above can be read and modified, but Lump data is treated as a `[]byte`.
+##### This library may reorganise lump order during the first export. This is intentional to handle lump resizing, but will change your checksum if you export without changes.
 
 # Usage
 
@@ -72,13 +63,13 @@ func main() {
 
 	file := bsp.Parse(f)
 
-	fmt.Println(file.Lumps[0].GetData().(string))
-	fmt.Println(file.Lumps[43].GetData().(string))
+	fmt.Println(file.GetLump(0).GetData().(string))
+	fmt.Println(file.GetLump(43).GetData().(string))
 }
 
 ```
 
-## Real World usage examples
+## Real World examples
 Replace game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
 
 

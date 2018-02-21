@@ -23,21 +23,31 @@ func TestToBytes(t *testing.T) {
 	outFileBytes := ToBytes(file)
 
 	if len(inFileBytes) != len(outFileBytes) {
-		t.Errorf("Export length mismatch. Got: %dbytes, expected %dbytes", len(outFileBytes), len(inFileBytes))
+		t.Errorf("Export length mismatch. Got: %dbytes, expected: %dbytes", len(outFileBytes), len(inFileBytes))
 	}
+}
 
-	// This is NOT useful! Even a straight import | export will attempt to reorganise the lumps.
-	//  Maybe it shouldn't do this, but is for now not a problem.
-	/*if !bytes.Equal(inFileBytes, outFileBytes) {
-		t.Errorf("Export data does not match import data")
-	}*/
+func TestLumpIntegrity(t *testing.T) {
+	f := GetTestFile()
+	file := Parse(f)
+	f.Close()
+
+	lumpIndex := 0
+	for lumpIndex < 64 {
+		lump := file.GetLump(lumpIndex)
+		lumpBytes := lump.ToBytes()
+		if len(lumpBytes) != int(file.header.Lumps[lumpIndex].Length) {
+			t.Errorf("Lump %d length mismatch. Got: %dbytes, expected: %dbytes", len(lumpBytes), file.header.Lumps[lumpIndex].Length)
+		}
+		lumpIndex += 1
+	}
 }
 
 
 
 
 func GetTestFile() *os.File {
-	f, err := os.Open("aim_office_battle.bsp")
+	f, err := os.Open("ze_bioshock_v6_2.bsp")
 	if err!= nil {
 		log.Fatal(err)
 	}

@@ -29,7 +29,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.BrushSide{},
 		lumps.Area{},
 		lumps.AreaPortal{},
-		lumps.Unimplemented{}, //portals | unused0 Z propcollision
+		lumps.Unimplemented{}, //portals | unused0 | propcollision
 		lumps.Unimplemented{}, //clusters | unused1 | prophulls
 		lumps.Unimplemented{}, //portalverts | unused2 | prophullverts
 		lumps.Unimplemented{}, //clusterportals | unused3 | proptris
@@ -43,13 +43,13 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //disp verts
 		lumps.Unimplemented{}, //disp lightmap sample positions
 		lumps.Game{},
-		lumps.LeafWaterData{},
+		lumps.Unimplemented{}, //LeafWaterData FIXME
 		lumps.Unimplemented{}, //primitives
 		lumps.Unimplemented{}, //primverts
 		lumps.Unimplemented{}, //primindices
 		lumps.Unimplemented{}, //pakfile
 		lumps.Unimplemented{}, //clipportalverts
-		lumps.Cubemap{},
+		lumps.Unimplemented{}, //cubemap FIXME
 		lumps.TexdataStringData{},
 		lumps.TexDataStringTable{},
 		lumps.Overlay{},       //overlays
@@ -59,7 +59,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //physcollidesurface | prop blob
 		lumps.Unimplemented{}, //wateroverlays
 		lumps.Unimplemented{}, //lightmappages | leaf ambient index hdr
-		lumps.Unimplemented{}, //lightmappageinfos | leaf ambient index
+		lumps.LeafAmbientIndex{}, //lightmappageinfos | leaf ambient index
 		lumps.Unimplemented{}, //lighting hdr
 		lumps.WorldLightHDR{}, //worldlights hdr
 		lumps.Unimplemented{}, //leaf ambient lighting hdr

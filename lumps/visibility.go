@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"bytes"
 	"log"
+	datatypes "github.com/galaco/bsp/lumps/datatypes/visibility"
 )
 
 /**
@@ -11,15 +12,26 @@ import (
  */
 type Visibility struct {
 	LumpInfo
-	data []byte
+	data datatypes.Vis
 }
 
 func (lump Visibility) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]byte, length)
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data.NumClusters)
 	if err != nil {
 		log.Fatal(err)
 	}
+	lump.data.ByteOffset = make([][2]int32, lump.data.NumClusters)
+	err = binary.Read(bytes.NewBuffer(raw[4:]), binary.LittleEndian, &lump.data.ByteOffset)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bitVectorLength := (length - 4) - (8 * lump.data.NumClusters)
+	lump.data.BitVectors = make([]byte, bitVectorLength)
+	err = binary.Read(bytes.NewBuffer(raw[length-bitVectorLength:]), binary.LittleEndian, &lump.data.BitVectors)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	lump.LumpInfo.SetLength(length)
 
 	return lump
@@ -31,6 +43,10 @@ func (lump Visibility) GetData() interface{} {
 
 func (lump Visibility) ToBytes() []byte {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
+	binary.Write(&buf, binary.LittleEndian, lump.data.NumClusters)
+	for _, offset := range lump.data.ByteOffset {
+		binary.Write(&buf, binary.LittleEndian, offset)
+	}
+	binary.Write(&buf, binary.LittleEndian, lump.data.BitVectors)
 	return buf.Bytes()
 }
