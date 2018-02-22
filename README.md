@@ -8,7 +8,7 @@ Go library for manipulating Source Engine .bsp map files.
 
 ##### Not all lumps are current supported, but can be freely read and modified, as they are treated as `[]byte`
 
-The following lumps currently have a full implementation:
+The following lumps currently have a full implementation for v20 bsp's:
 
 ```
 0: Entdata
@@ -19,6 +19,7 @@ The following lumps currently have a full implementation:
 6: Texinfo
 7: Faces
 8: Lighting
+9: Occlusion
 10: Leafs
 12: Edges
 13: Surfedges
@@ -28,7 +29,6 @@ The following lumps currently have a full implementation:
 19: Brushsides
 20: Areas
 21: AreaPortals
-36: LeafWaterData
 40: Pakfile
 42: Cubemaps
 43: Texdatastringdata

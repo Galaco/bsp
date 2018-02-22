@@ -9,6 +9,7 @@ import (
 	"encoding/binary"
 	"github.com/galaco/bsp/lumps"
 	"github.com/galaco/bsp/versions"
+	"fmt"
 )
 
 type Bsp struct {

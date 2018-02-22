@@ -16,7 +16,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.TexInfo{},
 		lumps.Face{},
 		lumps.Lighting{},
-		lumps.Unimplemented{}, //occlusion
+		lumps.Occlusion{}, //occlusion
 		lumps.Leaf{},
 		lumps.Unimplemented{}, //faceids
 		lumps.Edge{},
