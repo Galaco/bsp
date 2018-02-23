@@ -8,7 +8,7 @@ import (
 	"log"
 )
 /**
-	Lump n:
+	Lump 52: Leaf Ambient Index
  */
 type LeafAmbientIndex struct {
 	LumpInfo

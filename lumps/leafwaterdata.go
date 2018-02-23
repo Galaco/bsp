@@ -2,10 +2,10 @@ package lumps
 
 import (
 	datatypes "github.com/galaco/bsp/lumps/datatypes/leafwaterdata"
-	"unsafe"
 	"encoding/binary"
 	"bytes"
 	"log"
+	"unsafe"
 )
 /**
 	Lump 36: leafwaterdata

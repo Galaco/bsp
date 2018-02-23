@@ -56,17 +56,23 @@ import (
 
 
 func main() {
-	f,err := os.Open("de_dust2.bsp")
-	if err!= nil {
-		log.Fatal(err)
-	}
+	f,_ := os.Open("de_dust2.bsp")
+	fi,_ := f.Stat()
+	
+	fileData := make([]byte, fi.Size())
+	f.Read(fileData)
+	f.Close()
 
-	file := bsp.Parse(f)
+	// Create a new bsp reader
+	reader := bsp.NewReader()
+	reader.SetBuffer(fileData)
+	
+	// Read buffer
+	file := reader.Read()
 
 	fmt.Println(file.GetLump(0).GetData().(string))
 	fmt.Println(file.GetLump(43).GetData().(string))
 }
-
 ```
 
 ## Real World examples
