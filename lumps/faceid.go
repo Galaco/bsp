@@ -1,26 +1,26 @@
 package lumps
 
+
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/worldlight"
+	datatypes "github.com/galaco/bsp/lumps/datatypes/faceid"
 	"unsafe"
 	"encoding/binary"
 	"bytes"
 	"log"
 )
-
 /**
-	Lump 15: Worldlight
+	Lump 11: FaceIds
  */
-type WorldLight struct {
+type FaceId struct {
 	LumpInfo
-	data []datatypes.WorldLight
+	data []datatypes.FaceId
 }
 
-func (lump WorldLight) FromBytes(raw []byte, length int32) ILump {
+func (lump FaceId) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
-	lump.data = make([]datatypes.WorldLight, length/int32(unsafe.Sizeof(datatypes.WorldLight{})))
+	lump.data = make([]datatypes.FaceId, length/int32(unsafe.Sizeof(datatypes.FaceId{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
@@ -30,11 +30,11 @@ func (lump WorldLight) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump WorldLight) GetData() interface{} {
+func (lump FaceId) GetData() interface{} {
 	return lump.data
 }
 
-func (lump WorldLight) ToBytes() []byte {
+func (lump FaceId) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

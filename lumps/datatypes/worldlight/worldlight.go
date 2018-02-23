@@ -19,7 +19,7 @@ type WorldLight struct {
 	Intensity common.Vector
 	Normal common.Vector
 	Cluster int32
-	Type int8
+	Type int32 //Apparently this isn't an int8 in C compiler...
 	Style int32
 	Stopdot float32
 	Stopdot2 float32
