@@ -10,31 +10,23 @@ import (
 	"fmt"
 )
 
-/**
-	Bsp File reader.
- */
+// Bsp File reader.
 type Reader struct {
 	data []byte
 }
 
-/**
-	Get buffer to read from.
- */
+// Get buffer to read from.
 func (r *Reader) GetBuffer() []byte {
 	return r.data
 }
 
-/**
-	Set buffer to read from.
- */
+// Set buffer to read from.
 func (r *Reader) SetBuffer(data []byte) {
 	fmt.Println()
 	r.data = data
 }
 
-/**
-	Parse the set buffer.
- */
+// Parse the set buffer.
 func (r *Reader) Read() Bsp {
 	bsp := Bsp{}
 
@@ -52,9 +44,7 @@ func (r *Reader) Read() Bsp {
 }
 
 
-/**
-	Parse header from the bsp file.
- */
+// Parse header from the bsp file.
 func (r Reader) readHeader(reader *bytes.Reader, header Header) Header {
 	headerSize := unsafe.Sizeof(header)
 	headerBytes := make([]byte, headerSize)
@@ -73,9 +63,7 @@ func (r Reader) readHeader(reader *bytes.Reader, header Header) Header {
 	return header
 }
 
-/**
-	Parse a single lump.
- */
+// Parse a single lump.
 func (r Reader) readLump(reader *bytes.Reader, header Header, index int) lumps.ILump{
 	//Limit lump data to declared size
 	lumpHeader := header.Lumps[index]
@@ -93,10 +81,6 @@ func (r Reader) readLump(reader *bytes.Reader, header Header, index int) lumps.I
 	lump := getLumpForIndex(index, header.Version).FromBytes(raw, lumpHeader.Length)
 
 	return lump
-	// Why is this here?
-	// For reasons (4byte alignment?!), exported data length differs from imported.
-	// HOWEVER, the below snippet proves that all lumps import to export bytes are the same
-	// thus ensuring validity of the process.
 	/*result := lumpData[index].ToBytes()
 	fmt.Println(index, len(raw), len(result))
 	for i := range raw {
@@ -106,9 +90,7 @@ func (r Reader) readLump(reader *bytes.Reader, header Header, index int) lumps.I
 	}*/
 }
 
-/**
-	Return a new instance of Reader.
- */
+// Return a new instance of Reader.
 func NewReader() Reader {
 	return Reader{}
 }

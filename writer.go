@@ -7,30 +7,22 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-/**
-	Bsp export writer.
- */
+// Bsp export writer.
 type Writer struct {
 	data Bsp
 }
 
-/**
-	Get bsp file to write.
- */
+// Get bsp file to write.
 func (w *Writer) GetBsp() Bsp {
 	return w.data
 }
 
-/**
-	Set bsp file to write.
- */
+// Set bsp file to write.
 func (w *Writer) SetBsp(file Bsp) {
 	w.data = file
 }
 
-/**
-	Write bsp to []byte.
- */
+// Write bsp to []byte.
 func (w *Writer) Write() []byte {
 	// First we need to update the header to reflect any lump changes
 	// At the same time we can dump our lumps as bytes to write later

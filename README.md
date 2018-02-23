@@ -70,8 +70,8 @@ func main() {
 	// Read buffer
 	file := reader.Read()
 
-	fmt.Println(file.GetLump(0).GetData().(string))
-	fmt.Println(file.GetLump(43).GetData().(string))
+	fmt.Println(file.GetLump(0).GetContents().GetData().(string))
+	fmt.Println(file.GetLump(43).GetContents().GetData().(string))
 }
 ```
 

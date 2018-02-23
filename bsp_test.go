@@ -6,9 +6,7 @@ import (
 	"log"
 )
 
-/**
-	Test that resultant lump data matches expected.
- */
+//Test that resultant lump data matches expected.
 func TestLumpExports(t *testing.T) {
 	f := GetTestFile()
 	length := GetBufferForTestFile(f)
