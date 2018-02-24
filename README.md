@@ -45,7 +45,7 @@ The following lumps currently have a full implementation for v20 bsp's:
 
 # Usage
 
-Minimal example of obtaining entdata and texdata from a BSP. The following will print both the entdata and texdata
+Minimal example of obtaining entdata from a BSP. The following will print the entdata
 blocks of a specified .bsp to terminal.
 
 ```go
@@ -73,9 +73,9 @@ func main() {
 	
 	// Read buffer
 	file := reader.Read()
-
-	fmt.Println(file.GetLump(0).GetContents().GetData().(string))
-	fmt.Println(file.GetLump(43).GetContents().GetData().(string))
+    
+	lump := file.GetLump(0)
+	fmt.Println(lump.GetContents().GetData().(string))
 }
 ```
 

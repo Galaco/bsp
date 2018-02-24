@@ -30,8 +30,8 @@ func (bsp *Bsp) GetHeader() Header {
 }
 
 // Get the lump for a given index.
-func (bsp *Bsp) GetLump(index int) Lump {
-	return bsp.lumps[index]
+func (bsp *Bsp) GetLump(index int) *Lump {
+	return &bsp.lumps[index]
 }
 
 // Set the lump data for a given index.
