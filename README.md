@@ -32,6 +32,7 @@ The following lumps currently have a full implementation for v20 bsp's:
 19: Brushsides
 20: Areas
 21: AreaPortals
+36: LeafWaterData
 40: Pakfile
 42: Cubemaps
 43: Texdatastringdata

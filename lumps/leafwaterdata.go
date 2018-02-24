@@ -7,6 +7,7 @@ import (
 	"log"
 	"unsafe"
 )
+
 /**
 	Lump 36: leafwaterdata
  */
@@ -24,6 +25,7 @@ func (lump LeafWaterData) FromBytes(raw []byte, length int32) ILump {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	lump.LumpInfo.SetLength(length)
 
 	return lump

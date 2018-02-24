@@ -22,7 +22,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Edge{},
 		lumps.Surfedge{},
 		lumps.Model{},
-		lumps.WorldLight{}, //worldlights
+		lumps.WorldLight{},
 		lumps.LeafFace{},
 		lumps.LeafBrush{},
 		lumps.Brush{},
@@ -43,7 +43,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //disp verts
 		lumps.Unimplemented{}, //disp lightmap sample positions
 		lumps.Game{},
-		lumps.Unimplemented{}, //LeafWaterData FIXME
+		lumps.LeafWaterData{}, //LeafWaterData FIXME
 		lumps.Unimplemented{}, //primitives
 		lumps.Unimplemented{}, //primverts
 		lumps.Unimplemented{}, //primindices
@@ -52,9 +52,9 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //cubemap FIXME
 		lumps.TexdataStringData{},
 		lumps.TexDataStringTable{},
-		lumps.Overlay{},       //overlays
+		lumps.Overlay{},
 		lumps.Unimplemented{}, //leafmindisttowater
-		lumps.Unimplemented{}, //face marco texture info
+		lumps.Unimplemented{}, //face macro texture info
 		lumps.Unimplemented{}, //disp tris
 		lumps.Unimplemented{}, //physcollidesurface | prop blob
 		lumps.Unimplemented{}, //wateroverlays
@@ -67,7 +67,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //xzippakfile
 		lumps.Unimplemented{}, //faces hdr
 		lumps.Unimplemented{}, //map flags
-		lumps.OverlayFade{},   //overlay fades
+		lumps.OverlayFade{},
 		lumps.Unimplemented{}, //overlay system levels
 		lumps.Unimplemented{}, //physlevel
 		lumps.Unimplemented{}, //disp multiblend

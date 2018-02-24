@@ -19,6 +19,7 @@ func (lump Area) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
+
 	lump.data = make([]datatypes.Area, length/int32(unsafe.Sizeof(datatypes.Area{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
