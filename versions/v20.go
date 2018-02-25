@@ -49,7 +49,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //primindices
 		lumps.Unimplemented{}, //pakfile
 		lumps.Unimplemented{}, //clipportalverts
-		lumps.Unimplemented{}, //cubemap FIXME
+		lumps.Cubemap{},
 		lumps.TexdataStringData{},
 		lumps.TexDataStringTable{},
 		lumps.Overlay{},
