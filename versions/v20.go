@@ -4,7 +4,7 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-
+// Get mapping of lump types for v20 bsps
 func GetVersion20Mapping() [64]lumps.ILump {
 	return [64]lumps.ILump{
 		lumps.EntData{},
@@ -40,7 +40,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //vertnormals
 		lumps.Unimplemented{}, //vertnormalindices
 		lumps.Unimplemented{}, //disp lightmap alphas
-		lumps.Unimplemented{}, //disp verts
+		lumps.DispVert{},
 		lumps.Unimplemented{}, //disp lightmap sample positions
 		lumps.Game{},
 		lumps.LeafWaterData{}, //LeafWaterData FIXME
@@ -55,7 +55,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Overlay{},
 		lumps.Unimplemented{}, //leafmindisttowater
 		lumps.Unimplemented{}, //face macro texture info
-		lumps.Unimplemented{}, //disp tris
+		lumps.DispTris{},
 		lumps.Unimplemented{}, //physcollidesurface | prop blob
 		lumps.Unimplemented{}, //wateroverlays
 		lumps.LeafAmbientIndexHDR{},
