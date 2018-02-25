@@ -7,7 +7,7 @@ import (
 	"bytes"
 )
 
-//Test that resultant lump data matches expected.
+// Test that resultant lump data matches expected.
 func TestLumpExports(t *testing.T) {
 	f := GetTestFile()
 	length := GetBufferForTestFile(f)
@@ -30,29 +30,16 @@ func TestLumpExports(t *testing.T) {
 		if len(lumpBytes) != int(file.GetHeader().Lumps[lumpIndex].Length) {
 			t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(lumpBytes), file.header.Lumps[lumpIndex].Length)
 		}
-		 // We cant assert this with the current implementation.
+
+		//fmt.Println(lumpIndex, len(lump.GetRawContents()), len(lumpBytes))
 		if !bytes.Equal(lumpBytes, lump.GetRawContents()) {
 			t.Errorf("Lump: %d data mismatch", lumpIndex)
 		}
 		lumpIndex += 1
 	}
-
-	// Why is this here?
-	// For reasons (4byte alignment?!), exported data length differs from imported.
-	// HOWEVER, the below snippet proves that all lumps import to export bytes are the same
-	// thus ensuring validity of the process.
-	/*result := lumpData[index].ToBytes()
-	fmt.Println(index, len(raw), len(result))
-	for i := range raw {
-		if raw[i] != result[i] {
-			fmt.Println(i, raw[i], result[i])
-		}
-	}*/
 }
 
-/**
-	Obtain a test file to run against.
- */
+// Obtain a test file to run against.
 func GetTestFile() *os.File {
 	f, err := os.Open("maps/de_dust2.bsp")
 	if err!= nil {
@@ -62,9 +49,7 @@ func GetTestFile() *os.File {
 	return f
 }
 
-/**
-	Get a buffer to match the test file.
- */
+// Get a buffer to match the test file.
 func GetBufferForTestFile(file *os.File) int64 {
 	file.Seek(0,0)
 

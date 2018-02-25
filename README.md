@@ -28,6 +28,7 @@ The following lumps currently have a full implementation for v20 bsp's:
 14: Models
 15: WorldLight
 16: Leaffaces
+17: LeafBrushes
 18: Brushes
 19: Brushsides
 20: Areas
@@ -40,6 +41,11 @@ The following lumps currently have a full implementation for v20 bsp's:
 44: Texdatastringtable
 45: Overlays
 48: DispTris
+51: LeafAmbientIndexHDR
+52: LeafAmbientIndex
+54: WorldLightHDR
+55: LeafAmbientLightingHDR
+56: LeafAmbientLighting
 60: OverlayFades
 ```
 
