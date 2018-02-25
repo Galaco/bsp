@@ -58,11 +58,11 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //disp tris
 		lumps.Unimplemented{}, //physcollidesurface | prop blob
 		lumps.Unimplemented{}, //wateroverlays
-		lumps.Unimplemented{}, //lightmappages | leaf ambient index hdr
-		lumps.LeafAmbientIndex{}, //lightmappageinfos | leaf ambient index
+		lumps.LeafAmbientIndexHDR{},
+		lumps.LeafAmbientIndex{},
 		lumps.Unimplemented{}, //lighting hdr
 		lumps.WorldLightHDR{}, //worldlights hdr
-		lumps.Unimplemented{}, //leaf ambient lighting hdr
+		lumps.LeafAmbientLightingHDR{},
 		lumps.LeafAmbientLighting{}, //leaf ambient lighting
 		lumps.Unimplemented{}, //xzippakfile
 		lumps.Unimplemented{}, //faces hdr

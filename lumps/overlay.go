@@ -7,9 +7,9 @@ import (
 	"bytes"
 	"log"
 )
-/**
-	Lump 45: Overlay
- */
+
+// Lump 45: Overlay
+// Consists of an array of Overlay structs
 type Overlay struct {
 	LumpInfo
 	data []datatypes.Overlay

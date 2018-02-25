@@ -17,6 +17,8 @@ type Lump struct {
 	loaded bool
 }
 
+// Get lump identifier
+// Id is the lump type index (not the index for the order the lumps are stored)
 func (l *Lump) SetId(index int) {
 	l.index = index
 }
@@ -38,6 +40,7 @@ func (l *Lump) SetContents(data lumps.ILump) {
 }
 
 // Get the raw []byte contents of a lump.
+// N.B. This is the raw imported value. To get the raw value of a modified lump, use GetContents().ToBytes()
 func (l *Lump) GetRawContents() []byte {
 	return l.raw
 }
@@ -55,14 +58,14 @@ func (l *Lump) GetLength() int32 {
 // Return an instance of a Lump for a given offset.
 func getLumpForIndex(index int, version int32) lumps.ILump {
 	if index < 0 || index > 63 {
-		log.Fatal("Invalid lump index provided.")
+		log.Fatalf("Invalid lump index: %d provided\n", index)
 	}
 
 	switch version {
 	case 20:
 		return versions.GetVersion20Mapping()[index]
 	default:
-		log.Fatal("Bsp version not currently supported")
+		log.Fatalf("Bsp version: %d not currently supported\n", version)
 	}
 	return nil
 }
