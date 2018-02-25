@@ -65,7 +65,9 @@ func getLumpForIndex(index int, version int32) lumps.ILump {
 	case 20:
 		return versions.GetVersion20Mapping()[index]
 	default:
-		log.Fatalf("Bsp version: %d not currently supported\n", version)
+		// Fallback. If we don't support bsp version, still attempt to
+		// parse as simple []byte lumps.
+		return lumps.Unimplemented{}
 	}
 	return nil
 }
