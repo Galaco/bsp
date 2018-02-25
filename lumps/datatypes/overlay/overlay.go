@@ -29,4 +29,5 @@ public:
 type Overlay struct {
 	NId int32
 	NTexInfo int16
+	AlignmentPadding int16
 }

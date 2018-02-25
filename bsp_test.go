@@ -4,6 +4,7 @@ import (
 	"testing"
 	"os"
 	"log"
+	"bytes"
 )
 
 //Test that resultant lump data matches expected.
@@ -29,10 +30,10 @@ func TestLumpExports(t *testing.T) {
 		if len(lumpBytes) != int(file.GetHeader().Lumps[lumpIndex].Length) {
 			t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(lumpBytes), file.header.Lumps[lumpIndex].Length)
 		}
-		/* // We cant assert this with the current implementation.
-		if !bytes.Equal(lumpBytes, lump.GetImportDetails().GetRaw()) {
+		 // We cant assert this with the current implementation.
+		if !bytes.Equal(lumpBytes, lump.GetRawContents()) {
 			t.Errorf("Lump: %d data mismatch", lumpIndex)
-		}*/
+		}
 		lumpIndex += 1
 	}
 
@@ -53,7 +54,7 @@ func TestLumpExports(t *testing.T) {
 	Obtain a test file to run against.
  */
 func GetTestFile() *os.File {
-	f, err := os.Open("ze_bioshock_v6_2.bsp")
+	f, err := os.Open("maps/de_dust2.bsp")
 	if err!= nil {
 		log.Fatal(err)
 	}

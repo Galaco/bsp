@@ -38,7 +38,7 @@ The following lumps currently have a full implementation for v20 bsp's:
 43: Texdatastringdata
 44: Texdatastringtable
 45: Overlays
-46: OverlayFades
+60: OverlayFades
 ```
 
 ##### This library may reorganise lump order during the first export. This is intentional to handle lump resizing, but will change your checksum if you export without changes.

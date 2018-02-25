@@ -10,19 +10,41 @@ import (
 // N.B. Some information mirrors the header's lump descriptor, but header information should not be trusted after
 // import completion.
 type Lump struct {
+	raw []byte
 	data lumps.ILump
 	length int32
+	index int
+	loaded bool
+}
+
+func (l *Lump) SetId(index int) {
+	l.index = index
 }
 
 // Get the contents of a lump.
-// NOTE: Will need to be cast to the relevant lumps/*
+// NOTE: Will need to be cast to the relevant lumps
 func (l *Lump) GetContents() lumps.ILump {
+	if l.loaded == false {
+		l.data = l.data.FromBytes(l.raw, int32(len(l.raw)))
+		l.loaded = true
+	}
 	return l.data
 }
 
 // Set contents of a lump.
 func (l *Lump) SetContents(data lumps.ILump) {
 	l.data = data
+	l.loaded = false
+}
+
+// Get the raw []byte contents of a lump.
+func (l *Lump) GetRawContents() []byte {
+	return l.raw
+}
+
+// Set raw []byte contents of a lump.
+func (l *Lump) SetRawContents(raw []byte) {
+	l.raw = raw
 }
 
 // Get length of a lump in bytes.

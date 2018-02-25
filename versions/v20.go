@@ -63,7 +63,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //lighting hdr
 		lumps.WorldLightHDR{}, //worldlights hdr
 		lumps.Unimplemented{}, //leaf ambient lighting hdr
-		lumps.Unimplemented{}, //leaf ambient lighting
+		lumps.LeafAmbientLighting{}, //leaf ambient lighting
 		lumps.Unimplemented{}, //xzippakfile
 		lumps.Unimplemented{}, //faces hdr
 		lumps.Unimplemented{}, //map flags

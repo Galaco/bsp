@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"encoding/binary"
-	"github.com/galaco/bsp/lumps"
 	"fmt"
 )
 
@@ -35,9 +34,12 @@ func (r *Reader) Read() Bsp {
 	//Create Header
 	bsp.header = r.readHeader(reader, bsp.header)
 
-	//Create lumps from header data
+	// Create lumps from header data
 	for index := range bsp.header.Lumps {
-		bsp.lumps[index].SetContents(r.readLump(reader, bsp.header, index))
+		r := r.readLump(reader, bsp.header, index)
+		bsp.lumps[index].SetRawContents(r)
+		bsp.lumps[index].SetContents(getLumpForIndex(index, bsp.header.Version))
+		bsp.lumps[index].SetId(index)
 	}
 
 	return bsp
@@ -64,7 +66,7 @@ func (r Reader) readHeader(reader *bytes.Reader, header Header) Header {
 }
 
 // Parse a single lump.
-func (r Reader) readLump(reader *bytes.Reader, header Header, index int) lumps.ILump{
+func (r Reader) readLump(reader *bytes.Reader, header Header, index int) []byte {
 	//Limit lump data to declared size
 	lumpHeader := header.Lumps[index]
 	raw := make([]byte, lumpHeader.Length)
@@ -78,16 +80,7 @@ func (r Reader) readLump(reader *bytes.Reader, header Header, index int) lumps.I
 		}
 	}
 
-	lump := getLumpForIndex(index, header.Version).FromBytes(raw, lumpHeader.Length)
-
-	return lump
-	/*result := lumpData[index].ToBytes()
-	fmt.Println(index, len(raw), len(result))
-	for i := range raw {
-		if raw[i] != result[i] {
-			fmt.Println(i, raw[i], result[i])
-		}
-	}*/
+	return raw
 }
 
 // Return a new instance of Reader.
