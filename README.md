@@ -46,6 +46,7 @@ The following lumps currently have a full implementation for v20 bsp's:
 54: WorldLightHDR
 55: LeafAmbientLightingHDR
 56: LeafAmbientLighting
+59: MapFlags
 60: OverlayFades
 ```
 
