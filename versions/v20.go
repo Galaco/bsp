@@ -35,13 +35,13 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //clusterportals | unused3 | proptris
 		lumps.Unimplemented{}, //dispinfo
 		lumps.Unimplemented{}, //originalfaces
-		lumps.Unimplemented{}, //physdisp
+		lumps.Unimplemented{}, //physdisp NOTE: bsplib actually implements this as a byte* anyway
 		lumps.Unimplemented{}, //physcollide
 		lumps.Unimplemented{}, //vertnormals
 		lumps.Unimplemented{}, //vertnormalindices
 		lumps.Unimplemented{}, //disp lightmap alphas
 		lumps.DispVert{},
-		lumps.Unimplemented{}, //disp lightmap sample positions
+		lumps.Unimplemented{}, //disp lightmap sample positions NOTE: bsplib implements this as an unsigned char vector
 		lumps.Game{},
 		lumps.LeafWaterData{}, //LeafWaterData FIXME
 		lumps.Unimplemented{}, //primitives
@@ -54,7 +54,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.TexDataStringTable{},
 		lumps.Overlay{},
 		lumps.Unimplemented{}, //leafmindisttowater
-		lumps.Unimplemented{}, //face macro texture info
+		lumps.FaceMacroTextureInfo{}, //face macro texture info
 		lumps.DispTris{},
 		lumps.Unimplemented{}, //physcollidesurface | prop blob
 		lumps.Unimplemented{}, //wateroverlays
