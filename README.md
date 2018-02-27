@@ -40,12 +40,14 @@ The following lumps currently have a full implementation for v20 bsp's:
 43: Texdatastringdata
 44: Texdatastringtable
 45: Overlays
+47: FaceMacroTextureInfo
 48: DispTris
 51: LeafAmbientIndexHDR
 52: LeafAmbientIndex
 54: WorldLightHDR
 55: LeafAmbientLightingHDR
 56: LeafAmbientLighting
+58: FacesHDR
 59: MapFlags
 60: OverlayFades
 ```
