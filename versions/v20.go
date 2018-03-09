@@ -44,8 +44,8 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //disp lightmap sample positions NOTE: bsplib implements this as an unsigned char vector
 		lumps.Game{},
 		lumps.LeafWaterData{}, //LeafWaterData FIXME
-		lumps.Unimplemented{}, //primitives
-		lumps.Unimplemented{}, //primverts
+		lumps.Unimplemented{}, //primitives FIXME
+		lumps.PrimVert{}, //primverts
 		lumps.Unimplemented{}, //primindices
 		lumps.Unimplemented{}, //pakfile
 		lumps.Unimplemented{}, //clipportalverts

@@ -1,4 +1,7 @@
 package leaf
+
+const LEAF_FLAGS_RADIAL = 0x02
+
 type Leaf struct {
 	Contents int32
 	Cluster int16

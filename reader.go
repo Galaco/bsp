@@ -38,16 +38,15 @@ func (r *Reader) Read() Bsp {
 	for index := range bsp.header.Lumps {
 		r := r.readLump(reader, bsp.header, index)
 		bsp.lumps[index].SetRawContents(r)
-		bsp.lumps[index].SetContents(getLumpForIndex(index, bsp.header.Version))
+		bsp.lumps[index].SetContents(getReferenceLumpByIndex(index, bsp.header.Version))
 		bsp.lumps[index].SetId(index)
 	}
 
 	return bsp
 }
 
-
 // Parse header from the bsp file.
-func (r Reader) readHeader(reader *bytes.Reader, header Header) Header {
+func (r *Reader) readHeader(reader *bytes.Reader, header Header) Header {
 	headerSize := unsafe.Sizeof(header)
 	headerBytes := make([]byte, headerSize)
 
@@ -66,7 +65,7 @@ func (r Reader) readHeader(reader *bytes.Reader, header Header) Header {
 }
 
 // Parse a single lump.
-func (r Reader) readLump(reader *bytes.Reader, header Header, index int) []byte {
+func (r *Reader) readLump(reader *bytes.Reader, header Header, index int) []byte {
 	//Limit lump data to declared size
 	lumpHeader := header.Lumps[index]
 	raw := make([]byte, lumpHeader.Length)

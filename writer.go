@@ -29,11 +29,11 @@ func (w *Writer) Write() []byte {
 	lumpBytes := make([][]byte, 64)
 	currentOffset := 1036 // Header always 1036bytes
 
-	for index,lump := range w.data.lumps {
+	for _,index := range getDefaultLumpOrdering() {
 		// We have to handle lump 35 (GameData differently)
 		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
-		if index == 35 {
-			gamelump := (lump.GetContents()).(lumps.Game)
+		if index == LUMP_GAME_LUMP {
+			gamelump := (w.data.lumps[index].GetContents()).(lumps.Game)
 			w.data.lumps[index].SetContents(
 				gamelump.UpdateInternalOffsets(int32(currentOffset) - w.data.header.Lumps[index].Offset))
 		}
@@ -80,4 +80,67 @@ func (w *Writer) WriteLump(index int) []byte {
 func NewWriter() Writer {
 	w := Writer{}
 	return w
+}
+
+func getDefaultLumpOrdering() [64]int {
+	return [64]int {
+		LUMP_PLANES,
+		LUMP_LEAFS,
+		LUMP_LEAF_AMBIENT_LIGHTING,
+		LUMP_LEAF_AMBIENT_INDEX,
+		LUMP_LEAF_AMBIENT_INDEX_HDR,
+		LUMP_LEAF_AMBIENT_LIGHTING_HDR,
+		LUMP_VERTEXES,
+		LUMP_NODES,
+		LUMP_TEXINFO,
+		LUMP_TEXDATA,
+		LUMP_DISPINFO,
+		LUMP_DISP_VERTS,
+		LUMP_DISP_TRIS,
+		LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS,
+		LUMP_FACE_MACRO_TEXTURE_INFO,
+		LUMP_PRIMITIVES,
+		LUMP_PRIMVERTS,
+		LUMP_PRIMINDICES,
+		LUMP_FACES,
+		LUMP_FACES_HDR,
+		LUMP_FACEIDS,
+		LUMP_ORIGINALFACES,
+		LUMP_BRUSHES,
+		LUMP_BRUSHSIDES,
+		LUMP_LEAFFACES,
+		LUMP_LEAFBRUSHES,
+		LUMP_SURFEDGES,
+		LUMP_EDGES,
+		LUMP_MODELS,
+		LUMP_AREAS,
+		LUMP_AREAPORTALS,
+		LUMP_LIGHTING,
+		LUMP_LIGHTING_HDR,
+		LUMP_VISIBILITY,
+		LUMP_ENTITIES,
+		LUMP_WORLDLIGHTS,
+		LUMP_WORLDLIGHTS_HDR,
+		LUMP_LEAFWATERDATA,
+		LUMP_OCCLUSION,
+		LUMP_MAP_FLAGS,
+		LUMP_PORTALS,
+		LUMP_CLUSTERS,
+		LUMP_PORTALVERTS,
+		LUMP_CLUSTERPORTALS,
+		LUMP_CLIPPORTALVERTS,
+		LUMP_CUBEMAPS,
+		LUMP_TEXDATA_STRING_DATA,
+		LUMP_TEXDATA_STRING_TABLE,
+		LUMP_OVERLAYS,
+		LUMP_WATEROVERLAYS,
+		LUMP_OVERLAY_FADES,
+		LUMP_PHYSCOLLIDE,
+		LUMP_PHYSDISP,
+		LUMP_VERTNORMALS,
+		LUMP_VERTNORMALINDICES,
+		LUMP_LEAFMINDISTTOWATER,
+		LUMP_GAME_LUMP,
+		LUMP_PAKFILE,
+		}
 }
