@@ -18,9 +18,15 @@ type Leaf struct {
 
 func (lump Leaf) FromBytes(raw []byte, length int32) ILump {
 	lump.data = make([]datatypes.Leaf, length/int32(unsafe.Sizeof(datatypes.Leaf{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
+	structSize := int(unsafe.Sizeof(datatypes.Leaf{}))
+	numLeafs := len(lump.data)
+	i := 0
+	for i < numLeafs {
+		err := binary.Read(bytes.NewBuffer(raw[(structSize*i):(structSize*i)+structSize]), binary.LittleEndian, &lump.data[i])
+		if err != nil {
+			log.Fatal(err)
+		}
+		i++
 	}
 	lump.LumpInfo.SetLength(length)
 

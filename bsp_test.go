@@ -5,7 +5,6 @@ import (
 	"os"
 	"log"
 	"bytes"
-	"fmt"
 )
 
 // Test that resultant lump data matches expected.
@@ -30,21 +29,15 @@ func TestLumpExports(t *testing.T) {
 		lumpBytes := lump.GetContents().ToBytes()
 		if len(lumpBytes) != int(file.GetHeader().Lumps[lumpIndex].Length) {
 			t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(lumpBytes), file.header.Lumps[lumpIndex].Length)
+		} else {
+			//fmt.Printf("Index: %d, Expected: %d, Actual: %d\n", lumpIndex, len(lump.GetRawContents()), len(lumpBytes))
+			if !bytes.Equal(lumpBytes, lump.GetRawContents()) {
+				t.Errorf("Lump: %d data mismatch", lumpIndex)
+			}
 		}
 
-		fmt.Printf("Index: %d, Expected: %d, Actual: %d\n", lumpIndex, len(lump.GetRawContents()), len(lumpBytes))
-		if !bytes.Equal(lumpBytes, lump.GetRawContents()) {
-			t.Errorf("Lump: %d data mismatch", lumpIndex)
-		}
 		lumpIndex += 1
 	}
-
-	// Verify entire file
-	writer := NewWriter()
-	writer.SetBsp(file)
-	/*if !bytes.Equal(fileData, writer.Write()) {
-		t.Errorf("Bsp checksum mismatch")
-	}*/
 }
 
 // Obtain a test file to run against.
