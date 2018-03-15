@@ -11,6 +11,9 @@ import (
 /**
 	Lump 10: Leaf
  */
+
+ const MAX_MAP_LEAFS = 65536
+
 type Leaf struct {
 	LumpInfo
 	data []datatypes.Leaf
@@ -27,6 +30,9 @@ func (lump Leaf) FromBytes(raw []byte, length int32) ILump {
 			log.Fatal(err)
 		}
 		i++
+		if i > MAX_MAP_LEAFS {
+			log.Fatalf("Leaf count overflows maximum allowed size of %d\n", MAX_MAP_LEAFS)
+		}
 	}
 	lump.LumpInfo.SetLength(length)
 
