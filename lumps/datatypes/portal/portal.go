@@ -7,6 +7,8 @@ import (
 	"github.com/galaco/bsp/lumps/datatypes/common"
 )
 
+const MAX_PORTALS = 65536
+
 type Portal struct {
 	Id int32
 	Plane plane.Plane

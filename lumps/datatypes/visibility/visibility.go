@@ -1,5 +1,6 @@
 package visibility
 
+const MAX_MAP_VISIBILITY= 0x1000000
 
 type Vis struct {
 	NumClusters int32
