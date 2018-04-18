@@ -35,7 +35,7 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //clusterportals | unused3 | proptris
 		lumps.Unimplemented{}, //dispinfo
 		lumps.Face{}, //originalfaces
-		lumps.Unimplemented{}, //physdisp NOTE: bsplib actually implements this as a byte* anyway
+		lumps.PhysDisp{}, //physdisp NOTE: bsplib actually implements this as a byte* anyway
 		lumps.Unimplemented{}, //physcollide
 		lumps.Unimplemented{}, //vertnormals
 		lumps.Unimplemented{}, //vertnormalindices
@@ -48,13 +48,13 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.PrimVert{}, //primverts
 		lumps.Unimplemented{}, //primindices
 		lumps.Unimplemented{}, //pakfile
-		lumps.Unimplemented{}, //clipportalverts
+		lumps.ClipPortalVerts{},
 		lumps.Cubemap{},
 		lumps.TexdataStringData{},
 		lumps.TexDataStringTable{},
 		lumps.Overlay{},
-		lumps.LeafMinDistToWater{}, //leafmindisttowater
-		lumps.FaceMacroTextureInfo{}, //face macro texture info
+		lumps.LeafMinDistToWater{},
+		lumps.FaceMacroTextureInfo{},
 		lumps.DispTris{},
 		lumps.Unimplemented{}, //physcollidesurface | prop blob
 		lumps.Unimplemented{}, //wateroverlays
@@ -65,8 +65,8 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.LeafAmbientLightingHDR{},
 		lumps.LeafAmbientLighting{}, //leaf ambient lighting
 		lumps.Unimplemented{}, //xzippakfile
-		lumps.FaceHDR{}, //faces hdr
-		lumps.MapFlags{}, //map flags
+		lumps.FaceHDR{},
+		lumps.MapFlags{},
 		lumps.OverlayFade{},
 		lumps.Unimplemented{}, //overlay system levels
 		lumps.Unimplemented{}, //physlevel
