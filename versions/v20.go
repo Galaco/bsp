@@ -34,19 +34,19 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //portalverts | unused2 | prophullverts
 		lumps.Unimplemented{}, //clusterportals | unused3 | proptris
 		lumps.Unimplemented{}, //dispinfo
-		lumps.Face{}, //originalfaces
-		lumps.PhysDisp{}, //physdisp NOTE: bsplib actually implements this as a byte* anyway
+		lumps.Face{},
+		lumps.PhysDisp{},
 		lumps.Unimplemented{}, //physcollide
 		lumps.Unimplemented{}, //vertnormals
 		lumps.Unimplemented{}, //vertnormalindices
 		lumps.Unimplemented{}, //disp lightmap alphas
 		lumps.DispVert{},
-		lumps.Unimplemented{}, //disp lightmap sample positions NOTE: bsplib implements this as an unsigned char vector
+		lumps.DispLightmapSamplePosition{},
 		lumps.Game{},
 		lumps.LeafWaterData{}, //LeafWaterData FIXME
 		lumps.Unimplemented{}, //primitives FIXME
-		lumps.PrimVert{}, //primverts
-		lumps.Unimplemented{}, //primindices
+		lumps.PrimVert{},
+		lumps.PrimIndice{},
 		lumps.Unimplemented{}, //pakfile
 		lumps.ClipPortalVerts{},
 		lumps.Cubemap{},
