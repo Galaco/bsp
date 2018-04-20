@@ -35,7 +35,8 @@ The following lumps currently have a full implementation for v20 bsp's:
 21: AreaPortals
 27: OriginalFaces
 28: PhysDisp
-33: DispVert
+30: VertNormals
+33: DispVerts
 34: DispLightmapSamplePosition
 36: LeafWaterData
 38: PrimVerts

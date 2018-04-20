@@ -36,8 +36,8 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //dispinfo
 		lumps.Face{},
 		lumps.PhysDisp{},
-		lumps.Unimplemented{}, //physcollide
-		lumps.Unimplemented{}, //vertnormals
+		lumps.Unimplemented{}, //physcollide - IN PROGRESS
+		lumps.VertNormal{}, //vertnormals
 		lumps.Unimplemented{}, //vertnormalindices
 		lumps.Unimplemented{}, //disp lightmap alphas
 		lumps.DispVert{},
