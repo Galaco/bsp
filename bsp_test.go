@@ -5,7 +5,6 @@ import (
 	"os"
 	"log"
 	"bytes"
-	"fmt"
 )
 
 // Test that resultant lump data matches expected.
@@ -15,7 +14,10 @@ func TestLumpExports(t *testing.T) {
 
 	// Read bsp
 	reader := NewReader(f)
-	file := reader.Read()
+	file,err := reader.Read()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	//Load file
 	f.Close()
@@ -28,7 +30,7 @@ func TestLumpExports(t *testing.T) {
 		if len(lumpBytes) != int(file.GetHeader().Lumps[lumpIndex].Length) {
 			t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(lumpBytes), file.header.Lumps[lumpIndex].Length)
 		} else {
-			fmt.Printf("Index: %d, Expected: %d, Actual: %d\n", lumpIndex, len(lump.GetRawContents()), len(lumpBytes))
+			log.Printf("Index: %d, Expected: %d, Actual: %d\n", lumpIndex, len(lump.GetRawContents()), len(lumpBytes))
 			if !bytes.Equal(lumpBytes, lump.GetRawContents()) {
 				t.Errorf("Lump: %d data mismatch", lumpIndex)
 			}
@@ -46,16 +48,4 @@ func GetTestFile() *os.File {
 	}
 
 	return f
-}
-
-// Get a buffer to match the test file.
-func GetBufferForTestFile(file *os.File) int64 {
-	file.Seek(0,0)
-
-	fi,err := file.Stat()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return fi.Size()
 }
