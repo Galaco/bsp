@@ -109,7 +109,7 @@ func (l *Lump) GetContents() lumps.ILump {
 	return l.data
 }
 
-// Set contents of a lump.
+// Set content type of a lump.
 func (l *Lump) SetContents(data lumps.ILump) {
 	l.data = data
 	l.loaded = false
