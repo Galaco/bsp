@@ -33,18 +33,18 @@ func GetVersion20Mapping() [64]lumps.ILump {
 		lumps.Unimplemented{}, //clusters | unused1 | prophulls
 		lumps.Unimplemented{}, //portalverts | unused2 | prophullverts
 		lumps.Unimplemented{}, //clusterportals | unused3 | proptris
-		lumps.Unimplemented{}, //dispinfo
+		lumps.Unimplemented{},
 		lumps.Face{},
 		lumps.PhysDisp{},
 		lumps.Unimplemented{}, //physcollide - IN PROGRESS
-		lumps.VertNormal{}, //vertnormals
-		lumps.Unimplemented{}, //vertnormalindices
-		lumps.Unimplemented{}, //disp lightmap alphas
+		lumps.VertNormal{},
+		lumps.VertNormalIndice{},
+		lumps.Unimplemented{}, //disp lightmap alphas - IS STRIPPED ANYWAY?
 		lumps.DispVert{},
 		lumps.DispLightmapSamplePosition{},
 		lumps.Game{},
-		lumps.LeafWaterData{}, //LeafWaterData FIXME
-		lumps.Unimplemented{}, //primitives FIXME
+		lumps.LeafWaterData{},
+		lumps.Unimplemented{}, //primitives FIXME - Appears to be 4bytes unaccounted for at end of lump?
 		lumps.PrimVert{},
 		lumps.PrimIndice{},
 		lumps.Unimplemented{}, //pakfile

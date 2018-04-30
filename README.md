@@ -36,6 +36,7 @@ The following lumps currently have a full implementation for v20 bsp's:
 27: OriginalFaces
 28: PhysDisp
 30: VertNormals
+31: VertNormalIndices
 33: DispVerts
 34: DispLightmapSamplePosition
 36: LeafWaterData
@@ -71,30 +72,23 @@ blocks of a specified .bsp to terminal.
 package main
 
 import (
-	"fmt"
 	"github.com/galaco/bsp"
 	"log"
 	"os"
 )
 
-
 func main() {
 	f,_ := os.Open("de_dust2.bsp")
-	fi,_ := f.Stat()
-	
-	fileData := make([]byte, fi.Size())
-	f.Read(fileData)
-	f.Close()
 
 	// Create a new bsp reader
-	reader := bsp.NewReader()
-	reader.SetBuffer(fileData)
+	reader := bsp.NewReader(f)
 	
 	// Read buffer
 	file := reader.Read()
+	f.Close()
     
-	lump := file.GetLump(0)
-	fmt.Println(lump.GetContents().GetData().(string))
+	lump := file.GetLump(bsp.LUMP_ENTITIES)
+	log.Println(lump.GetContents().GetData().(string))
 }
 ```
 

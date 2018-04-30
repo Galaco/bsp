@@ -6,40 +6,34 @@ import (
 	"io"
 	"log"
 	"encoding/binary"
-	"fmt"
 )
 
 // Bsp File reader.
 type Reader struct {
-	data []byte
-}
-
-// Get buffer to read from.
-func (r *Reader) GetBuffer() []byte {
-	return r.data
-}
-
-// Set buffer to read from.
-func (r *Reader) SetBuffer(data []byte) {
-	fmt.Println()
-	r.data = data
+	stream io.Reader
 }
 
 // Parse the set buffer.
 func (r *Reader) Read() Bsp {
 	bsp := Bsp{}
 
-	reader := bytes.NewReader(r.GetBuffer())
+	buf := bytes.Buffer{}
+	_,err := buf.ReadFrom(r.stream)
+	if err != nil {
+		log.Println(err)
+	}
+	reader := bytes.NewReader(buf.Bytes())
 
 	//Create Header
 	bsp.header = r.readHeader(reader, bsp.header)
 
 	// Create lumps from header data
 	for index := range bsp.header.Lumps {
-		r := r.readLump(reader, bsp.header, index)
-		bsp.lumps[index].SetRawContents(r)
-		bsp.lumps[index].SetContents(getReferenceLumpByIndex(index, bsp.header.Version))
-		bsp.lumps[index].SetId(index)
+		func(index int, l *Lump) {
+			l.SetRawContents(r.readLump(reader, bsp.header, index))
+			l.SetContents(getReferenceLumpByIndex(index, bsp.header.Version))
+			l.SetId(index)
+		}(index, &bsp.lumps[index])
 	}
 
 	return bsp
@@ -83,6 +77,8 @@ func (r *Reader) readLump(reader *bytes.Reader, header Header, index int) []byte
 }
 
 // Return a new instance of Reader.
-func NewReader() Reader {
-	return Reader{}
+func NewReader(reader io.Reader) Reader {
+	return Reader{
+		reader,
+	}
 }
