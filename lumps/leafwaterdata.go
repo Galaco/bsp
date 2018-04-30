@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/leafwaterdata"
+	primitives "github.com/galaco/bsp/primitives/leafwaterdata"
 	"encoding/binary"
 	"bytes"
 	"log"
@@ -13,14 +13,14 @@ import (
  */
 type LeafWaterData struct {
 	LumpInfo
-	data []datatypes.LeafWaterData
+	data []primitives.LeafWaterData
 }
 
 func (lump LeafWaterData) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
-	lump.data = make([]datatypes.LeafWaterData, length/int32(unsafe.Sizeof(datatypes.LeafWaterData{})))
+	lump.data = make([]primitives.LeafWaterData, length/int32(unsafe.Sizeof(primitives.LeafWaterData{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

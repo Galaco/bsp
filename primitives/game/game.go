@@ -1,6 +1,6 @@
 package game
 
-import "github.com/galaco/bsp/lumps/datatypes/common"
+import "github.com/galaco/bsp/primitives/common"
 
 type Header struct {
 	LumpCount int32

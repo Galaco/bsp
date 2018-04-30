@@ -1,6 +1,6 @@
 package occlusion
 
-import "github.com/galaco/bsp/lumps/datatypes/common"
+import "github.com/galaco/bsp/primitives/common"
 
 type OcclusionData struct {
 	Flags int32

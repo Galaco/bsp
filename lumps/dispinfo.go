@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"log"
 	"unsafe"
-	"github.com/galaco/bsp/lumps/datatypes/dispinfo"
+	primitives "github.com/galaco/bsp/primitives/dispinfo"
 )
 
 /**
@@ -14,11 +14,11 @@ import (
 
 type DispInfo struct {
 	LumpInfo
-	data []dispinfo.DispInfo
+	data []primitives.DispInfo
 }
 
 func (lump DispInfo) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]dispinfo.DispInfo, length/int32(unsafe.Sizeof(dispinfo.DispInfo{})))
+	lump.data = make([]primitives.DispInfo, length/int32(unsafe.Sizeof(primitives.DispInfo{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

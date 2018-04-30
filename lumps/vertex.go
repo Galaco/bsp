@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"bytes"
 	"log"
-	"github.com/galaco/bsp/lumps/datatypes/common"
+	"github.com/galaco/bsp/primitives/common"
 	"unsafe"
 )
 

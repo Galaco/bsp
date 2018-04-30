@@ -1,25 +1,26 @@
 package lumps
 
 import (
-datatypes "github.com/galaco/bsp/lumps/datatypes/leafambientlighting"
-"unsafe"
-"encoding/binary"
-"bytes"
-"log"
+	primitives "github.com/galaco/bsp/primitives/leafambientlighting"
+	"unsafe"
+	"encoding/binary"
+	"bytes"
+	"log"
 )
+
 /**
-	Lump n:
+	Lump n: LeafAmbientLighting
  */
 type LeafAmbientLighting struct {
 	LumpInfo
-	data []datatypes.LeafAmbientLighting
+	data []primitives.LeafAmbientLighting
 }
 
 func (lump LeafAmbientLighting) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
-	lump.data = make([]datatypes.LeafAmbientLighting, length/int32(unsafe.Sizeof(datatypes.LeafAmbientLighting{})))
+	lump.data = make([]primitives.LeafAmbientLighting, length/int32(unsafe.Sizeof(primitives.LeafAmbientLighting{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

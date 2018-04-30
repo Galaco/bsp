@@ -1,18 +1,19 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/vertnormal"
+	primitives "github.com/galaco/bsp/primitives/vertnormal"
 	"unsafe"
 	"encoding/binary"
 	"bytes"
 	"log"
 )
+
 /**
 	Lump 30: VertNormal
  */
 type VertNormal struct {
 	LumpInfo
-	data []datatypes.VertNormal
+	data []primitives.VertNormal
 }
 
 func (lump VertNormal) FromBytes(raw []byte, length int32) ILump {
@@ -20,7 +21,7 @@ func (lump VertNormal) FromBytes(raw []byte, length int32) ILump {
 		return lump
 	}
 
-	lump.data = make([]datatypes.VertNormal, length/int32(unsafe.Sizeof(datatypes.VertNormal{})))
+	lump.data = make([]primitives.VertNormal, length/int32(unsafe.Sizeof(primitives.VertNormal{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

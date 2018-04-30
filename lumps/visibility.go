@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"bytes"
 	"log"
-	datatypes "github.com/galaco/bsp/lumps/datatypes/visibility"
+	primitives "github.com/galaco/bsp/primitives/visibility"
 )
 
 /**
@@ -12,7 +12,7 @@ import (
  */
 type Visibility struct {
 	LumpInfo
-	data datatypes.Vis
+	data primitives.Vis
 }
 
 func (lump Visibility) FromBytes(raw []byte, length int32) ILump {

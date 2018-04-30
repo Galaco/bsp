@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/leaf"
+	primitives "github.com/galaco/bsp/primitives/leaf"
 	"encoding/binary"
 	"bytes"
 	"log"
@@ -16,12 +16,12 @@ import (
 
 type Leaf struct {
 	LumpInfo
-	data []datatypes.Leaf
+	data []primitives.Leaf
 }
 
 func (lump Leaf) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]datatypes.Leaf, length/int32(unsafe.Sizeof(datatypes.Leaf{})))
-	structSize := int(unsafe.Sizeof(datatypes.Leaf{}))
+	lump.data = make([]primitives.Leaf, length/int32(unsafe.Sizeof(primitives.Leaf{})))
+	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
 	numLeafs := len(lump.data)
 	i := 0
 	for i < numLeafs {

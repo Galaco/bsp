@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/leafambientindex"
+	primitives "github.com/galaco/bsp/primitives/leafambientindex"
 	"unsafe"
 	"encoding/binary"
 	"bytes"
@@ -12,14 +12,14 @@ import (
  */
 type LeafAmbientIndex struct {
 	LumpInfo
-	data []datatypes.LeafAmbientIndex
+	data []primitives.LeafAmbientIndex
 }
 
 func (lump LeafAmbientIndex) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
-	lump.data = make([]datatypes.LeafAmbientIndex, length/int32(unsafe.Sizeof(datatypes.LeafAmbientIndex{})))
+	lump.data = make([]primitives.LeafAmbientIndex, length/int32(unsafe.Sizeof(primitives.LeafAmbientIndex{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/occlusion"
+	primitives "github.com/galaco/bsp/primitives/occlusion"
 	"unsafe"
 	"encoding/binary"
 	"bytes"
@@ -14,9 +14,9 @@ import (
 type Occlusion struct {
 	LumpInfo
 	Count int32
-	Data []datatypes.OcclusionData // len(slice) = Count
+	Data []primitives.OcclusionData // len(slice) = Count
 	PolyDataCount int32
-	PolyData []datatypes.OcclusionPolyData //len(slice) = PolyDataCount
+	PolyData []primitives.OcclusionPolyData //len(slice) = PolyDataCount
 	VertexIndexCount int32
 	VertexIndices []int32 //len(slice) = VertexIndexCount
 }
@@ -32,12 +32,12 @@ func (lump Occlusion) FromBytes(raw []byte, length int32) ILump {
 		log.Fatal(err)
 	}
 	offset += 4
-	lump.Data = make([]datatypes.OcclusionData, lump.Count)
+	lump.Data = make([]primitives.OcclusionData, lump.Count)
 	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.Data)
 	if err != nil {
 		log.Fatal(err)
 	}
-	offset += int(unsafe.Sizeof(datatypes.OcclusionData{})) * int(lump.Count)
+	offset += int(unsafe.Sizeof(primitives.OcclusionData{})) * int(lump.Count)
 
 	// polydata
 	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.PolyDataCount)
@@ -45,12 +45,12 @@ func (lump Occlusion) FromBytes(raw []byte, length int32) ILump {
 		log.Fatal(err)
 	}
 	offset += 4
-	lump.PolyData = make([]datatypes.OcclusionPolyData, lump.PolyDataCount)
+	lump.PolyData = make([]primitives.OcclusionPolyData, lump.PolyDataCount)
 	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.PolyData)
 	if err != nil {
 		log.Fatal(err)
 	}
-	offset += int(unsafe.Sizeof(datatypes.OcclusionPolyData{})) * int(lump.PolyDataCount)
+	offset += int(unsafe.Sizeof(primitives.OcclusionPolyData{})) * int(lump.PolyDataCount)
 
 	// vertexdata
 	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.VertexIndexCount)

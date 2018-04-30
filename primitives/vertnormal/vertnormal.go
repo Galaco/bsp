@@ -1,6 +1,6 @@
 package vertnormal
 
-import "github.com/galaco/bsp/lumps/datatypes/common"
+import "github.com/galaco/bsp/primitives/common"
 
 type VertNormal struct {
 	Pos common.Vector

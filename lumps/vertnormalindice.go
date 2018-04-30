@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"log"
 )
+
 /**
 	Lump 31: VertNormalIndice
  */

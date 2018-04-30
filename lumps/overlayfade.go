@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/overlayfade"
+	primitives "github.com/galaco/bsp/primitives/overlayfade"
 	"unsafe"
 	"encoding/binary"
 	"bytes"
@@ -12,14 +12,14 @@ import (
  */
 type OverlayFade struct {
 	LumpInfo
-	data []datatypes.OverlayFade
+	data []primitives.OverlayFade
 }
 
 func (lump OverlayFade) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
-	lump.data = make([]datatypes.OverlayFade, length/int32(unsafe.Sizeof(datatypes.OverlayFade{})))
+	lump.data = make([]primitives.OverlayFade, length/int32(unsafe.Sizeof(primitives.OverlayFade{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

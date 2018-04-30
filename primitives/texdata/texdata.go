@@ -1,6 +1,6 @@
 package texdata
 
-import "github.com/galaco/bsp/lumps/datatypes/common"
+import "github.com/galaco/bsp/primitives/common"
 
 type TexData struct {
 	Reflectivity common.Vector

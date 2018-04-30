@@ -1,6 +1,6 @@
 package plane
 
-import "github.com/galaco/bsp/lumps/datatypes/common"
+import "github.com/galaco/bsp/primitives/common"
 
 type Plane struct {
 	Normal common.Vector // normal vector

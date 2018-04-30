@@ -1,6 +1,6 @@
 package common
 
-import "github.com/galaco/bsp/lumps/datatypes/face"
+import "github.com/galaco/bsp/primitives/face"
 
 type Vector struct {
 	X float32

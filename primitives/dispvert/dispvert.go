@@ -1,6 +1,6 @@
 package dispvert
 
-import "github.com/galaco/bsp/lumps/datatypes/common"
+import "github.com/galaco/bsp/primitives/common"
 
 type DispVert struct {
 	Vec common.Vector

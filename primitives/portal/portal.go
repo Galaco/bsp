@@ -1,10 +1,10 @@
 package portal
 
 import (
-	"github.com/galaco/bsp/lumps/datatypes/plane"
-	"github.com/galaco/bsp/lumps/datatypes/node"
-	"github.com/galaco/bsp/lumps/datatypes/face"
-	"github.com/galaco/bsp/lumps/datatypes/common"
+	"github.com/galaco/bsp/primitives/plane"
+	"github.com/galaco/bsp/primitives/node"
+	"github.com/galaco/bsp/primitives/face"
+	"github.com/galaco/bsp/primitives/common"
 )
 
 const MAX_PORTALS = 65536

@@ -2,7 +2,7 @@ package lumps
 
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/faceid"
+	primitives "github.com/galaco/bsp/primitives/faceid"
 	"unsafe"
 	"encoding/binary"
 	"bytes"
@@ -13,14 +13,14 @@ import (
  */
 type FaceId struct {
 	LumpInfo
-	data []datatypes.FaceId
+	data []primitives.FaceId
 }
 
 func (lump FaceId) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
-	lump.data = make([]datatypes.FaceId, length/int32(unsafe.Sizeof(datatypes.FaceId{})))
+	lump.data = make([]primitives.FaceId, length/int32(unsafe.Sizeof(primitives.FaceId{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

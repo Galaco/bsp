@@ -3,7 +3,7 @@ package lumps
 import (
 	"testing"
 	"unsafe"
-	"github.com/galaco/bsp/lumps/datatypes/leaf"
+	primitives "github.com/galaco/bsp/primitives/leaf"
 	"log"
 )
 
@@ -11,7 +11,7 @@ const C_STRUCT_SIZE = 32
 
 // Assert leaf data when read from bytes is valid
 func TestLeafDataFromBytes(t *testing.T) {
-	l := leaf.Leaf{}
+	l := primitives.Leaf{}
 
 	if unsafe.Sizeof(l) != C_STRUCT_SIZE {
 		t.Errorf("Leaf struct is of incorrect size, expected: %d, actual: %d", C_STRUCT_SIZE, unsafe.Sizeof(l))
@@ -20,7 +20,7 @@ func TestLeafDataFromBytes(t *testing.T) {
 	lump := Leaf{}
 	data := lump.FromBytes(GetTestDataBytes(), int32(len(GetTestDataBytes())))
 	expected := GetTestLeafData()
-	actual := (data.GetData().([]leaf.Leaf))[0]
+	actual := (data.GetData().([]primitives.Leaf))[0]
 
 
 	if actual != expected {
@@ -32,8 +32,8 @@ func TestLeafDataFromBytes(t *testing.T) {
 	}
 }
 
-func GetTestLeafData() leaf.Leaf {
-	l := leaf.Leaf{}
+func GetTestLeafData() primitives.Leaf {
+	l := primitives.Leaf{}
 	l.Contents = 1
 	l.Cluster = 2
 	//l.Name = 61 // ("a")[0]

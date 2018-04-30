@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/mapflags"
+	primitives "github.com/galaco/bsp/primitives/mapflags"
 	"encoding/binary"
 	"bytes"
 	"log"
@@ -11,7 +11,7 @@ import (
  */
 type MapFlags struct {
 	LumpInfo
-	data datatypes.MapFlags
+	data primitives.MapFlags
 }
 
 func (lump MapFlags) FromBytes(raw []byte, length int32) ILump {

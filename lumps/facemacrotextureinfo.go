@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/facemacrotextureinfo"
+	primitives "github.com/galaco/bsp/primitives/facemacrotextureinfo"
 	"unsafe"
 	"encoding/binary"
 	"bytes"
@@ -12,7 +12,7 @@ import (
  */
 type FaceMacroTextureInfo struct {
 	LumpInfo
-	data []datatypes.FaceMacroTextureInfo
+	data []primitives.FaceMacroTextureInfo
 }
 
 func (lump FaceMacroTextureInfo) FromBytes(raw []byte, length int32) ILump {
@@ -20,7 +20,7 @@ func (lump FaceMacroTextureInfo) FromBytes(raw []byte, length int32) ILump {
 		return lump
 	}
 
-	lump.data = make([]datatypes.FaceMacroTextureInfo, length/int32(unsafe.Sizeof(datatypes.FaceMacroTextureInfo{})))
+	lump.data = make([]primitives.FaceMacroTextureInfo, length/int32(unsafe.Sizeof(primitives.FaceMacroTextureInfo{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

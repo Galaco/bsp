@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/plane"
+	primitives "github.com/galaco/bsp/primitives/plane"
 	"encoding/binary"
 	"bytes"
 	"log"
@@ -13,11 +13,11 @@ import (
  */
 type Planes struct {
 	LumpInfo
-	data []datatypes.Plane // MAP_MAX_PLANES = 65536
+	data []primitives.Plane // MAP_MAX_PLANES = 65536
 }
 
 func (lump Planes) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]datatypes.Plane, length/int32(unsafe.Sizeof(datatypes.Plane{})))
+	lump.data = make([]primitives.Plane, length/int32(unsafe.Sizeof(primitives.Plane{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

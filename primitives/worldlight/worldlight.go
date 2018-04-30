@@ -1,6 +1,6 @@
 package worldlight
 
-import "github.com/galaco/bsp/lumps/datatypes/common"
+import "github.com/galaco/bsp/primitives/common"
 
 /* Assuming this is 8bits
 enum emittype_t

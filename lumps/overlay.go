@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/overlay"
+	primitives "github.com/galaco/bsp/primitives/overlay"
 	"unsafe"
 	"encoding/binary"
 	"bytes"
@@ -12,14 +12,14 @@ import (
 // Consists of an array of Overlay structs
 type Overlay struct {
 	LumpInfo
-	data []datatypes.Overlay
+	data []primitives.Overlay
 }
 
 func (lump Overlay) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
-	lump.data = make([]datatypes.Overlay, length/int32(unsafe.Sizeof(datatypes.Overlay{})))
+	lump.data = make([]primitives.Overlay, length/int32(unsafe.Sizeof(primitives.Overlay{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
