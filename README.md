@@ -84,7 +84,10 @@ func main() {
 	reader := bsp.NewReader(f)
 	
 	// Read buffer
-	file := reader.Read()
+	file,err := reader.Read()
+	if err != nil {
+		log.Fatal(err)
+	}
 	f.Close()
     
 	lump := file.GetLump(bsp.LUMP_ENTITIES)

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"unsafe"
 	"github.com/galaco/bsp/lumps/datatypes/leaf"
-	"fmt"
+	"log"
 )
 
 const C_STRUCT_SIZE = 32
@@ -18,18 +18,16 @@ func TestLeafDataFromBytes(t *testing.T) {
 	}
 
 	lump := Leaf{}
-
-	fmt.Println("tests now")
 	data := lump.FromBytes(GetTestDataBytes(), int32(len(GetTestDataBytes())))
 	expected := GetTestLeafData()
 	actual := (data.GetData().([]leaf.Leaf))[0]
 
 
 	if actual != expected {
-		fmt.Println("Expected: ")
-		fmt.Println(expected)
-		fmt.Println("Actual: ")
-		fmt.Println(actual)
+		log.Println("Expected: ")
+		log.Println(expected)
+		log.Println("Actual: ")
+		log.Println(actual)
 		t.Errorf("Imported Leaf data mismatch.")
 	}
 }

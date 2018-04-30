@@ -132,18 +132,10 @@ func (l *Lump) GetLength() int32 {
 }
 
 // Return an instance of a Lump for a given offset.
-func getReferenceLumpByIndex(index int, version int32) lumps.ILump {
+func getReferenceLumpByIndex(index int, version int32) (lumps.ILump,error) {
 	if index < 0 || index > 63 {
 		log.Fatalf("Invalid lump index: %d provided\n", index)
 	}
 
-	switch version {
-	case 20:
-		return versions.GetVersion20Mapping()[index]
-	default:
-		// Fallback. If we don't support bsp version, still attempt to
-		// parse as simple []byte lumps.
-		return lumps.Unimplemented{}
-	}
-	return nil
+	return versions.GetLumpForVersion(int(version), index)
 }

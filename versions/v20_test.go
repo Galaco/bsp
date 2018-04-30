@@ -7,9 +7,10 @@ import (
 )
 
 func TestLumpIndexReturnType(t *testing.T) {
-	if reflect.TypeOf(GetVersion20Mapping()[4]) != reflect.TypeOf(lumps.Visibility{}) {
+	l,_ :=Getv20Lump(4)
+	if reflect.TypeOf(l) != reflect.TypeOf(lumps.Visibility{}) {
 		t.Errorf("Lump type mismatch. Got: %s, expected: %s, ",
-			reflect.TypeOf(GetVersion20Mapping()[4]),
+			reflect.TypeOf(l),
 			reflect.TypeOf(lumps.Visibility{}))
 	}
 }

@@ -36,9 +36,13 @@ func (r *Reader) Read() (*Bsp,error) {
 		if err != nil {
 			return nil,err
 		}
-		bsp.lumps[index].SetRawContents(lp)
-		bsp.lumps[index].SetContents(getReferenceLumpByIndex(index, bsp.header.Version))
 		bsp.lumps[index].SetId(index)
+		bsp.lumps[index].SetRawContents(lp)
+		refLump,err := getReferenceLumpByIndex(index, bsp.header.Version)
+		if err != nil {
+			return nil,err
+		}
+		bsp.lumps[index].SetContents(refLump)
 	}
 
 	return &bsp,err
