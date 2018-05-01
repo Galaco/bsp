@@ -28,7 +28,7 @@ func (lump Node) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Node) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump Node) ToBytes() []byte {

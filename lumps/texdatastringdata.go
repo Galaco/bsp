@@ -16,7 +16,7 @@ func (lump TexdataStringData) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump TexdataStringData) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump TexdataStringData) ToBytes() []byte {

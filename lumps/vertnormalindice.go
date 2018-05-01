@@ -30,7 +30,7 @@ func (lump VertNormalIndice) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump VertNormalIndice) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump VertNormalIndice) ToBytes() []byte {

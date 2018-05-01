@@ -25,7 +25,7 @@ func (lump Pakfile) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Pakfile) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump Pakfile) ToBytes() []byte {

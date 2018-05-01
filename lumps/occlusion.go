@@ -71,7 +71,7 @@ func (lump Occlusion) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Occlusion) GetData() interface{} {
-	return lump
+	return &lump
 }
 
 func (lump Occlusion) ToBytes() []byte {

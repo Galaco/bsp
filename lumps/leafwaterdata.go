@@ -32,7 +32,7 @@ func (lump LeafWaterData) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump LeafWaterData) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump LeafWaterData) ToBytes() []byte {

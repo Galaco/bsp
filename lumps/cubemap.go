@@ -30,7 +30,7 @@ func (lump Cubemap) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Cubemap) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump Cubemap) ToBytes() []byte {

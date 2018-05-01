@@ -26,7 +26,7 @@ func TestLumpExports(t *testing.T) {
 	lumpIndex := 0
 	for lumpIndex < 64 {
 		lump := file.GetLump(lumpIndex)
-		lumpBytes := lump.GetContents().ToBytes()
+		lumpBytes := (*lump.GetContents()).ToBytes()
 		if len(lumpBytes) != int(file.GetHeader().Lumps[lumpIndex].Length) {
 			t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(lumpBytes), file.header.Lumps[lumpIndex].Length)
 		} else {

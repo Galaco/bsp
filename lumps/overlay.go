@@ -30,7 +30,7 @@ func (lump Overlay) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Overlay) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump Overlay) ToBytes() []byte {

@@ -20,7 +20,7 @@ func (lump PhysDisp) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump PhysDisp) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump PhysDisp) ToBytes() []byte {

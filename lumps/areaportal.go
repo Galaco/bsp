@@ -30,7 +30,7 @@ func (lump AreaPortal) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump AreaPortal) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump AreaPortal) ToBytes() []byte {

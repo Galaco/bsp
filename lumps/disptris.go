@@ -31,7 +31,7 @@ func (lump DispTris) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump DispTris) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump DispTris) ToBytes() []byte {

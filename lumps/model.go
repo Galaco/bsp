@@ -28,7 +28,7 @@ func (lump Model) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Model) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump Model) ToBytes() []byte {

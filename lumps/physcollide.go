@@ -31,7 +31,7 @@ func (lump PhysCollide) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump PhysCollide) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump PhysCollide) ToBytes() []byte {
