@@ -1,9 +1,11 @@
 package cubemap
 
-import "github.com/galaco/bsp/primitives/common"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type CubemapSample struct {
-	Origin common.VectorInt32
+	Origin mgl32.Vec3
 	Size byte
 	AlignmentPadding [3]byte
 }

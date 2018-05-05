@@ -1,9 +1,11 @@
 package plane
 
-import "github.com/galaco/bsp/primitives/common"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type Plane struct {
-	Normal common.Vector // normal vector
+	Normal mgl32.Vec3 // normal vector
 	Distance float32  // distance from origin
 	AxisType int32	  // plane axis identifier
 }

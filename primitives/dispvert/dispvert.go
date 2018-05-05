@@ -1,9 +1,11 @@
 package dispvert
 
-import "github.com/galaco/bsp/primitives/common"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type DispVert struct {
-	Vec common.Vector
+	Vec mgl32.Vec3
 	Dist float32
 	Alpha float32
 }

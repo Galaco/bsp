@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"log"
 	"unsafe"
-	"github.com/galaco/bsp/primitives/common"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 /**
@@ -14,11 +14,11 @@ import (
 
 type ClipPortalVerts struct {
 	LumpInfo
-	data []common.Vector
+	data []mgl32.Vec3
 }
 
 func (lump ClipPortalVerts) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]common.Vector, length/int32(unsafe.Sizeof(common.Vector{})))
+	lump.data = make([]mgl32.Vec3, length/int32(unsafe.Sizeof(mgl32.Vec3{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)

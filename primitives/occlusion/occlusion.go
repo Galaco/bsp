@@ -1,13 +1,15 @@
 package occlusion
 
-import "github.com/galaco/bsp/primitives/common"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type OcclusionData struct {
 	Flags int32
 	FirstPoly int32
 	PolyCount int32
-	Mins common.Vector
-	Maxs common.Vector
+	Mins mgl32.Vec3
+	Maxs mgl32.Vec3
 	Area int32
 }
 

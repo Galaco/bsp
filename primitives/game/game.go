@@ -1,6 +1,8 @@
 package game
 
-import "github.com/galaco/bsp/primitives/common"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type Header struct {
 	LumpCount int32
@@ -30,8 +32,8 @@ type StaticPropLeafLump struct {
 	Leaf []uint16 // Slice length must equal leafEntries. Validation to be added
 }
 type StaticPropLump struct {
-	Origin common.Vector
-	Angles common.Vector
+	Origin mgl32.Vec3
+	Angles mgl32.Vec3
 	PropType uint16
 	FirstLeaf uint16
 	LeafCount uint16
@@ -40,7 +42,7 @@ type StaticPropLump struct {
 	Skin int32
 	FadeMinDist float32
 	FadeMaxDist float32
-	LightingOrigin common.Vector
+	LightingOrigin mgl32.Vec3
 	ForcedFadeScale float32
 	MinDXLevel uint16
 	MaxDXLevel uint16

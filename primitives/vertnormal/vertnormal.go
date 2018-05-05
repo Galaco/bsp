@@ -1,7 +1,9 @@
 package vertnormal
 
-import "github.com/galaco/bsp/primitives/common"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type VertNormal struct {
-	Pos common.Vector
+	Pos mgl32.Vec3
 }

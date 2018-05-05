@@ -1,6 +1,8 @@
 package worldlight
 
-import "github.com/galaco/bsp/primitives/common"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 /* Assuming this is 8bits
 enum emittype_t
@@ -15,9 +17,9 @@ enum emittype_t
  */
 
 type WorldLight struct {
-	Origin common.Vector
-	Intensity common.Vector
-	Normal common.Vector
+	Origin mgl32.Vec3
+	Intensity mgl32.Vec3
+	Normal mgl32.Vec3
 	Cluster int32
 	Type int32 //Apparently this isn't an int8 in C compiler...
 	Style int32

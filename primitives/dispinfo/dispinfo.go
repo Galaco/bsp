@@ -1,9 +1,11 @@
 package dispinfo
 
-import "github.com/galaco/bsp/primitives/common"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type DispInfo struct {
-	StartPosition common.Vector
+	StartPosition mgl32.Vec3
 	DispVertStart int32
 	DispTriStart int32
 	Power int32

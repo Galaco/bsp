@@ -1,18 +1,10 @@
 package common
 
-import "github.com/galaco/bsp/primitives/face"
+import (
+	"github.com/galaco/bsp/primitives/face"
+	"github.com/go-gl/mathgl/mgl32"
+)
 
-type Vector struct {
-	X float32
-	Y float32
-	Z float32
-}
-
-type VectorInt32 struct {
-	X int32
-	Y int32
-	Z int32
-}
 
 type ColorRGBExponent32 struct {
 	R byte
@@ -29,7 +21,7 @@ const MAX_POINTS_ON_FIXED_WINDING = 12
 type Winding struct {
 	Original int32 // qboolean = int32
 	NumPoints int32
-	Points []Vector
+	Points []mgl32.Vec3
 }
 
 type Side struct {
@@ -58,14 +50,14 @@ type MapDispInfo struct {
 	Power int32
 	MinTess int32
 	SmoothingAngle float32
-	uAxis Vector
-	vAxis Vector
-	StartPosition Vector
+	uAxis mgl32.Vec3
+	vAxis mgl32.Vec3
+	StartPosition mgl32.Vec3
 	AlphaValues []float32
 	MaxDispDist float32
 	DispDists []float32
-	VectorDisps []Vector
-	VectorOffsets []Vector
+	VectorDisps []mgl32.Vec3
+	VectorOffsets []mgl32.Vec3
 	Contents int32
 	BrushSideID int32
 	Flags int32
