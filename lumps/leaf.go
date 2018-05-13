@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/leaf"
+	primitives "github.com/galaco/bsp/primitives/leaf"
 	"encoding/binary"
 	"bytes"
 	"log"
@@ -11,16 +11,28 @@ import (
 /**
 	Lump 10: Leaf
  */
+
+ const MAX_MAP_LEAFS = 65536
+
 type Leaf struct {
 	LumpInfo
-	data []datatypes.Leaf
+	data []primitives.Leaf
 }
 
 func (lump Leaf) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]datatypes.Leaf, length/int32(unsafe.Sizeof(datatypes.Leaf{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
+	lump.data = make([]primitives.Leaf, length/int32(unsafe.Sizeof(primitives.Leaf{})))
+	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
+	numLeafs := len(lump.data)
+	i := 0
+	for i < numLeafs {
+		err := binary.Read(bytes.NewBuffer(raw[(structSize*i):(structSize*i)+structSize]), binary.LittleEndian, &lump.data[i])
+		if err != nil {
+			log.Fatal(err)
+		}
+		i++
+		if i > MAX_MAP_LEAFS {
+			log.Fatalf("Leaf count overflows maximum allowed size of %d\n", MAX_MAP_LEAFS)
+		}
 	}
 	lump.LumpInfo.SetLength(length)
 
@@ -28,7 +40,7 @@ func (lump Leaf) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Leaf) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump Leaf) ToBytes() []byte {

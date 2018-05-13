@@ -26,7 +26,7 @@ func (lump Edge) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Edge) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump Edge) ToBytes() []byte {

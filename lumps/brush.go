@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/brush"
+	primitives "github.com/galaco/bsp/primitives/brush"
 	"encoding/binary"
 	"bytes"
 	"log"
@@ -13,11 +13,11 @@ import (
  */
 type Brush struct {
 	LumpInfo
-	data []datatypes.Brush
+	data []primitives.Brush
 }
 
 func (lump Brush) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]datatypes.Brush, length/int32(unsafe.Sizeof(datatypes.Brush{})))
+	lump.data = make([]primitives.Brush, length/int32(unsafe.Sizeof(primitives.Brush{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
@@ -28,7 +28,7 @@ func (lump Brush) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Brush) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump Brush) ToBytes() []byte {

@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/texinfo"
+	primitives "github.com/galaco/bsp/primitives/texinfo"
 	"encoding/binary"
 	"bytes"
 	"log"
@@ -14,11 +14,11 @@ import (
 
 type TexInfo struct {
 	LumpInfo
-	data []datatypes.TexInfo
+	data []primitives.TexInfo
 }
 
 func (lump TexInfo) FromBytes(raw []byte, length int32) ILump {
-	lump.data = make([]datatypes.TexInfo, length/int32(unsafe.Sizeof(datatypes.TexInfo{})))
+	lump.data = make([]primitives.TexInfo, length/int32(unsafe.Sizeof(primitives.TexInfo{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
@@ -29,7 +29,7 @@ func (lump TexInfo) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump TexInfo) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump TexInfo) ToBytes() []byte {

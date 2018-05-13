@@ -1,7 +1,7 @@
 package lumps
 
 import (
-	datatypes "github.com/galaco/bsp/lumps/datatypes/cubemap"
+	primitives "github.com/galaco/bsp/primitives/cubemap"
 	"unsafe"
 	"encoding/binary"
 	"bytes"
@@ -12,14 +12,14 @@ import (
  */
 type Cubemap struct {
 	LumpInfo
-	data []datatypes.CubemapSample
+	data []primitives.CubemapSample
 }
 
 func (lump Cubemap) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
-	lump.data = make([]datatypes.CubemapSample, length/int32(unsafe.Sizeof(datatypes.CubemapSample{})))
+	lump.data = make([]primitives.CubemapSample, length/int32(unsafe.Sizeof(primitives.CubemapSample{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
@@ -30,7 +30,7 @@ func (lump Cubemap) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Cubemap) GetData() interface{} {
-	return lump.data
+	return &lump.data
 }
 
 func (lump Cubemap) ToBytes() []byte {

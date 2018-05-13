@@ -5,15 +5,11 @@ import (
 	"unsafe"
 	"io"
 	"encoding/binary"
-	"github.com/galaco/bsp/lumps"
-	"fmt"
 )
 
-/**
-	Bsp File reader.
- */
+// Bsp File reader.
 type Reader struct {
-	data []byte
+	stream io.Reader
 }
 
 // Parse the set buffer.
@@ -34,15 +30,19 @@ func (r *Reader) Read() (*Bsp,error) {
 	}
 	bsp.header = *h
 
-	//Create lumps from header data
+	// Create lumps from header data
 	for index := range bsp.header.Lumps {
 		lp,err := r.readLump(reader, bsp.header, index)
 		if err != nil {
 			return nil,err
 		}
-		bsp.lumps[index].SetRawContents(lp)
-		bsp.lumps[index].SetContents(getReferenceLumpByIndex(index, bsp.header.Version))
 		bsp.lumps[index].SetId(index)
+		bsp.lumps[index].SetRawContents(lp)
+		refLump,err := getReferenceLumpByIndex(index, bsp.header.Version)
+		if err != nil {
+			return nil,err
+		}
+		bsp.lumps[index].SetContents(refLump)
 	}
 
 	return &bsp,err
@@ -85,9 +85,9 @@ func (r *Reader) readLump(reader *bytes.Reader, header Header, index int) ([]byt
 	return raw,nil
 }
 
-/**
-	Return a new instance of Reader.
- */
-func NewReader() Reader {
-	return Reader{}
+// Return a new instance of Reader.
+func NewReader(reader io.Reader) Reader {
+	return Reader{
+		reader,
+	}
 }

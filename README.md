@@ -15,63 +15,83 @@ The following lumps currently have a full implementation for v20 bsp's:
 1: Planes
 2: Texdata
 3: Vertexes
+4: Visibility
 5: Nodes
 6: Texinfo
 7: Faces
 8: Lighting
 9: Occlusion
 10: Leafs
+11: FaceId
 12: Edges
 13: Surfedges
 14: Models
+15: WorldLight
 16: Leaffaces
+17: LeafBrushes
 18: Brushes
 19: Brushsides
 20: Areas
 21: AreaPortals
+27: OriginalFaces
+28: PhysDisp
+30: VertNormals
+31: VertNormalIndices
+33: DispVerts
+34: DispLightmapSamplePosition
+36: LeafWaterData
+38: PrimVerts
+39: PrimIndices
 40: Pakfile
+41: ClipPortalVerts
 42: Cubemaps
 43: Texdatastringdata
 44: Texdatastringtable
 45: Overlays
-46: OverlayFades
+46: LeafMinDistToWater
+47: FaceMacroTextureInfo
+48: DispTris
+51: LeafAmbientIndexHDR
+52: LeafAmbientIndex
+54: WorldLightHDR
+55: LeafAmbientLightingHDR
+56: LeafAmbientLighting
+58: FacesHDR
+59: MapFlags
+60: OverlayFades
 ```
 
 ##### This library may reorganise lump order during the first export. This is intentional to handle lump resizing, but will change your checksum if you export without changes.
 
 # Usage
 
-Minimal example of obtaining entdata and texdata from a BSP. The following will print both the entdata and texdata
+Minimal example of obtaining entdata from a BSP. The following will print the entdata
 blocks of a specified .bsp to terminal.
 
 ```go
 package main
 
 import (
-	"fmt"
 	"github.com/galaco/bsp"
 	"log"
 	"os"
 )
 
-
 func main() {
 	f,_ := os.Open("de_dust2.bsp")
-	fi,_ := f.Stat()
-	
-	fileData := make([]byte, fi.Size())
-	f.Read(fileData)
-	f.Close()
 
 	// Create a new bsp reader
-	reader := bsp.NewReader()
-	reader.SetBuffer(fileData)
+	reader := bsp.NewReader(f)
 	
 	// Read buffer
-	file := reader.Read()
-
-	fmt.Println(file.GetLump(0).GetData().(string))
-	fmt.Println(file.GetLump(43).GetData().(string))
+	file,err := reader.Read()
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.Close()
+    
+	lump := file.GetLump(bsp.LUMP_ENTITIES)
+	log.Println(lump.GetContents().GetData().(string))
 }
 ```
 
