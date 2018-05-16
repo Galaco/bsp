@@ -16,12 +16,22 @@ enum emittype_t
 };
  */
 
+type EmitType uint8
+
+const EMIT_SURFACE EmitType = 0
+const EMIT_POINT EmitType = 1
+const EMIT_POINTLIGHT EmitType = 2
+const EMIT_SKYLIGHT EmitType = 3
+const EMIT_QUAKELIGHT EmitType = 4
+const EMIT_SKYAMBIENT EmitType = 5
+
 type WorldLight struct {
 	Origin mgl32.Vec3
 	Intensity mgl32.Vec3
 	Normal mgl32.Vec3
 	Cluster int32
-	Type int32 //Apparently this isn't an int8 in C compiler...
+	Type EmitType //Think for alignments sake with is uint8. May be 3 bytes padding...
+	_ [3]byte
 	Style int32
 	Stopdot float32
 	Stopdot2 float32
