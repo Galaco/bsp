@@ -50,3 +50,52 @@ func (lump Visibility) ToBytes() []byte {
 	binary.Write(&buf, binary.LittleEndian, lump.data.BitVectors)
 	return buf.Bytes()
 }
+
+/*
+
+/*
+===================
+DecompressVis
+===================
+*/
+func (l Visibility) DecompressVis(in *[]byte, decompressed *[]byte) *[]byte {
+	var c int
+	var out []byte
+	var row int
+	var inOffset = 0
+	var outOffset = 0
+
+	row = int(l.data.NumClusters + 7) >> 3
+	out = *decompressed
+
+	hasSimulatedDoWhile := false
+	for (int(out[outOffset])) < row || hasSimulatedDoWhile == false {
+		hasSimulatedDoWhile = true
+
+		if int((*in)[inOffset]) > 0 {
+			inOffset++
+			outOffset++
+			out[outOffset] = (*in)[inOffset]
+			continue
+		}
+
+		c = int((*in)[1])
+		if c == 0 {
+			log.Fatalf("DecompressVis: 0 repeat")
+		}
+
+		inOffset += 2
+		if (int(out[outOffset])) + c > row {
+			c = row - int(out[outOffset])
+			log.Printf("warning: Vis decompression overrun\n")
+		}
+
+		for c != 0 {
+			outOffset++
+			out[outOffset] = 0
+			c--
+		}
+	}
+
+	return &out
+}
