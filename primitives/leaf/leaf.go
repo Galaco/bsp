@@ -2,7 +2,11 @@ package leaf
 
 const BITMASK_LOWER9 = 0x1FF // 511 (2^9 - 1)
 const BITMASK_LOWER7 = 0x7F // 127 (2^7 - 1)
-const LEAF_FLAGS_RADIAL = 0x02
+
+// NOTE: Only 7-bits stored!!!
+const LEAF_FLAGS_SKY	= 0x01		// This leaf has 3D sky in its PVS
+const LEAF_FLAGS_RADIAL	= 0x02		// This leaf culled away some portals due to radial vis
+const LEAF_FLAGS_SKY2D	= 0x04		// This leaf has 2D sky in its PVS
 
 type Leaf struct {
 	Contents int32
