@@ -20,7 +20,7 @@ type EmitType uint8
 
 const EMIT_SURFACE EmitType = 0
 const EMIT_POINT EmitType = 1
-const EMIT_POINTLIGHT EmitType = 2
+const EMIT_SPOTLIGHT EmitType = 2
 const EMIT_SKYLIGHT EmitType = 3
 const EMIT_QUAKELIGHT EmitType = 4
 const EMIT_SKYAMBIENT EmitType = 5
