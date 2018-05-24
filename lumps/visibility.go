@@ -7,14 +7,14 @@ import (
 	primitives "github.com/galaco/bsp/primitives/visibility"
 )
 
-/**
-	Lump 4: Visibility
- */
+// Lump 4: Visibility
 type Visibility struct {
 	LumpInfo
 	data primitives.Vis
 }
 
+// FromBytes
+// Populate receiver lump from byte slice
 func (lump Visibility) FromBytes(raw []byte, length int32) ILump {
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data.NumClusters)
 	if err != nil {
@@ -37,10 +37,16 @@ func (lump Visibility) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
+// GetData
+// Get internal lump data structure
+// Returns interface{} to fulfill interface
+// Should be typecasted to expected type
 func (lump Visibility) GetData() interface{} {
 	return &lump.data
 }
 
+// ToBytes
+// Convert internal data structure into a byte slice
 func (lump Visibility) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data.NumClusters)
@@ -51,31 +57,70 @@ func (lump Visibility) ToBytes() []byte {
 	return buf.Bytes()
 }
 
-/*
+// GetVisCache
+// Determines the Potential Visible Set for a cluster?
+func (lump *Visibility) GetVisCache(lastOffset int, cluster int, pvs *[]byte) int {
+	// get the PVS for the pos to limit the number of checks
+	if lump.data.NumClusters == 0 {
+		for i := range *pvs {
+			if i < int((lump.data.NumClusters + 7) / 8) {
+				(*pvs)[i] = 255
+			} else {
+				break
+			}
+		}
+		lastOffset = -1
+	} else {
+		if cluster < 0 {
+			// Error, point embedded in wall
+			// sampled[0][1] = 255;
+			for i := range *pvs {
+				if i < int((lump.data.NumClusters + 7) / 8) {
+					(*pvs)[i] = 255
+				} else {
+					break
+				}
+			}
+			lastOffset = -1
+		} else {
+			thisOffset := int(lump.data.ByteOffset[cluster][primitives.DVIS_PVS])
+			if thisOffset != lastOffset {
+				if thisOffset == -1 {
+					log.Fatalf("visofs == -1\n")
+				}
 
-/*
-===================
-DecompressVis
-===================
-*/
-func (l Visibility) DecompressVis(in *[]byte, decompressed *[]byte) *[]byte {
+				visRunlength := lump.ToBytes()[thisOffset:]
+				pvs = lump.DecompressVis(&visRunlength, len(*pvs))
+			}
+			lastOffset = thisOffset
+		}
+	}
+	return lastOffset
+}
+
+// DecompressVis
+// Decompress Visibility BitVectors
+// Note: Often we want to decompress only a subset of the compressed data the lump contains. As such,
+// target compressed data is passed in rather than derived from the receiver.
+func (lump *Visibility) DecompressVis(in *[]byte, length int) *[]byte {
 	var c int
-	var out []byte
+	var out = make([]byte, length)
 	var row int
 	var inOffset = 0
 	var outOffset = 0
 
-	row = int(l.data.NumClusters + 7) >> 3
-	out = *decompressed
+	row = int(lump.data.NumClusters + 7) >> 3
 
 	hasSimulatedDoWhile := false
-	for (int(out[outOffset])) < row || hasSimulatedDoWhile == false {
+	for (outOffset < len(out) && int(out[outOffset]) < row) || hasSimulatedDoWhile == false {
 		hasSimulatedDoWhile = true
 
-		if int((*in)[inOffset]) > 0 {
+		// @NOTE: The ++ operations may need to shift to the stop
+		// In this case, that will cause an out-of-bounds unless we compare to len()-1
+		if inOffset < len(*in) {
+			out[outOffset] = (*in)[inOffset]
 			inOffset++
 			outOffset++
-			out[outOffset] = (*in)[inOffset]
 			continue
 		}
 
@@ -90,7 +135,7 @@ func (l Visibility) DecompressVis(in *[]byte, decompressed *[]byte) *[]byte {
 			log.Printf("warning: Vis decompression overrun\n")
 		}
 
-		for c != 0 {
+		for c > 0 {
 			outOffset++
 			out[outOffset] = 0
 			c--
