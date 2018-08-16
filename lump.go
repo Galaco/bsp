@@ -101,12 +101,12 @@ func (l *Lump) SetId(index int) {
 
 // Get the contents of a lump.
 // NOTE: Will need to be cast to the relevant lumps
-func (l *Lump) GetContents() *lumps.ILump {
+func (l *Lump) GetContents() lumps.ILump {
 	if l.loaded == false {
 		l.data = l.data.FromBytes(l.raw, int32(len(l.raw)))
 		l.loaded = true
 	}
-	return &l.data
+	return l.data
 }
 
 // Set content type of a lump.

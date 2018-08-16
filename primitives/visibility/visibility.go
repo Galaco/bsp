@@ -1,6 +1,9 @@
 package visibility
 
 const MAX_MAP_VISIBILITY= 0x1000000
+const DVIS_PVS = 0
+const DVIS_PAS = 1
+const MAX_CLUSTER_SIZE_PER_VIS = 8
 
 type Vis struct {
 	NumClusters int32
