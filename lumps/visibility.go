@@ -59,12 +59,12 @@ func (lump Visibility) ToBytes() []byte {
 
 // GetVisCache
 // Determines the Potential Visible Set for a cluster?
-func (lump *Visibility) GetVisCache(lastOffset int, cluster int, pvs *[]byte) int {
+func (lump *Visibility) GetVisCache(lastOffset int, cluster int, pvs []byte) int {
 	// get the PVS for the pos to limit the number of checks
 	if lump.data.NumClusters == 0 {
-		for i := range *pvs {
+		for i := range pvs {
 			if i < int((lump.data.NumClusters + 7) / 8) {
-				(*pvs)[i] = 255
+				pvs[i] = 255
 			} else {
 				break
 			}
@@ -74,9 +74,9 @@ func (lump *Visibility) GetVisCache(lastOffset int, cluster int, pvs *[]byte) in
 		if cluster < 0 {
 			// Error, point embedded in wall
 			// sampled[0][1] = 255;
-			for i := range *pvs {
+			for i := range pvs {
 				if i < int((lump.data.NumClusters + 7) / 8) {
-					(*pvs)[i] = 255
+					pvs[i] = 255
 				} else {
 					break
 				}
@@ -90,7 +90,7 @@ func (lump *Visibility) GetVisCache(lastOffset int, cluster int, pvs *[]byte) in
 				}
 
 				visRunlength := lump.ToBytes()[thisOffset:]
-				pvs = lump.DecompressVis(&visRunlength, len(*pvs))
+				pvs = lump.DecompressVis(visRunlength, len(pvs))
 			}
 			lastOffset = thisOffset
 		}
@@ -102,7 +102,7 @@ func (lump *Visibility) GetVisCache(lastOffset int, cluster int, pvs *[]byte) in
 // Decompress Visibility BitVectors
 // Note: Often we want to decompress only a subset of the compressed data the lump contains. As such,
 // target compressed data is passed in rather than derived from the receiver.
-func (lump *Visibility) DecompressVis(in *[]byte, length int) *[]byte {
+func (lump *Visibility) DecompressVis(in []byte, length int) []byte {
 	var c int
 	var out = make([]byte, length)
 	var row int
@@ -117,14 +117,14 @@ func (lump *Visibility) DecompressVis(in *[]byte, length int) *[]byte {
 
 		// @NOTE: The ++ operations may need to shift to the stop
 		// In this case, that will cause an out-of-bounds unless we compare to len()-1
-		if inOffset < len(*in) {
-			out[outOffset] = (*in)[inOffset]
+		if inOffset < len(in) {
+			out[outOffset] = in[inOffset]
 			inOffset++
 			outOffset++
 			continue
 		}
 
-		c = int((*in)[1])
+		c = int(in[1])
 		if c == 0 {
 			log.Fatalf("DecompressVis: 0 repeat")
 		}
@@ -142,5 +142,5 @@ func (lump *Visibility) DecompressVis(in *[]byte, length int) *[]byte {
 		}
 	}
 
-	return &out
+	return out
 }

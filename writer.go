@@ -33,7 +33,7 @@ func (w *Writer) Write() []byte {
 		// We have to handle lump 35 (GameData differently)
 		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
 		if index == LUMP_GAME_LUMP {
-			gamelump := (*w.data.lumps[index].GetContents()).(*lumps.Game)
+			gamelump := w.data.lumps[index].GetContents().(lumps.Game)
 			w.data.lumps[index].SetContents(
 				gamelump.UpdateInternalOffsets(int32(currentOffset) - w.data.header.Lumps[index].Offset))
 		}
@@ -71,7 +71,7 @@ func (w *Writer) Write() []byte {
  */
 func (w *Writer) WriteLump(index int) []byte {
 	lump := w.data.GetLump(index)
-	return (*lump.GetContents()).ToBytes()
+	return lump.GetContents().ToBytes()
 }
 
 /**

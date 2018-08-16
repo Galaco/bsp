@@ -5,6 +5,7 @@ import (
 	"unsafe"
 	"io"
 	"encoding/binary"
+	"os"
 )
 
 // Bsp File reader.
@@ -12,7 +13,10 @@ type Reader struct {
 	stream io.Reader
 }
 
-// Parse the set buffer.
+// Reads the BSP into internal byte structure
+// Note that parsing is somewhat lazy. Proper data structures are only generated for
+// lumps that are requested at a later time. This generated the header, then []byte
+// data for each lump
 func (r *Reader) Read() (*Bsp,error) {
 	bsp := Bsp{}
 
@@ -67,7 +71,9 @@ func (r *Reader) readHeader(reader *bytes.Reader, header Header) (*Header, error
 	return &header,nil
 }
 
-// Parse a single lump.
+// Reads a single lumps data
+// Expect a byte reader containing the lump data, as well as the
+// header and lump identifier (index)
 func (r *Reader) readLump(reader *bytes.Reader, header Header, index int) ([]byte, error) {
 	//Limit lump data to declared size
 	lumpHeader := header.Lumps[index]
@@ -85,9 +91,25 @@ func (r *Reader) readLump(reader *bytes.Reader, header Header, index int) ([]byt
 	return raw,nil
 }
 
-// Return a new instance of Reader.
-func NewReader(reader io.Reader) Reader {
-	return Reader{
+// Wraps ReadFromStream to control the file access as well.
+// Use ReadFromStream if you already have a file handle
+func ReadFromFile(filepath string) (*Bsp, error) {
+	f, err := os.Open(filepath)
+	if err != nil {
+		return nil,err
+	}
+	b,err := ReadFromStream(f)
+
+	f.Close()
+	return b,err
+}
+
+// Read from any struct that implements io.Reader
+// handy for passing in a string/bytes/other stream
+func ReadFromStream(reader io.Reader) (*Bsp, error) {
+	r := &Reader {
 		reader,
 	}
+
+	return r.Read()
 }
