@@ -29,7 +29,7 @@ func (lump TexInfo) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump TexInfo) GetData() interface{} {
-	return &lump.data
+	return lump.data
 }
 
 func (lump TexInfo) ToBytes() []byte {

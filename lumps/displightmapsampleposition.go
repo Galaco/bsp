@@ -20,7 +20,7 @@ func (lump DispLightmapSamplePosition) FromBytes(raw []byte, length int32) ILump
 }
 
 func (lump DispLightmapSamplePosition) GetData() interface{} {
-	return &lump.data
+	return lump.data
 }
 
 func (lump DispLightmapSamplePosition) ToBytes() []byte {

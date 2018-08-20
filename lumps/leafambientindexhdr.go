@@ -30,7 +30,7 @@ func (lump LeafAmbientIndexHDR) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump LeafAmbientIndexHDR) GetData() interface{} {
-	return &lump.data
+	return lump.data
 }
 
 func (lump LeafAmbientIndexHDR) ToBytes() []byte {

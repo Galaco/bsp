@@ -30,7 +30,7 @@ func (lump PrimIndice) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump PrimIndice) GetData() interface{} {
-	return &lump.data
+	return lump.data
 }
 
 func (lump PrimIndice) ToBytes() []byte {

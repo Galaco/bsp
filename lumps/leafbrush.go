@@ -26,7 +26,7 @@ func (lump LeafBrush) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump LeafBrush) GetData() interface{} {
-	return &lump.data
+	return lump.data
 }
 
 func (lump LeafBrush) ToBytes() []byte {

@@ -31,7 +31,7 @@ func (lump WorldLightHDR) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump WorldLightHDR) GetData() interface{} {
-	return &lump.data
+	return lump.data
 }
 
 func (lump WorldLightHDR) ToBytes() []byte {

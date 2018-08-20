@@ -31,7 +31,7 @@ func (lump FaceMacroTextureInfo) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump FaceMacroTextureInfo) GetData() interface{} {
-	return &lump.data
+	return lump.data
 }
 
 func (lump FaceMacroTextureInfo) ToBytes() []byte {

@@ -31,7 +31,7 @@ func (lump Vertex) FromBytes(raw []byte, length int32) ILump {
 }
 
 func (lump Vertex) GetData() interface{} {
-	return &lump.data
+	return lump.data
 }
 
 func (lump Vertex) ToBytes() []byte {
