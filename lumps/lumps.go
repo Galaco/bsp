@@ -21,6 +21,26 @@ type ILump interface {
 	ToBytes() []byte
 }
 
+type LumpGeneric struct {
+	LumpInfo
+	data []byte
+}
+
+func (lump *LumpGeneric) FromBytes(data []byte, length int32) ILump {
+	lump.length = length
+	lump.data = data
+
+	return lump
+}
+
+func (lump *LumpGeneric) GetData() interface{}{
+	return lump.data
+}
+
+func (lump *LumpGeneric) ToBytes() []byte {
+	return lump.data
+}
+
 /**
 	Helper info for a lump
  */

@@ -11,11 +11,11 @@ import (
 	Lump 21: Areaportals
  */
 type AreaPortal struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.AreaPortal
 }
 
-func (lump AreaPortal) FromBytes(raw []byte, length int32) ILump {
+func (lump *AreaPortal) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -29,11 +29,11 @@ func (lump AreaPortal) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump AreaPortal) GetData() interface{} {
+func (lump *AreaPortal) GetData() interface{} {
 	return lump.data
 }
 
-func (lump AreaPortal) ToBytes() []byte {
+func (lump *AreaPortal) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

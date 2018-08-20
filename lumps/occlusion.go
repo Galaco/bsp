@@ -12,7 +12,7 @@ import (
 	Lump 9: Occlusion
  */
 type Occlusion struct {
-	LumpInfo
+	LumpGeneric
 	Count int32
 	Data []primitives.OcclusionData // len(slice) = Count
 	PolyDataCount int32
@@ -21,7 +21,7 @@ type Occlusion struct {
 	VertexIndices []int32 //len(slice) = VertexIndexCount
 }
 
-func (lump Occlusion) FromBytes(raw []byte, length int32) ILump {
+func (lump *Occlusion) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -70,11 +70,11 @@ func (lump Occlusion) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump Occlusion) GetData() interface{} {
+func (lump *Occlusion) GetData() interface{} {
 	return &lump
 }
 
-func (lump Occlusion) ToBytes() []byte {
+func (lump *Occlusion) ToBytes() []byte {
 	var buf bytes.Buffer
 	// write data
 	binary.Write(&buf, binary.LittleEndian, lump.Count)

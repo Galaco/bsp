@@ -11,11 +11,11 @@ import (
 	Lump 20: PhysCollide
  */
 type PhysCollide struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.PhysCollideEntry
 }
 
-func (lump PhysCollide) FromBytes(raw []byte, length int32) ILump {
+func (lump *PhysCollide) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -30,11 +30,11 @@ func (lump PhysCollide) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump PhysCollide) GetData() interface{} {
+func (lump *PhysCollide) GetData() interface{} {
 	return lump.data
 }
 
-func (lump PhysCollide) ToBytes() []byte {
+func (lump *PhysCollide) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

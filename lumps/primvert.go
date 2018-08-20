@@ -12,11 +12,11 @@ import (
 	Lump 37: PrimVert
  */
 type PrimVert struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.PrimVert
 }
 
-func (lump PrimVert) FromBytes(raw []byte, length int32) ILump {
+func (lump *PrimVert) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -31,11 +31,11 @@ func (lump PrimVert) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump PrimVert) GetData() interface{} {
+func (lump *PrimVert) GetData() interface{} {
 	return lump.data
 }
 
-func (lump PrimVert) ToBytes() []byte {
+func (lump *PrimVert) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

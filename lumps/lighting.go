@@ -11,11 +11,11 @@ import (
 	Lump 8: Lighting
  */
 type Lighting struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.ColorRGBExponent32
 }
 
-func (lump Lighting) FromBytes(raw []byte, length int32) ILump {
+func (lump *Lighting) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -29,11 +29,11 @@ func (lump Lighting) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump Lighting) GetData() interface{} {
+func (lump *Lighting) GetData() interface{} {
 	return lump.data
 }
 
-func (lump Lighting) ToBytes() []byte {
+func (lump *Lighting) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

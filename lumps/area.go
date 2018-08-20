@@ -11,11 +11,11 @@ import (
 	Lump 20: Areas
  */
 type Area struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.Area
 }
 
-func (lump Area) FromBytes(raw []byte, length int32) ILump {
+func (lump *Area) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -30,11 +30,11 @@ func (lump Area) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump Area) GetData() interface{} {
+func (lump *Area) GetData() interface{} {
 	return lump.data
 }
 
-func (lump Area) ToBytes() []byte {
+func (lump *Area) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

@@ -11,11 +11,11 @@ import (
 	Lump 47: FaceMacroTextureInfo
  */
 type FaceMacroTextureInfo struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.FaceMacroTextureInfo
 }
 
-func (lump FaceMacroTextureInfo) FromBytes(raw []byte, length int32) ILump {
+func (lump *FaceMacroTextureInfo) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -30,11 +30,11 @@ func (lump FaceMacroTextureInfo) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump FaceMacroTextureInfo) GetData() interface{} {
+func (lump *FaceMacroTextureInfo) GetData() interface{} {
 	return lump.data
 }
 
-func (lump FaceMacroTextureInfo) ToBytes() []byte {
+func (lump *FaceMacroTextureInfo) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

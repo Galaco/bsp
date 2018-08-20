@@ -13,11 +13,11 @@ import (
  */
 
 type TexInfo struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.TexInfo
 }
 
-func (lump TexInfo) FromBytes(raw []byte, length int32) ILump {
+func (lump *TexInfo) FromBytes(raw []byte, length int32) ILump {
 	lump.data = make([]primitives.TexInfo, length/int32(unsafe.Sizeof(primitives.TexInfo{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -28,11 +28,11 @@ func (lump TexInfo) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump TexInfo) GetData() interface{} {
+func (lump *TexInfo) GetData() interface{} {
 	return lump.data
 }
 
-func (lump TexInfo) ToBytes() []byte {
+func (lump *TexInfo) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

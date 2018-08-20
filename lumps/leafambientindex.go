@@ -11,11 +11,11 @@ import (
 	Lump 52: Leaf Ambient Index
  */
 type LeafAmbientIndex struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.LeafAmbientIndex
 }
 
-func (lump LeafAmbientIndex) FromBytes(raw []byte, length int32) ILump {
+func (lump *LeafAmbientIndex) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -29,11 +29,11 @@ func (lump LeafAmbientIndex) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump LeafAmbientIndex) GetData() interface{} {
+func (lump *LeafAmbientIndex) GetData() interface{} {
 	return lump.data
 }
 
-func (lump LeafAmbientIndex) ToBytes() []byte {
+func (lump *LeafAmbientIndex) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

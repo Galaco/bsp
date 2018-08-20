@@ -12,11 +12,11 @@ import (
 	Lump 15: Worldlight
  */
 type WorldLightHDR struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.WorldLight
 }
 
-func (lump WorldLightHDR) FromBytes(raw []byte, length int32) ILump {
+func (lump *WorldLightHDR) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -30,11 +30,11 @@ func (lump WorldLightHDR) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump WorldLightHDR) GetData() interface{} {
+func (lump *WorldLightHDR) GetData() interface{} {
 	return lump.data
 }
 
-func (lump WorldLightHDR) ToBytes() []byte {
+func (lump *WorldLightHDR) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

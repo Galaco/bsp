@@ -11,11 +11,11 @@ import (
 // Lump 45: Overlay
 // Consists of an array of Overlay structs
 type Overlay struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.Overlay
 }
 
-func (lump Overlay) FromBytes(raw []byte, length int32) ILump {
+func (lump *Overlay) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -29,11 +29,11 @@ func (lump Overlay) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump Overlay) GetData() interface{} {
+func (lump *Overlay) GetData() interface{} {
 	return lump.data
 }
 
-func (lump Overlay) ToBytes() []byte {
+func (lump *Overlay) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

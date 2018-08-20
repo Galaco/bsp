@@ -11,11 +11,11 @@ import (
 	Lump 60: Overlayfades
  */
 type OverlayFade struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.OverlayFade
 }
 
-func (lump OverlayFade) FromBytes(raw []byte, length int32) ILump {
+func (lump *OverlayFade) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -29,11 +29,11 @@ func (lump OverlayFade) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump OverlayFade) GetData() interface{} {
+func (lump *OverlayFade) GetData() interface{} {
 	return lump.data
 }
 
-func (lump OverlayFade) ToBytes() []byte {
+func (lump *OverlayFade) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

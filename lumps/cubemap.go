@@ -11,11 +11,11 @@ import (
 	Lump 42: Cubemaps
  */
 type Cubemap struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.CubemapSample
 }
 
-func (lump Cubemap) FromBytes(raw []byte, length int32) ILump {
+func (lump *Cubemap) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -29,11 +29,11 @@ func (lump Cubemap) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump Cubemap) GetData() interface{} {
+func (lump *Cubemap) GetData() interface{} {
 	return lump.data
 }
 
-func (lump Cubemap) ToBytes() []byte {
+func (lump *Cubemap) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

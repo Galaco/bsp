@@ -12,11 +12,11 @@ import (
 	Lump 36: leafwaterdata
  */
 type LeafWaterData struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.LeafWaterData
 }
 
-func (lump LeafWaterData) FromBytes(raw []byte, length int32) ILump {
+func (lump *LeafWaterData) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -31,11 +31,11 @@ func (lump LeafWaterData) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump LeafWaterData) GetData() interface{} {
+func (lump *LeafWaterData) GetData() interface{} {
 	return lump.data
 }
 
-func (lump LeafWaterData) ToBytes() []byte {
+func (lump *LeafWaterData) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

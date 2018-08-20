@@ -10,11 +10,11 @@ import (
 	Lump 39: PrimIndice
  */
 type PrimIndice struct {
-	LumpInfo
+	LumpGeneric
 	data []uint16
 }
 
-func (lump PrimIndice) FromBytes(raw []byte, length int32) ILump {
+func (lump *PrimIndice) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -29,11 +29,11 @@ func (lump PrimIndice) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump PrimIndice) GetData() interface{} {
+func (lump *PrimIndice) GetData() interface{} {
 	return lump.data
 }
 
-func (lump PrimIndice) ToBytes() []byte {
+func (lump *PrimIndice) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

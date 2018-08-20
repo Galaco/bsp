@@ -9,13 +9,13 @@ import (
 
 // Lump 4: Visibility
 type Visibility struct {
-	LumpInfo
+	LumpGeneric
 	data primitives.Vis
 }
 
 // FromBytes
 // Populate receiver lump from byte slice
-func (lump Visibility) FromBytes(raw []byte, length int32) ILump {
+func (lump *Visibility) FromBytes(raw []byte, length int32) ILump {
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data.NumClusters)
 	if err != nil {
 		log.Fatal(err)
@@ -41,13 +41,13 @@ func (lump Visibility) FromBytes(raw []byte, length int32) ILump {
 // Get internal lump data structure
 // Returns interface{} to fulfill interface
 // Should be typecasted to expected type
-func (lump Visibility) GetData() interface{} {
+func (lump *Visibility) GetData() interface{} {
 	return &lump.data
 }
 
 // ToBytes
 // Convert internal data structure into a byte slice
-func (lump Visibility) ToBytes() []byte {
+func (lump *Visibility) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data.NumClusters)
 	for _, offset := range lump.data.ByteOffset {

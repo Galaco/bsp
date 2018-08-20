@@ -11,11 +11,11 @@ import (
 	Lump 51: Leaf Ambient Index HDR
  */
 type LeafAmbientIndexHDR struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.LeafAmbientIndex
 }
 
-func (lump LeafAmbientIndexHDR) FromBytes(raw []byte, length int32) ILump {
+func (lump *LeafAmbientIndexHDR) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -29,11 +29,11 @@ func (lump LeafAmbientIndexHDR) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump LeafAmbientIndexHDR) GetData() interface{} {
+func (lump *LeafAmbientIndexHDR) GetData() interface{} {
 	return lump.data
 }
 
-func (lump LeafAmbientIndexHDR) ToBytes() []byte {
+func (lump *LeafAmbientIndexHDR) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

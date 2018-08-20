@@ -13,10 +13,10 @@ import (
  */
 
 type Vertex struct {
-	LumpInfo
+	LumpGeneric
 	data []mgl32.Vec3
 }
-func (lump Vertex) FromBytes(raw []byte, length int32) ILump {
+func (lump *Vertex) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -30,11 +30,11 @@ func (lump Vertex) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump Vertex) GetData() interface{} {
+func (lump *Vertex) GetData() interface{} {
 	return lump.data
 }
 
-func (lump Vertex) ToBytes() []byte {
+func (lump *Vertex) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

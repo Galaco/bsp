@@ -12,11 +12,11 @@ import (
 	Lump n: LeafAmbientLighting
  */
 type LeafAmbientLighting struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.LeafAmbientLighting
 }
 
-func (lump LeafAmbientLighting) FromBytes(raw []byte, length int32) ILump {
+func (lump *LeafAmbientLighting) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -30,11 +30,11 @@ func (lump LeafAmbientLighting) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump LeafAmbientLighting) GetData() interface{} {
+func (lump *LeafAmbientLighting) GetData() interface{} {
 	return lump.data
 }
 
-func (lump LeafAmbientLighting) ToBytes() []byte {
+func (lump *LeafAmbientLighting) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

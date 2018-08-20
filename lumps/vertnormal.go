@@ -12,11 +12,11 @@ import (
 	Lump 30: VertNormal
  */
 type VertNormal struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.VertNormal
 }
 
-func (lump VertNormal) FromBytes(raw []byte, length int32) ILump {
+func (lump *VertNormal) FromBytes(raw []byte, length int32) ILump {
 	if length == 0 {
 		return lump
 	}
@@ -31,11 +31,11 @@ func (lump VertNormal) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump VertNormal) GetData() interface{} {
+func (lump *VertNormal) GetData() interface{} {
 	return lump.data
 }
 
-func (lump VertNormal) ToBytes() []byte {
+func (lump *VertNormal) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

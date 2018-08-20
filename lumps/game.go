@@ -15,12 +15,12 @@ import (
 	@TODO NOTE: This really needs per-game implementations to be useful, otherwise we might as well skip reading this lump entirely
  */
 type Game struct {
-	LumpInfo
+	LumpGeneric
 	Header primitives.Header
 	GameLumps []byte
 }
 
-func (lump Game) FromBytes(raw []byte, length int32) ILump {
+func (lump *Game) FromBytes(raw []byte, length int32) ILump {
 	lump.LumpInfo.SetLength(length)
 
 	if len(raw) == 0 {
@@ -53,11 +53,11 @@ func (lump Game) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump Game) GetData() interface{} {
+func (lump *Game) GetData() interface{} {
 	return lump
 }
 
-func (lump Game) ToBytes() []byte {
+func (lump *Game) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount)
 	for _,lumpHeader := range lump.Header.GameLumps {
@@ -67,7 +67,7 @@ func (lump Game) ToBytes() []byte {
 	return payload
 }
 
-func (lump Game) UpdateInternalOffsets(offsetAdjustment int32) Game {
+func (lump *Game) UpdateInternalOffsets(offsetAdjustment int32) *Game {
 	if offsetAdjustment == 0 {
 		return lump
 	}

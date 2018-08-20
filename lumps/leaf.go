@@ -15,11 +15,11 @@ import (
  const MAX_MAP_LEAFS = 65536
 
 type Leaf struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.Leaf
 }
 
-func (lump Leaf) FromBytes(raw []byte, length int32) ILump {
+func (lump *Leaf) FromBytes(raw []byte, length int32) ILump {
 	lump.data = make([]primitives.Leaf, length/int32(unsafe.Sizeof(primitives.Leaf{})))
 	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
 	numLeafs := len(lump.data)
@@ -39,11 +39,11 @@ func (lump Leaf) FromBytes(raw []byte, length int32) ILump {
 	return lump
 }
 
-func (lump Leaf) GetData() interface{} {
+func (lump *Leaf) GetData() interface{} {
 	return lump.data
 }
 
-func (lump Leaf) ToBytes() []byte {
+func (lump *Leaf) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()
