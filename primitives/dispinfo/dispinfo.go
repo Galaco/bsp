@@ -4,6 +4,8 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+const MaxDispCornerNeightbours = 4
+
 type DispInfo struct {
 	StartPosition mgl32.Vec3
 	DispVertStart int32
@@ -13,11 +15,13 @@ type DispInfo struct {
 	SmoothingAngle float32
 	Contents int32
 	MapFace uint16
+	_ [2]byte
 	LightmapAlphaStart int32
 	LightmapSampleStartPosition int32
-	EdgeNeighbors [4]DispNeighbor
-	CornerNeighbors [4]DispCornerNeighbors
-	AllowedVerts [10]uint32
+	Ignore [32]uint32
+	//EdgeNeighbors [4]DispNeighbor
+	//CornerNeighbors [4]DispCornerNeighbors
+	//AllowedVerts [8]uint32
 
 }
 
@@ -27,13 +31,12 @@ type DispNeighbor struct {
 
 type DispSubNeighbor struct {
 	Index uint16 // 0xFFFF if no neighbor
-	NeighborOrientation byte
-	Span byte
-	NeighborSpan byte
-
+	NeighborOrientation uint8
+	Span uint8
+	NeighborSpan uint8
 }
 
 type DispCornerNeighbors struct {
-	Neighbors uint16
-	NumNeighbors byte
+	Neighbors [MaxDispCornerNeightbours]uint16
+	NumNeighbors uint8
 }

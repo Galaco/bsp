@@ -62,7 +62,7 @@ func Getv20Lump(index int) (lumps.ILump,error) {
 	case 25:
 		ret = &lumps.Unimplemented{} //clusterportals | unused3 | proptris
 	case 26:
-		ret = &lumps.Unimplemented{}
+		ret = &lumps.DispInfo{}
 	case 27:
 		ret = &lumps.Face{}
 	case 28:
