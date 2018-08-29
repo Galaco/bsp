@@ -15,9 +15,10 @@ type Primitive struct {
 	data []primitives.Primitive
 }
 
-func (lump *Primitive) FromBytes(raw []byte, length int32) ILump {
+func (lump *Primitive) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 
 	lump.data = make([]primitives.Primitive, length/int32(unsafe.Sizeof(primitives.Primitive{})))
@@ -25,12 +26,9 @@ func (lump *Primitive) FromBytes(raw []byte, length int32) ILump {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Primitive) GetData() interface{} {
+func (lump *Primitive) GetData() []primitives.Primitive {
 	return lump.data
 }
 

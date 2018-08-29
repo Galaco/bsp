@@ -8,14 +8,12 @@ type EntData struct {
 	data string
 }
 
-func (lump *EntData) FromBytes(raw []byte, length int32) ILump {
+func (lump *EntData) FromBytes(raw []byte, length int32) {
 	lump.data = string(raw)
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *EntData) GetData() interface{} {
+func (lump *EntData) GetData() string {
 	return lump.data
 }
 

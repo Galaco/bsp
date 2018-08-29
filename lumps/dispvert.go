@@ -15,9 +15,10 @@ type DispVert struct {
 	data []primitives.DispVert
 }
 
-func (lump *DispVert) FromBytes(raw []byte, length int32) ILump {
+func (lump *DispVert) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 
 	lump.data = make([]primitives.DispVert, length/int32(unsafe.Sizeof(primitives.DispVert{})))
@@ -25,12 +26,9 @@ func (lump *DispVert) FromBytes(raw []byte, length int32) ILump {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *DispVert) GetData() interface{} {
+func (lump *DispVert) GetData() []primitives.DispVert {
 	return lump.data
 }
 

@@ -90,8 +90,8 @@ func main() {
 	}
 	f.Close()
     
-	lump := file.GetLump(bsp.LUMP_ENTITIES)
-	log.Println(lump.GetContents().GetData().(string))
+	lump := file.GetLump(bsp.LUMP_ENTITIES).(*lump.Entities)
+	log.Println(lump.GetData())
 }
 ```
 

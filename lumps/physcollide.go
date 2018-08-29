@@ -15,9 +15,10 @@ type PhysCollide struct {
 	data []primitives.PhysCollideEntry
 }
 
-func (lump *PhysCollide) FromBytes(raw []byte, length int32) ILump {
+func (lump *PhysCollide) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 
 	lump.data = make([]primitives.PhysCollideEntry, length/int32(unsafe.Sizeof(primitives.PhysCollideEntry{})))
@@ -25,12 +26,9 @@ func (lump *PhysCollide) FromBytes(raw []byte, length int32) ILump {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *PhysCollide) GetData() interface{} {
+func (lump *PhysCollide) GetData() []primitives.PhysCollideEntry {
 	return lump.data
 }
 

@@ -19,7 +19,7 @@ type Leaf struct {
 	data []primitives.Leaf
 }
 
-func (lump *Leaf) FromBytes(raw []byte, length int32) ILump {
+func (lump *Leaf) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Leaf, length/int32(unsafe.Sizeof(primitives.Leaf{})))
 	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
 	numLeafs := len(lump.data)
@@ -35,11 +35,9 @@ func (lump *Leaf) FromBytes(raw []byte, length int32) ILump {
 		}
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Leaf) GetData() interface{} {
+func (lump *Leaf) GetData() []primitives.Leaf {
 	return lump.data
 }
 

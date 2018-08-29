@@ -8,18 +8,12 @@ type DispLightmapSamplePosition struct {
 	data []byte
 }
 
-func (lump *DispLightmapSamplePosition) FromBytes(raw []byte, length int32) ILump {
-	if length == 0 {
-		return lump
-	}
-
+func (lump *DispLightmapSamplePosition) FromBytes(raw []byte, length int32) {
 	lump.data = raw
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *DispLightmapSamplePosition) GetData() interface{} {
+func (lump *DispLightmapSamplePosition) GetData() []byte {
 	return lump.data
 }
 

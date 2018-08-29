@@ -15,9 +15,9 @@ type LeafAmbientIndexHDR struct {
 	data []primitives.LeafAmbientIndex
 }
 
-func (lump *LeafAmbientIndexHDR) FromBytes(raw []byte, length int32) ILump {
+func (lump *LeafAmbientIndexHDR) FromBytes(raw []byte, length int32) {
 	if length == 0 {
-		return lump
+		return
 	}
 	lump.data = make([]primitives.LeafAmbientIndex, length/int32(unsafe.Sizeof(primitives.LeafAmbientIndex{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
@@ -25,11 +25,9 @@ func (lump *LeafAmbientIndexHDR) FromBytes(raw []byte, length int32) ILump {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *LeafAmbientIndexHDR) GetData() interface{} {
+func (lump *LeafAmbientIndexHDR) GetData() []primitives.LeafAmbientIndex {
 	return lump.data
 }
 

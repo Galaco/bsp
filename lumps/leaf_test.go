@@ -18,9 +18,9 @@ func TestLeafDataFromBytes(t *testing.T) {
 	}
 
 	lump := Leaf{}
-	data := lump.FromBytes(GetTestDataBytes(), int32(len(GetTestDataBytes())))
+	lump.FromBytes(GetTestDataBytes(), int32(len(GetTestDataBytes())))
 	expected := GetTestLeafData()
-	actual := data.GetData().([]primitives.Leaf)[0]
+	actual := lump.GetData()[0]
 
 
 	if actual != expected {

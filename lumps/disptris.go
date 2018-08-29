@@ -15,9 +15,10 @@ type DispTris struct {
 	data []primitives.DispTri
 }
 
-func (lump *DispTris) FromBytes(raw []byte, length int32) ILump {
+func (lump *DispTris) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 
 	lump.data = make([]primitives.DispTri, length/int32(unsafe.Sizeof(primitives.DispTri{})))
@@ -25,12 +26,9 @@ func (lump *DispTris) FromBytes(raw []byte, length int32) ILump {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *DispTris) GetData() interface{} {
+func (lump *DispTris) GetData() []primitives.DispTri {
 	return lump.data
 }
 

@@ -16,18 +16,16 @@ type BrushSide struct {
 	data []primitives.BrushSide // MAX_MAP_BRUSHSIDES = 65536
 }
 
-func (lump *BrushSide) FromBytes(raw []byte, length int32) ILump {
+func (lump *BrushSide) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.BrushSide, length/int32(unsafe.Sizeof(primitives.BrushSide{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *BrushSide) GetData() interface{} {
+func (lump *BrushSide) GetData() []primitives.BrushSide {
 	return lump.data
 }
 

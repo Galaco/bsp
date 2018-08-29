@@ -71,7 +71,7 @@ func (w *Writer) Write() []byte {
  */
 func (w *Writer) WriteLump(index int) []byte {
 	lump := w.data.GetLump(index)
-	return lump.GetContents().ToBytes()
+	return lump.ToBytes()
 }
 
 /**

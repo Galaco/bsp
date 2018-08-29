@@ -16,18 +16,16 @@ type Model struct {
 	data []primitives.Model
 }
 
-func (lump *Model) FromBytes(raw []byte, length int32) ILump {
+func (lump *Model) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Model, length/int32(unsafe.Sizeof(primitives.Model{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Model) GetData() interface{} {
+func (lump *Model) GetData() []primitives.Model {
 	return lump.data
 }
 

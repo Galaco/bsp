@@ -8,12 +8,7 @@ type ILump interface {
 	/**
 		Import a []byte to a defined lump structure(s).
 	 */
-	FromBytes([]byte, int32) ILump
-
-	/**
-		Return populated lump structure(s).
-	 */
-	GetData() interface{}
+	FromBytes([]byte, int32)
 
 	/**
 		Export lump structure back to []byte.
@@ -26,15 +21,9 @@ type LumpGeneric struct {
 	data []byte
 }
 
-func (lump *LumpGeneric) FromBytes(data []byte, length int32) ILump {
+func (lump *LumpGeneric) FromBytes(data []byte, length int32) {
 	lump.length = length
 	lump.data = data
-
-	return lump
-}
-
-func (lump *LumpGeneric) GetData() interface{}{
-	return lump.data
 }
 
 func (lump *LumpGeneric) ToBytes() []byte {

@@ -20,11 +20,11 @@ type Game struct {
 	GameLumps []byte
 }
 
-func (lump *Game) FromBytes(raw []byte, length int32) ILump {
+func (lump *Game) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 
 	if len(raw) == 0 {
-		return lump
+		return
 	}
 
 	// First reconstruct the header to be of the right size
@@ -49,11 +49,9 @@ func (lump *Game) FromBytes(raw []byte, length int32) ILump {
 	err = binary.Read(
 		bytes.NewBuffer(raw[headerSize:length]),
 		binary.LittleEndian, &lump.GameLumps)
-
-	return lump
 }
 
-func (lump *Game) GetData() interface{} {
+func (lump *Game) GetData() *Game {
 	return lump
 }
 

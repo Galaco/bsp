@@ -16,9 +16,10 @@ type VertNormal struct {
 	data []primitives.VertNormal
 }
 
-func (lump *VertNormal) FromBytes(raw []byte, length int32) ILump {
+func (lump *VertNormal) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 
 	lump.data = make([]primitives.VertNormal, length/int32(unsafe.Sizeof(primitives.VertNormal{})))
@@ -26,12 +27,9 @@ func (lump *VertNormal) FromBytes(raw []byte, length int32) ILump {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *VertNormal) GetData() interface{} {
+func (lump *VertNormal) GetData() []primitives.VertNormal {
 	return lump.data
 }
 

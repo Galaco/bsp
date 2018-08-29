@@ -14,9 +14,10 @@ type PrimIndice struct {
 	data []uint16
 }
 
-func (lump *PrimIndice) FromBytes(raw []byte, length int32) ILump {
+func (lump *PrimIndice) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 
 	lump.data = make([]uint16, length/int32(2))
@@ -24,12 +25,9 @@ func (lump *PrimIndice) FromBytes(raw []byte, length int32) ILump {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *PrimIndice) GetData() interface{} {
+func (lump *PrimIndice) GetData() []uint16 {
 	return lump.data
 }
 

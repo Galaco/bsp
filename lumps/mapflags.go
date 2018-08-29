@@ -14,21 +14,19 @@ type MapFlags struct {
 	data primitives.MapFlags
 }
 
-func (lump *MapFlags) FromBytes(raw []byte, length int32) ILump {
+func (lump *MapFlags) FromBytes(raw []byte, length int32) {
 	if length == 0 {
-		return lump
+		return
 	}
 
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *MapFlags) GetData() interface{} {
+func (lump *MapFlags) GetData() *primitives.MapFlags {
 	return &lump.data
 }
 

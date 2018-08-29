@@ -16,21 +16,19 @@ type WorldLight struct {
 	data []primitives.WorldLight
 }
 
-func (lump *WorldLight) FromBytes(raw []byte, length int32) ILump {
+func (lump *WorldLight) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 	lump.data = make([]primitives.WorldLight, length/int32(unsafe.Sizeof(primitives.WorldLight{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *WorldLight) GetData() interface{} {
+func (lump *WorldLight) GetData() []primitives.WorldLight {
 	return lump.data
 }
 

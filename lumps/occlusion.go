@@ -21,9 +21,9 @@ type Occlusion struct {
 	VertexIndices []int32 //len(slice) = VertexIndexCount
 }
 
-func (lump *Occlusion) FromBytes(raw []byte, length int32) ILump {
+func (lump *Occlusion) FromBytes(raw []byte, length int32) {
 	if length == 0 {
-		return lump
+		return
 	}
 	offset := 0
 	// data
@@ -66,12 +66,10 @@ func (lump *Occlusion) FromBytes(raw []byte, length int32) ILump {
 
 
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Occlusion) GetData() interface{} {
-	return &lump
+func (lump *Occlusion) GetData() *Occlusion {
+	return lump
 }
 
 func (lump *Occlusion) ToBytes() []byte {

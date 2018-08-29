@@ -14,18 +14,16 @@ type Surfedge struct {
 	data []int32 // MAX_MAP_SURFEDGES = 512000
 }
 
-func (lump *Surfedge) FromBytes(raw []byte, length int32) ILump {
+func (lump *Surfedge) FromBytes(raw []byte, length int32) {
 	lump.data = make([]int32, length/4)
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Surfedge) GetData() interface{} {
+func (lump *Surfedge) GetData() []int32 {
 	return lump.data
 }
 

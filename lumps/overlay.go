@@ -15,21 +15,19 @@ type Overlay struct {
 	data []primitives.Overlay
 }
 
-func (lump *Overlay) FromBytes(raw []byte, length int32) ILump {
+func (lump *Overlay) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 	lump.data = make([]primitives.Overlay, length/int32(unsafe.Sizeof(primitives.Overlay{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Overlay) GetData() interface{} {
+func (lump *Overlay) GetData() []primitives.Overlay {
 	return lump.data
 }
 

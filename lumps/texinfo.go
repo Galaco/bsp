@@ -17,18 +17,16 @@ type TexInfo struct {
 	data []primitives.TexInfo
 }
 
-func (lump *TexInfo) FromBytes(raw []byte, length int32) ILump {
+func (lump *TexInfo) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.TexInfo, length/int32(unsafe.Sizeof(primitives.TexInfo{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *TexInfo) GetData() interface{} {
+func (lump *TexInfo) GetData() []primitives.TexInfo {
 	return lump.data
 }
 

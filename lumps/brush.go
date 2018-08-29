@@ -16,18 +16,16 @@ type Brush struct {
 	data []primitives.Brush
 }
 
-func (lump *Brush) FromBytes(raw []byte, length int32) ILump {
+func (lump *Brush) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Brush, length/int32(unsafe.Sizeof(primitives.Brush{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Brush) GetData() interface{} {
+func (lump *Brush) GetData() []primitives.Brush {
 	return lump.data
 }
 

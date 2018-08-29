@@ -15,7 +15,7 @@ type Visibility struct {
 
 // FromBytes
 // Populate receiver lump from byte slice
-func (lump *Visibility) FromBytes(raw []byte, length int32) ILump {
+func (lump *Visibility) FromBytes(raw []byte, length int32) {
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data.NumClusters)
 	if err != nil {
 		log.Fatal(err)
@@ -33,15 +33,13 @@ func (lump *Visibility) FromBytes(raw []byte, length int32) ILump {
 	}
 
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
 // GetData
 // Get internal lump data structure
 // Returns interface{} to fulfill interface
 // Should be typecasted to expected type
-func (lump *Visibility) GetData() interface{} {
+func (lump *Visibility) GetData() *primitives.Vis {
 	return &lump.data
 }
 

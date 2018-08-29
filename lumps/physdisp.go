@@ -8,18 +8,12 @@ type PhysDisp struct {
 	data []byte
 }
 
-func (lump *PhysDisp) FromBytes(raw []byte, length int32) ILump {
-	if length == 0 {
-		return lump
-	}
-
+func (lump *PhysDisp) FromBytes(raw []byte, length int32) {
 	lump.data = raw
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *PhysDisp) GetData() interface{} {
+func (lump *PhysDisp) GetData() []byte {
 	return lump.data
 }
 

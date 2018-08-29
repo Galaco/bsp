@@ -15,9 +15,10 @@ type Area struct {
 	data []primitives.Area
 }
 
-func (lump *Area) FromBytes(raw []byte, length int32) ILump {
+func (lump *Area) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 
 	lump.data = make([]primitives.Area, length/int32(unsafe.Sizeof(primitives.Area{})))
@@ -26,11 +27,9 @@ func (lump *Area) FromBytes(raw []byte, length int32) ILump {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Area) GetData() interface{} {
+func (lump *Area) GetData() []primitives.Area {
 	return lump.data
 }
 

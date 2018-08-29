@@ -8,14 +8,12 @@ type TexdataStringData struct {
 	data string // MAX_MAP_TEXDATA_STRING_DATA = 256000, TEXTURE_NAME_LENGTH = 128
 }
 
-func (lump *TexdataStringData) FromBytes(raw []byte, length int32) ILump {
+func (lump *TexdataStringData) FromBytes(raw []byte, length int32) {
 	lump.data = string(raw)
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *TexdataStringData) GetData() interface{} {
+func (lump *TexdataStringData) GetData() string {
 	return lump.data
 }
 

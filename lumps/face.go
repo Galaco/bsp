@@ -17,18 +17,16 @@ type Face struct {
 	data []primitives.Face
 }
 
-func (lump *Face) FromBytes(raw []byte, length int32) ILump {
+func (lump *Face) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Face, length/int32(unsafe.Sizeof(primitives.Face{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Face) GetData() interface{} {
+func (lump *Face) GetData() []primitives.Face {
 	return lump.data
 }
 

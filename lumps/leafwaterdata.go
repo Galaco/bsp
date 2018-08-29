@@ -16,9 +16,10 @@ type LeafWaterData struct {
 	data []primitives.LeafWaterData
 }
 
-func (lump *LeafWaterData) FromBytes(raw []byte, length int32) ILump {
+func (lump *LeafWaterData) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 	lump.data = make([]primitives.LeafWaterData, length/int32(unsafe.Sizeof(primitives.LeafWaterData{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
@@ -26,12 +27,9 @@ func (lump *LeafWaterData) FromBytes(raw []byte, length int32) ILump {
 		log.Fatal(err)
 	}
 
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *LeafWaterData) GetData() interface{} {
+func (lump *LeafWaterData) GetData() []primitives.LeafWaterData {
 	return lump.data
 }
 

@@ -1,5 +1,7 @@
 package bsp
 
+import "github.com/galaco/bsp/lumps"
+
 // Root .bsp filetype container.
 // Consists of a 1036byte header and 64 lump blocks.
 type Bsp struct {
@@ -30,7 +32,12 @@ func (bsp *Bsp) GetHeader() Header {
 }
 
 // Get the lump for a given index.
-func (bsp *Bsp) GetLump(index int) *Lump {
+func (bsp *Bsp) GetLump(index int) lumps.ILump {
+	return bsp.GetLumpRaw(index).GetContents()
+}
+
+// Get the lump for a given index.
+func (bsp *Bsp) GetLumpRaw(index int) *Lump {
 	return &bsp.lumps[index]
 }
 

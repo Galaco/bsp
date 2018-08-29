@@ -16,18 +16,16 @@ type Node struct {
 	data []primitives.Node // MAP_MAX_NODES = 65536
 }
 
-func (lump *Node) FromBytes(raw []byte, length int32) ILump {
+func (lump *Node) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Node, length/int32(unsafe.Sizeof(primitives.Node{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Node) GetData() interface{} {
+func (lump *Node) GetData() []primitives.Node {
 	return lump.data
 }
 

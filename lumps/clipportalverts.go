@@ -17,18 +17,16 @@ type ClipPortalVerts struct {
 	data []mgl32.Vec3
 }
 
-func (lump *ClipPortalVerts) FromBytes(raw []byte, length int32) ILump {
+func (lump *ClipPortalVerts) FromBytes(raw []byte, length int32) {
 	lump.data = make([]mgl32.Vec3, length/int32(unsafe.Sizeof(mgl32.Vec3{})))
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *ClipPortalVerts) GetData() interface{} {
+func (lump *ClipPortalVerts) GetData() []mgl32.Vec3 {
 	return lump.data
 }
 

@@ -14,18 +14,16 @@ type Edge struct {
 	data [][2]uint16 // MAX_MAP_EDGES = 256000
 }
 
-func (lump *Edge) FromBytes(raw []byte, length int32) ILump {
+func (lump *Edge) FromBytes(raw []byte, length int32) {
 	lump.data = make([][2]uint16, length/4)
 	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump *Edge) GetData() interface{} {
+func (lump *Edge) GetData() [][2]uint16 {
 	return lump.data
 }
 
