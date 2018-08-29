@@ -90,7 +90,7 @@ func Getv20Lump(index int) (lumps.ILump,error) {
 	case 39:
 		ret = &lumps.PrimIndice{}
 	case 40:
-		ret = &lumps.Unimplemented{} //pakfile
+		ret = &lumps.Pakfile{} //pakfile
 	case 41:
 		ret = &lumps.ClipPortalVerts{}
 	case 42:
