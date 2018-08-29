@@ -42,7 +42,7 @@ func (lump *Pakfile) ToBytes() []byte {
 
 // Get a specific file from the pak
 func (lump *Pakfile) GetFile(filePath string) ([]byte,error) {
-	filePath = strings.ToLower(filePath)
+	filePath = lump.sanitisePath(filePath)
 	for _,f := range lump.zipReader.File {
 		if strings.ToLower(f.Name) == filePath {
 			rc,err := f.Open()
@@ -53,4 +53,10 @@ func (lump *Pakfile) GetFile(filePath string) ([]byte,error) {
 		}
 	}
 	return []byte{},nil
+}
+
+func (lump *Pakfile) sanitisePath(filePath string) string {
+	filePath = strings.ToLower(filePath)
+	filePath = strings.Replace(filePath, "/", "\\", -1)
+	return filePath
 }
