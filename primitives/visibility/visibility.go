@@ -11,17 +11,22 @@ type Vis struct {
 	BitVectors []byte // Compressed bit vectors, contains run-length compression PVS data
 }
 
-func (vis *Vis) GetVisibleIdsForCluster(clusterId int16) (visibleClusterIds []int16) {
-	offset := vis.ByteOffset[clusterId][0]
+// Decompress vis data for a given cluster
+// see https://developer.valvesoftware.com/wiki/Source_BSP_File_Format#Visibility for more
+func (vis *Vis) GetPVSForCluster(clusterId int16) ([]bool) {
+	visibleClusterIds := make([]bool, vis.NumClusters)
+	v := vis.ByteOffset[clusterId][0] // pvs offset for cluster
 
-	currentClusterId := int16(-1)
-	for _,byte := range vis.BitVectors[offset:offset+int32(vis.NumClusters / 8)] {
-		for i := uint8(1); i < 9; i++ {
-			if (uint8(byte) & i) == 1 {
-				visibleClusterIds = append(visibleClusterIds, currentClusterId)
+	for c := int16(0); c < int16(vis.NumClusters); v++ {
+		if vis.BitVectors[v] == 0 {
+			v++
+			c += int16(8 * uint8(vis.BitVectors[v]))
+		} else {
+			for bit := uint8(1); bit != 0; bit, c = bit * 2, c + 1 {
+				if (vis.BitVectors[v] & bit) == 1 {
+					visibleClusterIds[c] = true
+				}
 			}
-
-			currentClusterId++
 		}
 	}
 
