@@ -18,7 +18,7 @@ type Planes struct {
 
 func (lump *Planes) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Plane, length/int32(unsafe.Sizeof(primitives.Plane{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -18,7 +18,7 @@ type Node struct {
 
 func (lump *Node) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Node, length/int32(unsafe.Sizeof(primitives.Node{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -18,7 +18,7 @@ type Model struct {
 
 func (lump *Model) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Model, length/int32(unsafe.Sizeof(primitives.Model{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

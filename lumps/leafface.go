@@ -16,7 +16,7 @@ type LeafFace struct {
 
 func (lump *LeafFace) FromBytes(raw []byte, length int32) {
 	lump.data = make([]uint16, length/2)
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
