@@ -143,7 +143,6 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				return nil
 			}
 
-			log.Println("a")
 			return &primitives.StaticPropLump{
 				DictLump: dicts,
 				LeafLump: leaf,
