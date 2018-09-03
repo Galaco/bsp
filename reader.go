@@ -2,6 +2,7 @@ package bsp
 
 import (
 	"bytes"
+	"github.com/galaco/bsp/lumps"
 	"unsafe"
 	"io"
 	"encoding/binary"
@@ -43,6 +44,15 @@ func (r *Reader) Read() (*Bsp,error) {
 		bsp.lumps[index].SetId(index)
 		bsp.lumps[index].SetRawContents(lp)
 		refLump,err := getReferenceLumpByIndex(index, bsp.header.Version)
+
+		// There are specific rules for the game lump that requires some extra information
+		// Game lump lumps have offset data relative to file start, not lump start
+		// This will correct the offsets to the start of the lump.
+		// @NOTE: Portal2 console uses relative offsets. This game+platform are not supported currently
+		if index == LUMP_GAME_LUMP {
+			refLump.(*lumps.Game).UpdateInternalOffsets(bsp.header.Lumps[index].Offset)
+		}
+
 		if err != nil {
 			return nil,err
 		}
