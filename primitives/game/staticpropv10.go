@@ -24,6 +24,7 @@ type StaticPropV10 struct {
 	DiffuseModulation float32
 	Unknown float32
 	DisableXBox360 bool
+	_ [3]byte
 }
 
 func (l *StaticPropV10) GetOrigin() mgl32.Vec3 {
