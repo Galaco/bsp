@@ -1,6 +1,7 @@
 package bsp
 
 import (
+	"github.com/galaco/bsp/lumps"
 	"testing"
 	"os"
 )
@@ -18,8 +19,10 @@ func TestReadFromStream(t *testing.T) {
 		t.Error(err)
 	}
 
-	_,err = ReadFromStream(f)
+	r,err := ReadFromStream(f)
 	if err != nil {
 		t.Error(err)
 	}
+
+	r.GetLump(LUMP_GAME_LUMP).(*lumps.Game).GetStaticPropLump()
 }
