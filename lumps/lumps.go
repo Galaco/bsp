@@ -1,18 +1,18 @@
 package lumps
 
 /**
-	Lump interface.
-	Organise Lump data in a cleaner and more accessible manner
- */
+Lump interface.
+Organise Lump data in a cleaner and more accessible manner
+*/
 type ILump interface {
 	/**
-		Import a []byte to a defined lump structure(s).
-	 */
+	Import a []byte to a defined lump structure(s).
+	*/
 	FromBytes([]byte, int32)
 
 	/**
-		Export lump structure back to []byte.
-	 */
+	Export lump structure back to []byte.
+	*/
 	ToBytes() []byte
 }
 
@@ -31,21 +31,22 @@ func (lump *LumpGeneric) ToBytes() []byte {
 }
 
 /**
-	Helper info for a lump
- */
+Helper info for a lump
+*/
 type LumpInfo struct {
 	length int32
 }
 
 /**
-	Return lump import length in bytes.
- */
+Return lump import length in bytes.
+*/
 func (info LumpInfo) GetLength() int32 {
 	return info.length
 }
+
 /**
-	Set lump import length in bytes
- */
+Set lump import length in bytes
+*/
 func (info LumpInfo) SetLength(length int32) {
 	info.length = length
 }

@@ -1,14 +1,14 @@
 package lumps
 
 import (
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
 	"log"
 )
 
 /**
-	Lump 13: Surfedge
- */
+Lump 13: Surfedge
+*/
 type Surfedge struct {
 	LumpGeneric
 	data []int32 // MAX_MAP_SURFEDGES = 512000
@@ -16,7 +16,7 @@ type Surfedge struct {
 
 func (lump *Surfedge) FromBytes(raw []byte, length int32) {
 	lump.data = make([]int32, length/4)
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

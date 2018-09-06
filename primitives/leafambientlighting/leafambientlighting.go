@@ -4,10 +4,10 @@ import primitives "github.com/galaco/bsp/primitives/common"
 
 type LeafAmbientLighting struct {
 	Cube CompressedLightCube
-	X byte
-	Y byte
-	Z byte
-	Pad byte
+	X    byte
+	Y    byte
+	Z    byte
+	Pad  byte
 }
 
 type CompressedLightCube struct {

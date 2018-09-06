@@ -1,14 +1,14 @@
 package lumps
 
 import (
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
 	"log"
 )
 
 /**
-	Lump 46: LeafMinDistToWater
- */
+Lump 46: LeafMinDistToWater
+*/
 
 type LeafMinDistToWater struct {
 	LumpGeneric
@@ -17,7 +17,7 @@ type LeafMinDistToWater struct {
 
 func (lump *LeafMinDistToWater) FromBytes(raw []byte, length int32) {
 	lump.data = make([]uint16, length/int32(2))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

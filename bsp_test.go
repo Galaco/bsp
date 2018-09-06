@@ -1,14 +1,14 @@
 package bsp
 
 import (
-	"testing"
-	"log"
 	"bytes"
+	"log"
+	"testing"
 )
 
 // Test that resultant lump data matches expected.
 func TestLumpExports(t *testing.T) {
-	file,err := ReadFromFile("maps/v20/de_dust2.bsp")
+	file, err := ReadFromFile("maps/v20/de_dust2.bsp")
 	if err != nil {
 		t.Error(err)
 	}

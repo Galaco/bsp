@@ -1,16 +1,16 @@
 package lumps
 
 import (
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	"github.com/go-gl/mathgl/mgl32"
 	"log"
 	"unsafe"
-	"github.com/go-gl/mathgl/mgl32"
 )
 
 /**
-	Lump 41: ClipPortalVerts
- */
+Lump 41: ClipPortalVerts
+*/
 
 type ClipPortalVerts struct {
 	LumpGeneric
@@ -19,7 +19,7 @@ type ClipPortalVerts struct {
 
 func (lump *ClipPortalVerts) FromBytes(raw []byte, length int32) {
 	lump.data = make([]mgl32.Vec3, length/int32(unsafe.Sizeof(mgl32.Vec3{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

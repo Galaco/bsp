@@ -1,16 +1,16 @@
 package lumps
 
 import (
-	"encoding/binary"
-	"bytes"
 	"archive/zip"
+	"bytes"
+	"encoding/binary"
 	"io/ioutil"
 	"strings"
 )
 
 /**
-	Lump 40: Pakfile
- */
+Lump 40: Pakfile
+*/
 type Pakfile struct {
 	LumpGeneric
 	zipReader *zip.Reader
@@ -21,7 +21,7 @@ func (lump *Pakfile) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 
 	b := bytes.NewReader(raw)
-	zipReader,err := zip.NewReader(b, int64(length))
+	zipReader, err := zip.NewReader(b, int64(length))
 	if err == nil {
 		lump.zipReader = zipReader
 	}
@@ -41,18 +41,18 @@ func (lump *Pakfile) ToBytes() []byte {
 }
 
 // Get a specific file from the pak
-func (lump *Pakfile) GetFile(filePath string) ([]byte,error) {
+func (lump *Pakfile) GetFile(filePath string) ([]byte, error) {
 	filePath = lump.sanitisePath(filePath)
-	for _,f := range lump.zipReader.File {
+	for _, f := range lump.zipReader.File {
 		if strings.ToLower(f.Name) == filePath {
-			rc,err := f.Open()
+			rc, err := f.Open()
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
 			return ioutil.ReadAll(rc)
 		}
 	}
-	return []byte{},nil
+	return []byte{}, nil
 }
 
 func (lump *Pakfile) sanitisePath(filePath string) string {

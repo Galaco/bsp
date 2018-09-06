@@ -10,39 +10,40 @@ type Header struct {
 	LumpCount int32
 	GameLumps []LumpDef // Slice length must equal lumpCount. Validation to be added
 }
-func (header Header) SetLumpCount(num int32) Header{
+
+func (header Header) SetLumpCount(num int32) Header {
 	header.LumpCount = num
 	header.GameLumps = make([]LumpDef, header.LumpCount)
 	return header
 }
 
 type LumpDef struct {
-	Id int32
-	Flags uint16
-	Version uint16
+	Id         int32
+	Flags      uint16
+	Version    uint16
 	FileOffset int32
 	FileLength int32
 }
 
 type GenericGameLump struct {
 	Length int32
-	Data []byte
+	Data   []byte
 }
 
 type StaticPropLump struct {
-	DictLump StaticPropDictLump
-	LeafLump StaticPropLeafLump
+	DictLump  StaticPropDictLump
+	LeafLump  StaticPropLeafLump
 	PropLumps []IStaticPropDataLump
 }
 
 // Note: Nothing below here is actually implemented, as its primarily game/version specific data.
 type StaticPropDictLump struct {
 	DictEntries int32
-	Name []string // Slice length must equal dictEntries. Validation to be added
+	Name        []string // Slice length must equal dictEntries. Validation to be added
 }
 type StaticPropLeafLump struct {
 	LeafEntries int32
-	Leaf []uint16 // Slice length must equal leafEntries. Validation to be added
+	Leaf        []uint16 // Slice length must equal leafEntries. Validation to be added
 }
 
 type IStaticPropDataLump interface {
@@ -66,6 +67,6 @@ type IStaticPropDataLump interface {
 	GetMinGPULevel() uint8
 	GetMaxGPULevel() uint8
 	GetDiffuseModulation() float32 //v7 onwards
-	GetUnknown() float32 //v10 onwards
-	GetDisableXBox360() bool //v9 onwards
+	GetUnknown() float32           //v10 onwards
+	GetDisableXBox360() bool       //v9 onwards
 }

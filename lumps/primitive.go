@@ -1,15 +1,16 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/primitive"
-	"unsafe"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/primitive"
 	"log"
+	"unsafe"
 )
+
 /**
-	Lump 36: Primitive
- */
+Lump 36: Primitive
+*/
 type Primitive struct {
 	LumpGeneric
 	data []primitives.Primitive
@@ -22,7 +23,7 @@ func (lump *Primitive) FromBytes(raw []byte, length int32) {
 	}
 
 	lump.data = make([]primitives.Primitive, length/int32(unsafe.Sizeof(primitives.Primitive{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

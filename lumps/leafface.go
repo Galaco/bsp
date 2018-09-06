@@ -1,14 +1,14 @@
 package lumps
 
 import (
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
 	"log"
 )
 
 /**
-	Lump 16: LeafFace
- */
+Lump 16: LeafFace
+*/
 type LeafFace struct {
 	LumpGeneric
 	data []uint16 // MAX_MAP_LEAFFACES = 65536

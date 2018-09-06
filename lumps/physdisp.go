@@ -1,8 +1,8 @@
 package lumps
 
 /**
-	Lump 28: PhysDisp
- */
+Lump 28: PhysDisp
+*/
 type PhysDisp struct {
 	LumpGeneric
 	data []byte

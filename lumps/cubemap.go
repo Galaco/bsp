@@ -1,15 +1,16 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/cubemap"
-	"unsafe"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/cubemap"
 	"log"
+	"unsafe"
 )
+
 /**
-	Lump 42: Cubemaps
- */
+Lump 42: Cubemaps
+*/
 type Cubemap struct {
 	LumpGeneric
 	data []primitives.CubemapSample
@@ -21,7 +22,7 @@ func (lump *Cubemap) FromBytes(raw []byte, length int32) {
 		return
 	}
 	lump.data = make([]primitives.CubemapSample, length/int32(unsafe.Sizeof(primitives.CubemapSample{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

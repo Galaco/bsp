@@ -1,15 +1,16 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/physcollide"
-	"unsafe"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/physcollide"
 	"log"
+	"unsafe"
 )
+
 /**
-	Lump 20: PhysCollide
- */
+Lump 20: PhysCollide
+*/
 type PhysCollide struct {
 	LumpGeneric
 	data []primitives.PhysCollideEntry
@@ -22,7 +23,7 @@ func (lump *PhysCollide) FromBytes(raw []byte, length int32) {
 	}
 
 	lump.data = make([]primitives.PhysCollideEntry, length/int32(unsafe.Sizeof(primitives.PhysCollideEntry{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

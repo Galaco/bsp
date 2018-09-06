@@ -1,16 +1,16 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/vertnormal"
-	"unsafe"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/vertnormal"
 	"log"
+	"unsafe"
 )
 
 /**
-	Lump 30: VertNormal
- */
+Lump 30: VertNormal
+*/
 type VertNormal struct {
 	LumpGeneric
 	data []primitives.VertNormal
@@ -23,7 +23,7 @@ func (lump *VertNormal) FromBytes(raw []byte, length int32) {
 	}
 
 	lump.data = make([]primitives.VertNormal, length/int32(unsafe.Sizeof(primitives.VertNormal{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

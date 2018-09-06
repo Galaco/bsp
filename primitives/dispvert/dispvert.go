@@ -5,7 +5,7 @@ import (
 )
 
 type DispVert struct {
-	Vec mgl32.Vec3
-	Dist float32
+	Vec   mgl32.Vec3
+	Dist  float32
 	Alpha float32
 }

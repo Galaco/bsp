@@ -1,8 +1,8 @@
 package lumps
 
 /**
-	Lump 34: DispLightmapSamplePosition
- */
+Lump 34: DispLightmapSamplePosition
+*/
 type DispLightmapSamplePosition struct {
 	LumpGeneric
 	data []byte

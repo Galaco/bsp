@@ -9,17 +9,15 @@ import (
 	"unsafe"
 )
 
-
-
 /**
-	Lump 35.
-	@TODO NOTE: This really needs per-game implementations to be useful, otherwise we might as well skip reading this lump entirely
- */
+Lump 35.
+@TODO NOTE: This really needs per-game implementations to be useful, otherwise we might as well skip reading this lump entirely
+*/
 type Game struct {
 	LumpGeneric
-	Header primitives.Header
-	GameLumps []primitives.GenericGameLump
-	LumpOffset int32
+	Header              primitives.Header
+	GameLumps           []primitives.GenericGameLump
+	LumpOffset          int32
 	areOffsetsCorrected bool
 }
 
@@ -36,7 +34,7 @@ func (lump *Game) FromBytes(raw []byte, length int32) {
 
 	// Read header
 	lump.Header.GameLumps = make([]primitives.LumpDef, lumpCount)
-	headerSize := 4 + (int32(unsafe.Sizeof(primitives.LumpDef{}))*int32(lumpCount))
+	headerSize := 4 + (int32(unsafe.Sizeof(primitives.LumpDef{})) * int32(lumpCount))
 	err := binary.Read(bytes.NewBuffer(raw[4:headerSize]), binary.LittleEndian, &lump.Header.GameLumps)
 	if err != nil {
 		log.Fatal(err)
@@ -52,9 +50,9 @@ func (lump *Game) FromBytes(raw []byte, length int32) {
 
 	// Read gamelumps
 	lump.GameLumps = make([]primitives.GenericGameLump, lumpCount)
-	for i,lumpHeader := range lump.Header.GameLumps {
+	for i, lumpHeader := range lump.Header.GameLumps {
 		lump.GameLumps[i].Length = lumpHeader.FileLength
-		lump.GameLumps[i].Data = raw[lumpHeader.FileOffset:lumpHeader.FileOffset + lumpHeader.FileLength]
+		lump.GameLumps[i].Data = raw[lumpHeader.FileOffset : lumpHeader.FileOffset+lumpHeader.FileLength]
 	}
 }
 
@@ -65,10 +63,10 @@ func (lump *Game) GetData() *Game {
 func (lump *Game) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount)
-	for _,lumpHeader := range lump.Header.GameLumps {
+	for _, lumpHeader := range lump.Header.GameLumps {
 		binary.Write(&buf, binary.LittleEndian, lumpHeader)
 	}
-	for _,l := range lump.GameLumps {
+	for _, l := range lump.GameLumps {
 		binary.Write(&buf, binary.LittleEndian, l)
 	}
 	return buf.Bytes()
@@ -83,7 +81,7 @@ func (lump *Game) UpdateInternalOffsets(fileOffset int32) *Game {
 }
 
 func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
-	for i,gameLump := range lump.Header.GameLumps {
+	for i, gameLump := range lump.Header.GameLumps {
 		if gameLump.Id == primitives.StaticPropLumpId {
 			sprpLump := lump.GameLumps[i]
 
@@ -91,7 +89,7 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 
 			//dict
 			numDicts := int32(0)
-			err := binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + 4]), binary.LittleEndian, &numDicts)
+			err := binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+4]), binary.LittleEndian, &numDicts)
 			if err != nil {
 				return nil
 			}
@@ -102,7 +100,7 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 			dictNames := make([]string, numDicts)
 			for i := int32(0); i < numDicts; i++ {
 				t := make([]byte, 128)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + 128]), binary.LittleEndian, &t)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+128]), binary.LittleEndian, &t)
 				if err != nil {
 					return nil
 				}
@@ -113,7 +111,7 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 
 			//leaf
 			numLeafs := int32(0)
-			err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + 4]), binary.LittleEndian, &numLeafs)
+			err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+4]), binary.LittleEndian, &numLeafs)
 			if err != nil {
 				return nil
 			}
@@ -122,7 +120,7 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				LeafEntries: numLeafs,
 			}
 			leafs := make([]uint16, numLeafs)
-			err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + int(2 * numLeafs)]), binary.LittleEndian, &leafs)
+			err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+int(2*numLeafs)]), binary.LittleEndian, &leafs)
 			if err != nil {
 				return nil
 			}
@@ -142,88 +140,88 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 			case 4:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV4{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV4, numProps)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + propLumpSize]), binary.LittleEndian, &vprops)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
-				for idx,prop := range vprops {
+				for idx, prop := range vprops {
 					props[idx] = &prop
 				}
 			case 5:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV5{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV5, numProps)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + propLumpSize]), binary.LittleEndian, &vprops)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
-				for idx,prop := range vprops {
+				for idx, prop := range vprops {
 					props[idx] = &prop
 				}
 			case 6:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV6{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV6, numProps)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + propLumpSize]), binary.LittleEndian, &vprops)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
-				for idx,prop := range vprops {
+				for idx, prop := range vprops {
 					props[idx] = &prop
 				}
 			case 7:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV7{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV7, numProps)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + propLumpSize]), binary.LittleEndian, &vprops)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
-				for idx,prop := range vprops {
+				for idx, prop := range vprops {
 					props[idx] = &prop
 				}
 			case 8:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV8{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV8, numProps)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + propLumpSize]), binary.LittleEndian, &vprops)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
-				for idx,prop := range vprops {
+				for idx, prop := range vprops {
 					props[idx] = &prop
 				}
 			case 9:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV9{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV9, numProps)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + propLumpSize]), binary.LittleEndian, &vprops)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
-				for idx,prop := range vprops {
+				for idx, prop := range vprops {
 					props[idx] = &prop
 				}
 			case 10:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV10{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV10, numProps)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + propLumpSize]), binary.LittleEndian, &vprops)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
-				for idx,prop := range vprops {
+				for idx, prop := range vprops {
 					props[idx] = &prop
 				}
 			case 11:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV11{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV11, numProps)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset + propLumpSize]), binary.LittleEndian, &vprops)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
-				for idx,prop := range vprops {
+				for idx, prop := range vprops {
 					props[idx] = &prop
 				}
 			}
 
 			return &primitives.StaticPropLump{
-				DictLump: dicts,
-				LeafLump: leaf,
+				DictLump:  dicts,
+				LeafLump:  leaf,
 				PropLumps: props,
 			}
 		}

@@ -5,16 +5,16 @@ import (
 )
 
 type StaticPropV4 struct {
-	Origin mgl32.Vec3
-	Angles mgl32.Vec3
-	PropType uint16
-	FirstLeaf uint16
-	LeafCount uint16
-	Solid uint8
-	Flags uint8
-	Skin int32
-	FadeMinDist float32
-	FadeMaxDist float32
+	Origin         mgl32.Vec3
+	Angles         mgl32.Vec3
+	PropType       uint16
+	FirstLeaf      uint16
+	LeafCount      uint16
+	Solid          uint8
+	Flags          uint8
+	Skin           int32
+	FadeMinDist    float32
+	FadeMaxDist    float32
 	LightingOrigin mgl32.Vec3
 }
 
@@ -34,11 +34,11 @@ func (l *StaticPropV4) GetPropType() uint16 {
 	return l.PropType
 }
 
-func (l *StaticPropV4) GetFirstLeaf() uint16  {
+func (l *StaticPropV4) GetFirstLeaf() uint16 {
 	return l.FirstLeaf
 }
 
-func (l *StaticPropV4) GetLeafCount() uint16  {
+func (l *StaticPropV4) GetLeafCount() uint16 {
 	return l.LeafCount
 }
 

@@ -5,24 +5,24 @@ import (
 )
 
 type StaticPropV9 struct {
-	Origin mgl32.Vec3
-	Angles mgl32.Vec3
-	PropType uint16
-	FirstLeaf uint16
-	LeafCount uint16
-	Solid uint8
-	Flags uint8
-	Skin int32
-	FadeMinDist float32
-	FadeMaxDist float32
-	LightingOrigin mgl32.Vec3
-	ForcedFadeScale float32
-	MinCPULevel uint8
-	MaxCPULevel uint8
-	MinGPULevel uint8
-	MaxGPULevel uint8
+	Origin            mgl32.Vec3
+	Angles            mgl32.Vec3
+	PropType          uint16
+	FirstLeaf         uint16
+	LeafCount         uint16
+	Solid             uint8
+	Flags             uint8
+	Skin              int32
+	FadeMinDist       float32
+	FadeMaxDist       float32
+	LightingOrigin    mgl32.Vec3
+	ForcedFadeScale   float32
+	MinCPULevel       uint8
+	MaxCPULevel       uint8
+	MinGPULevel       uint8
+	MaxGPULevel       uint8
 	DiffuseModulation float32
-	DisableXBox360 bool
+	DisableXBox360    bool
 }
 
 func (l *StaticPropV9) GetOrigin() mgl32.Vec3 {
@@ -41,11 +41,11 @@ func (l *StaticPropV9) GetPropType() uint16 {
 	return l.PropType
 }
 
-func (l *StaticPropV9) GetFirstLeaf() uint16  {
+func (l *StaticPropV9) GetFirstLeaf() uint16 {
 	return l.FirstLeaf
 }
 
-func (l *StaticPropV9) GetLeafCount() uint16  {
+func (l *StaticPropV9) GetLeafCount() uint16 {
 	return l.LeafCount
 }
 

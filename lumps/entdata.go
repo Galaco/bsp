@@ -1,8 +1,8 @@
 package lumps
 
 /**
-	Lump 0: Entdata
- */
+Lump 0: Entdata
+*/
 type EntData struct {
 	LumpGeneric
 	data string

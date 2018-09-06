@@ -1,10 +1,10 @@
 package lumps
 
 import (
-	"encoding/binary"
 	"bytes"
-	"log"
+	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/visibility"
+	"log"
 )
 
 // Lump 4: Visibility
@@ -16,7 +16,7 @@ type Visibility struct {
 // FromBytes
 // Populate receiver lump from byte slice
 func (lump *Visibility) FromBytes(raw []byte, length int32) {
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data.NumClusters)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.NumClusters)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,9 +25,8 @@ func (lump *Visibility) FromBytes(raw []byte, length int32) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	offset := 4 + (8 * lump.data.NumClusters)
-	lump.data.BitVectors = make([]byte, length - offset)
-	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.data.BitVectors)
+	lump.data.BitVectors = make([]byte, length)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.BitVectors)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,10 +46,6 @@ func (lump *Visibility) GetData() *primitives.Vis {
 // Convert internal data structure into a byte slice
 func (lump *Visibility) ToBytes() []byte {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data.NumClusters)
-	for _, offset := range lump.data.ByteOffset {
-		binary.Write(&buf, binary.LittleEndian, offset)
-	}
 	binary.Write(&buf, binary.LittleEndian, lump.data.BitVectors)
 	return buf.Bytes()
 }

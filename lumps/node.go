@@ -1,16 +1,16 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/node"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/node"
 	"log"
 	"unsafe"
 )
 
 /**
-	Lump 5: Node
- */
+Lump 5: Node
+*/
 type Node struct {
 	LumpGeneric
 	data []primitives.Node // MAP_MAX_NODES = 65536

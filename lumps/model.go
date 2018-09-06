@@ -1,16 +1,16 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/model"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/model"
 	"log"
 	"unsafe"
 )
 
 /**
-	Lump 14: Model
- */
+Lump 14: Model
+*/
 type Model struct {
 	LumpGeneric
 	data []primitives.Model

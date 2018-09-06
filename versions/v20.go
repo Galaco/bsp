@@ -1,11 +1,11 @@
 package versions
 
 import (
-	"github.com/galaco/bsp/lumps"
 	"errors"
+	"github.com/galaco/bsp/lumps"
 )
 
-func Getv20Lump(index int) (lumps.ILump,error) {
+func Getv20Lump(index int) (lumps.ILump, error) {
 	var ret lumps.ILump
 	var err error
 	switch index {
@@ -141,5 +141,5 @@ func Getv20Lump(index int) (lumps.ILump,error) {
 		err = errors.New("invalid lump id")
 	}
 
-	return ret,err
+	return ret, err
 }

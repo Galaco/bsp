@@ -1,14 +1,14 @@
 package lumps
 
 import (
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
 	"log"
 )
 
 /**
-	Lump 44: TexDataStringTable
- */
+Lump 44: TexDataStringTable
+*/
 type TexDataStringTable struct {
 	LumpGeneric
 	data []int32 // MAX_MAP_TEXINFO = 2048

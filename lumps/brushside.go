@@ -1,16 +1,16 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/brushside"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/brushside"
 	"log"
 	"unsafe"
 )
 
 /**
-	Lump 19: BrushSide
- */
+Lump 19: BrushSide
+*/
 type BrushSide struct {
 	LumpGeneric
 	data []primitives.BrushSide // MAX_MAP_BRUSHSIDES = 65536
@@ -18,7 +18,7 @@ type BrushSide struct {
 
 func (lump *BrushSide) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.BrushSide, length/int32(unsafe.Sizeof(primitives.BrushSide{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

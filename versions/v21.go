@@ -4,7 +4,7 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-func Getv21Lump(index int) (lumps.ILump,error) {
+func Getv21Lump(index int) (lumps.ILump, error) {
 	var ret lumps.ILump
 	var err error
 	switch index {
@@ -12,5 +12,5 @@ func Getv21Lump(index int) (lumps.ILump,error) {
 		return Getv20Lump(index)
 	}
 
-	return ret,err
+	return ret, err
 }

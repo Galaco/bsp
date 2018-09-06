@@ -1,16 +1,16 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/plane"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/plane"
 	"log"
 	"unsafe"
 )
 
 /**
-	Lump 1: Planes
- */
+Lump 1: Planes
+*/
 type Planes struct {
 	LumpGeneric
 	data []primitives.Plane // MAP_MAX_PLANES = 65536
@@ -34,4 +34,3 @@ func (lump *Planes) ToBytes() []byte {
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()
 }
-

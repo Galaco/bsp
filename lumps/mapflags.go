@@ -1,14 +1,15 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/mapflags"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/mapflags"
 	"log"
 )
+
 /**
-	Lump 59: MapFlags
- */
+Lump 59: MapFlags
+*/
 type MapFlags struct {
 	LumpGeneric
 	data primitives.MapFlags

@@ -1,10 +1,10 @@
 package lumps
 
 import (
-	"testing"
-	"unsafe"
 	primitives "github.com/galaco/bsp/primitives/leaf"
 	"log"
+	"testing"
+	"unsafe"
 )
 
 const C_STRUCT_SIZE = 32
@@ -21,7 +21,6 @@ func TestLeafDataFromBytes(t *testing.T) {
 	lump.FromBytes(GetTestDataBytes(), int32(len(GetTestDataBytes())))
 	expected := GetTestLeafData()
 	actual := lump.GetData()[0]
-
 
 	if actual != expected {
 		log.Println("Expected: ")
@@ -54,10 +53,9 @@ func GetTestLeafData() primitives.Leaf {
 	return l
 }
 
-
-func GetTestDataBytes() []byte{
+func GetTestDataBytes() []byte {
 	return []byte{
-		1,	// contents
+		1, // contents
 		0,
 		0,
 		0,

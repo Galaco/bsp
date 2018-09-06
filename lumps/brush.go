@@ -1,16 +1,16 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/brush"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/brush"
 	"log"
 	"unsafe"
 )
 
 /**
-	Lump 18: Brush
- */
+Lump 18: Brush
+*/
 type Brush struct {
 	LumpGeneric
 	data []primitives.Brush
@@ -18,7 +18,7 @@ type Brush struct {
 
 func (lump *Brush) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Brush, length/int32(unsafe.Sizeof(primitives.Brush{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

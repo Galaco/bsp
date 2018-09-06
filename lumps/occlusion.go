@@ -1,24 +1,24 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/occlusion"
-	"unsafe"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/occlusion"
 	"log"
+	"unsafe"
 )
 
 /**
-	Lump 9: Occlusion
- */
+Lump 9: Occlusion
+*/
 type Occlusion struct {
 	LumpGeneric
-	Count int32
-	Data []primitives.OcclusionData // len(slice) = Count
-	PolyDataCount int32
-	PolyData []primitives.OcclusionPolyData //len(slice) = PolyDataCount
+	Count            int32
+	Data             []primitives.OcclusionData // len(slice) = Count
+	PolyDataCount    int32
+	PolyData         []primitives.OcclusionPolyData //len(slice) = PolyDataCount
 	VertexIndexCount int32
-	VertexIndices []int32 //len(slice) = VertexIndexCount
+	VertexIndices    []int32 //len(slice) = VertexIndexCount
 }
 
 func (lump *Occlusion) FromBytes(raw []byte, length int32) {
@@ -27,7 +27,7 @@ func (lump *Occlusion) FromBytes(raw []byte, length int32) {
 	}
 	offset := 0
 	// data
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.Count)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Count)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +64,6 @@ func (lump *Occlusion) FromBytes(raw []byte, length int32) {
 		log.Fatal(err)
 	}
 
-
 	lump.LumpInfo.SetLength(length)
 }
 
@@ -76,19 +75,19 @@ func (lump *Occlusion) ToBytes() []byte {
 	var buf bytes.Buffer
 	// write data
 	binary.Write(&buf, binary.LittleEndian, lump.Count)
-	for _,data := range lump.Data {
+	for _, data := range lump.Data {
 		binary.Write(&buf, binary.LittleEndian, data)
 	}
 
 	// write polydata
 	binary.Write(&buf, binary.LittleEndian, lump.PolyDataCount)
-	for _,data := range lump.PolyData {
+	for _, data := range lump.PolyData {
 		binary.Write(&buf, binary.LittleEndian, data)
 	}
 
 	// write indices
 	binary.Write(&buf, binary.LittleEndian, lump.VertexIndexCount)
-	for _,data := range lump.VertexIndices {
+	for _, data := range lump.VertexIndices {
 		binary.Write(&buf, binary.LittleEndian, data)
 	}
 	return buf.Bytes()

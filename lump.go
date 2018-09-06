@@ -2,8 +2,8 @@ package bsp
 
 import (
 	"github.com/galaco/bsp/lumps"
-	"log"
 	"github.com/galaco/bsp/versions"
+	"log"
 )
 
 const LUMP_ENTITIES = 0
@@ -86,10 +86,10 @@ const LUMP_DISP_MULTIBLEND = 63
 // N.B. Some information mirrors the header's lump descriptor, but header information should not be trusted after
 // import completion.
 type Lump struct {
-	raw []byte
-	data lumps.ILump
+	raw    []byte
+	data   lumps.ILump
 	length int32
-	index int
+	index  int
 	loaded bool
 }
 
@@ -132,7 +132,7 @@ func (l *Lump) GetLength() int32 {
 }
 
 // Return an instance of a Lump for a given offset.
-func getReferenceLumpByIndex(index int, version int32) (lumps.ILump,error) {
+func getReferenceLumpByIndex(index int, version int32) (lumps.ILump, error) {
 	if index < 0 || index > 63 {
 		log.Fatalf("Invalid lump index: %d provided\n", index)
 	}

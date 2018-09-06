@@ -1,18 +1,18 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/leaf"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/leaf"
 	"log"
 	"unsafe"
 )
 
 /**
-	Lump 10: Leaf
- */
+Lump 10: Leaf
+*/
 
- const MAX_MAP_LEAFS = 65536
+const MAX_MAP_LEAFS = 65536
 
 type Leaf struct {
 	LumpGeneric

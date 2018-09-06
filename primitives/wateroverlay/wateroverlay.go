@@ -31,8 +31,7 @@ public:
 	Vector			vecOrigin;
 	Vector			vecBasisNormal;
 };
- */
+*/
 
- type WaterOverlay struct {
-
- }
+type WaterOverlay struct {
+}

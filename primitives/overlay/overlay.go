@@ -25,9 +25,9 @@ public:
 	Vector		vecOrigin;
 	Vector		vecBasisNormal;
 };
- */
+*/
 type Overlay struct {
-	NId int32
-	NTexInfo int16
+	NId              int32
+	NTexInfo         int16
 	AlignmentPadding int16
 }

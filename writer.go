@@ -1,6 +1,5 @@
 package bsp
 
-
 import (
 	"bytes"
 	"encoding/binary"
@@ -29,7 +28,7 @@ func (w *Writer) Write() []byte {
 	lumpBytes := make([][]byte, 64)
 	currentOffset := 1036 // Header always 1036bytes
 
-	for _,index := range getDefaultLumpOrdering() {
+	for _, index := range getDefaultLumpOrdering() {
 		// We have to handle lump 35 (GameData differently)
 		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
 		if index == LUMP_GAME_LUMP {
@@ -47,7 +46,7 @@ func (w *Writer) Write() []byte {
 		currentOffset += lumpSize
 
 		// Finally 4byte align each lump.
-		lumpBytes[index] = append(lumpBytes[index], make([]byte, currentOffset % 4)...)
+		lumpBytes[index] = append(lumpBytes[index], make([]byte, currentOffset%4)...)
 		currentOffset += currentOffset % 4
 	}
 
@@ -58,7 +57,7 @@ func (w *Writer) Write() []byte {
 	binary.Write(&buf, binary.LittleEndian, w.data.header)
 
 	//Write lumps
-	for _,lumpData := range lumpBytes {
+	for _, lumpData := range lumpBytes {
 		binary.Write(&buf, binary.LittleEndian, lumpData)
 
 	}
@@ -67,23 +66,23 @@ func (w *Writer) Write() []byte {
 }
 
 /**
-	Export a single lump to []byte.
- */
+Export a single lump to []byte.
+*/
 func (w *Writer) WriteLump(index int) []byte {
 	lump := w.data.GetLump(index)
 	return lump.ToBytes()
 }
 
 /**
-	Return a new bsp writer instance.
- */
+Return a new bsp writer instance.
+*/
 func NewWriter() Writer {
 	w := Writer{}
 	return w
 }
 
 func getDefaultLumpOrdering() [64]int {
-	return [64]int {
+	return [64]int{
 		LUMP_PLANES,
 		LUMP_LEAFS,
 		LUMP_LEAF_AMBIENT_LIGHTING,
@@ -142,5 +141,5 @@ func getDefaultLumpOrdering() [64]int {
 		LUMP_LEAFMINDISTTOWATER,
 		LUMP_GAME_LUMP,
 		LUMP_PAKFILE,
-		}
+	}
 }

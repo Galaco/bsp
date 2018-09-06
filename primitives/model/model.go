@@ -5,10 +5,10 @@ import (
 )
 
 type Model struct {
-	Mins mgl32.Vec3
-	Maxs mgl32.Vec3
-	Origin mgl32.Vec3
-	HeadNode int32
+	Mins      mgl32.Vec3
+	Maxs      mgl32.Vec3
+	Origin    mgl32.Vec3
+	HeadNode  int32
 	FirstFace int32
-	NumFaces int32
+	NumFaces  int32
 }

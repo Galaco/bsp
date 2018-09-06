@@ -2,12 +2,12 @@ package bsp
 
 import (
 	"github.com/galaco/bsp/lumps"
-	"testing"
 	"os"
+	"testing"
 )
 
 func TestReadFromFile(t *testing.T) {
-	_,err := ReadFromFile("maps/v20/de_dust2.bsp")
+	_, err := ReadFromFile("maps/v20/de_dust2.bsp")
 	if err != nil {
 		t.Error(err)
 	}
@@ -19,7 +19,7 @@ func TestReadFromStream(t *testing.T) {
 		t.Error(err)
 	}
 
-	r,err := ReadFromStream(f)
+	r, err := ReadFromStream(f)
 	if err != nil {
 		t.Error(err)
 	}

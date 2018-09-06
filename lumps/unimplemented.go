@@ -1,9 +1,8 @@
 package lumps
 
-
 /**
-	Lump n:
- */
+Lump n:
+*/
 type Unimplemented struct {
 	LumpGeneric
 	data []byte

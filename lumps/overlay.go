@@ -1,11 +1,11 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/overlay"
-	"unsafe"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/overlay"
 	"log"
+	"unsafe"
 )
 
 // Lump 45: Overlay
@@ -21,7 +21,7 @@ func (lump *Overlay) FromBytes(raw []byte, length int32) {
 		return
 	}
 	lump.data = make([]primitives.Overlay, length/int32(unsafe.Sizeof(primitives.Overlay{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}

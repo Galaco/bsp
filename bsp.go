@@ -6,24 +6,24 @@ import "github.com/galaco/bsp/lumps"
 // Consists of a 1036byte header and 64 lump blocks.
 type Bsp struct {
 	header Header
-	lumps [64]Lump
+	lumps  [64]Lump
 }
 
 // Bsp header. Contains format and lump layout data.
 // Do not trust lump information between import and export
 type Header struct {
-	Id int32
-	Version int32
-	Lumps [64]HeaderLump
+	Id       int32
+	Version  int32
+	Lumps    [64]HeaderLump
 	Revision int32
 }
 
 // Layout information for a given lump, stored in the Header.
 type HeaderLump struct {
-	Offset int32
-	Length int32
+	Offset  int32
+	Length  int32
 	Version int32
-	Id [4]byte
+	Id      [4]byte
 }
 
 // Get the header for a bsp.
