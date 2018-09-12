@@ -144,8 +144,8 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				if err != nil {
 					return nil
 				}
-				for idx, prop := range vprops {
-					props[idx] = &prop
+				for idx := range vprops {
+					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
 				}
 			case 5:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV5{})) * int(numProps)
@@ -154,8 +154,8 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				if err != nil {
 					return nil
 				}
-				for idx, prop := range vprops {
-					props[idx] = &prop
+				for idx := range vprops {
+					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
 				}
 			case 6:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV6{})) * int(numProps)
@@ -164,8 +164,8 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				if err != nil {
 					return nil
 				}
-				for idx, prop := range vprops {
-					props[idx] = &prop
+				for idx := range vprops {
+					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
 				}
 			case 7:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV7{})) * int(numProps)
@@ -174,8 +174,8 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				if err != nil {
 					return nil
 				}
-				for idx, prop := range vprops {
-					props[idx] = &prop
+				for idx := range vprops {
+					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
 				}
 			case 8:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV8{})) * int(numProps)
@@ -184,8 +184,8 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				if err != nil {
 					return nil
 				}
-				for idx, prop := range vprops {
-					props[idx] = &prop
+				for idx := range vprops {
+					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
 				}
 			case 9:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV9{})) * int(numProps)
@@ -194,8 +194,8 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				if err != nil {
 					return nil
 				}
-				for idx, prop := range vprops {
-					props[idx] = &prop
+				for idx := range vprops {
+					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
 				}
 			case 10:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV10{})) * int(numProps)
@@ -204,8 +204,8 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				if err != nil {
 					return nil
 				}
-				for idx, prop := range vprops {
-					props[idx] = &prop
+				for idx := range vprops {
+					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
 				}
 			case 11:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV11{})) * int(numProps)
@@ -214,8 +214,8 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				if err != nil {
 					return nil
 				}
-				for idx, prop := range vprops {
-					props[idx] = &prop
+				for idx := range vprops {
+					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
 				}
 			}
 
