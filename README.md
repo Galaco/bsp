@@ -33,6 +33,7 @@ The following lumps currently have a full implementation for v20 bsp's (tested a
 19: Brushsides
 20: Areas
 21: AreaPortals
+26: DispInfo
 27: OriginalFaces
 28: PhysDisp
 30: VertNormals
@@ -41,6 +42,7 @@ The following lumps currently have a full implementation for v20 bsp's (tested a
 34: DispLightmapSamplePosition
 35: Game lump (partial: sprp only)
 36: LeafWaterData
+37: Primitives
 38: PrimVerts
 39: PrimIndices
 40: Pakfile
@@ -98,7 +100,7 @@ func main() {
 
 ## Real World examples
 * Replace game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
-* Proof of concept BSP viewer: [https://github.com/Galaco/Go-Source-Engine-Pre](https://github.com/Galaco/Go-Source-Engine-Pre)
+* Proof of concept BSP viewer: [https://github.com/Galaco/Gource-Engine](https://github.com/Galaco/Gource-Engine)
 
 
 # Contributing
