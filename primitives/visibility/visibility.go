@@ -29,18 +29,18 @@ func (vis *Vis) GetPVSForCluster(clusterId int16) []bool {
 	visibleClusterIds := make([]bool, vis.NumClusters)
 	v := vis.ByteOffset[clusterId][0] // pvs offset for cluster
 
-	for offset := int32(0); offset < vis.NumClusters; v++ {
-		if vis.BitVectors[v] == 0 {
+	for currentClusterIdx := int32(0); currentClusterIdx < vis.NumClusters; v++ {
+		if int(vis.BitVectors[v]) == 0 {
 			v++
-			offset += int32(8 * vis.BitVectors[v])
+			currentClusterIdx += (int32(vis.BitVectors[v]) << 3)
 			continue
 		}
-		for i := uint8(0); i < 8 && offset+int32(i) < vis.NumClusters; i++ {
+		for i := uint8(0); i < 8 && currentClusterIdx+int32(i) < vis.NumClusters; i++ {
 			if (vis.BitVectors[v] & (1 << i)) != 0 {
-				visibleClusterIds[offset+int32(i)] = true
+				visibleClusterIds[currentClusterIdx+int32(i)] = true
 			}
 		}
-		offset += 8
+		currentClusterIdx += 8
 	}
 
 	return visibleClusterIds
