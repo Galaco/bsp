@@ -1,14 +1,14 @@
 package bsp
 
 import (
-	"testing"
-	"log"
 	"bytes"
+	"log"
+	"testing"
 )
 
 // Test that resultant lump data matches expected.
 func TestLumpExports(t *testing.T) {
-	file,err := ReadFromFile("maps/v20/de_dust2.bsp")
+	file, err := ReadFromFile("maps/v20/de_dust2.bsp")
 	if err != nil {
 		t.Error(err)
 	}
@@ -17,12 +17,13 @@ func TestLumpExports(t *testing.T) {
 	lumpIndex := 0
 	for lumpIndex < 64 {
 		lump := file.GetLump(lumpIndex)
-		lumpBytes := lump.GetContents().ToBytes()
+		rawLump := file.GetLumpRaw(lumpIndex)
+		lumpBytes := lump.ToBytes()
 		if len(lumpBytes) != int(file.GetHeader().Lumps[lumpIndex].Length) {
 			t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(lumpBytes), file.header.Lumps[lumpIndex].Length)
 		} else {
-			log.Printf("Index: %d, Expected: %d, Actual: %d\n", lumpIndex, len(lump.GetRawContents()), len(lumpBytes))
-			if !bytes.Equal(lumpBytes, lump.GetRawContents()) {
+			log.Printf("Index: %d, Expected: %d, Actual: %d\n", lumpIndex, len(rawLump.GetRawContents()), len(lumpBytes))
+			if !bytes.Equal(lumpBytes, rawLump.GetRawContents()) {
 				t.Errorf("Lump: %d data mismatch", lumpIndex)
 			}
 		}

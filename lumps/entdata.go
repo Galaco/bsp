@@ -1,24 +1,22 @@
 package lumps
 
 /**
-	Lump 0: Entdata
- */
+Lump 0: Entdata
+*/
 type EntData struct {
-	LumpInfo
+	LumpGeneric
 	data string
 }
 
-func (lump EntData) FromBytes(raw []byte, length int32) ILump {
+func (lump *EntData) FromBytes(raw []byte, length int32) {
 	lump.data = string(raw)
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump EntData) GetData() interface{} {
-	return &lump.data
+func (lump *EntData) GetData() string {
+	return lump.data
 }
 
-func (lump EntData) ToBytes() []byte {
+func (lump *EntData) ToBytes() []byte {
 	return []byte(lump.data)
 }

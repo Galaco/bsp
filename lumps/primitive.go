@@ -1,40 +1,39 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/primitive"
-	"unsafe"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/primitive"
 	"log"
+	"unsafe"
 )
+
 /**
-	Lump 36: Primitive
- */
+Lump 36: Primitive
+*/
 type Primitive struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.Primitive
 }
 
-func (lump Primitive) FromBytes(raw []byte, length int32) ILump {
+func (lump *Primitive) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 
 	lump.data = make([]primitives.Primitive, length/int32(unsafe.Sizeof(primitives.Primitive{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump Primitive) GetData() interface{} {
-	return &lump.data
+func (lump *Primitive) GetData() []primitives.Primitive {
+	return lump.data
 }
 
-func (lump Primitive) ToBytes() []byte {
+func (lump *Primitive) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

@@ -1,38 +1,36 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/texinfo"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/texinfo"
 	"log"
 	"unsafe"
 )
 
 /**
-	Lump 6: TexInfo
- */
+Lump 6: TexInfo
+*/
 
 type TexInfo struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.TexInfo
 }
 
-func (lump TexInfo) FromBytes(raw []byte, length int32) ILump {
+func (lump *TexInfo) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.TexInfo, length/int32(unsafe.Sizeof(primitives.TexInfo{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump TexInfo) GetData() interface{} {
-	return &lump.data
+func (lump *TexInfo) GetData() []primitives.TexInfo {
+	return lump.data
 }
 
-func (lump TexInfo) ToBytes() []byte {
+func (lump *TexInfo) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

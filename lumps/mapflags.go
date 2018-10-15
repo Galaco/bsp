@@ -1,38 +1,37 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/mapflags"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/mapflags"
 	"log"
 )
+
 /**
-	Lump 59: MapFlags
- */
+Lump 59: MapFlags
+*/
 type MapFlags struct {
-	LumpInfo
+	LumpGeneric
 	data primitives.MapFlags
 }
 
-func (lump MapFlags) FromBytes(raw []byte, length int32) ILump {
+func (lump *MapFlags) FromBytes(raw []byte, length int32) {
 	if length == 0 {
-		return lump
+		return
 	}
 
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump MapFlags) GetData() interface{} {
+func (lump *MapFlags) GetData() *primitives.MapFlags {
 	return &lump.data
 }
 
-func (lump MapFlags) ToBytes() []byte {
+func (lump *MapFlags) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

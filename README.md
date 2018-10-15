@@ -2,13 +2,13 @@
 Go library for manipulating Source Engine .bsp map files.
 
 ### Features:
-* Read support for (probably) all documented bsp formats
-* Write support for (probably) all documented bsp formats.
+* Read support for (most) non-xbox360 bsps.
 * Freely modify and resize any Lump data.
+* Limited write support
 
 ##### Not all lumps are current supported, but can be freely read and modified, as they are treated as `[]byte`
 
-The following lumps currently have a full implementation for v20 bsp's:
+The following lumps currently have a full implementation for v20 bsp's (tested against CS:S & CS:GO):
 
 ```
 0: Entdata
@@ -33,13 +33,16 @@ The following lumps currently have a full implementation for v20 bsp's:
 19: Brushsides
 20: Areas
 21: AreaPortals
+26: DispInfo
 27: OriginalFaces
 28: PhysDisp
 30: VertNormals
 31: VertNormalIndices
 33: DispVerts
 34: DispLightmapSamplePosition
+35: Game lump (partial: sprp only)
 36: LeafWaterData
+37: Primitives
 38: PrimVerts
 39: PrimIndices
 40: Pakfile
@@ -66,7 +69,7 @@ The following lumps currently have a full implementation for v20 bsp's:
 # Usage
 
 Minimal example of obtaining entdata from a BSP. The following will print the entdata
-blocks of a specified .bsp to terminal.
+lump (entdata is a single json-like string) of a specified .bsp to console.
 
 ```go
 package main
@@ -90,14 +93,15 @@ func main() {
 	}
 	f.Close()
     
-	lump := file.GetLump(bsp.LUMP_ENTITIES)
-	log.Println(lump.GetContents().GetData().(string))
+	lump := file.GetLump(bsp.LUMP_ENTITIES).(*lump.Entities)
+	log.Println(lump.GetData())
 }
 ```
 
 ## Real World examples
-Replace game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
+* Replace game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
+* Proof of concept BSP viewer: [https://github.com/Galaco/Gource-Engine](https://github.com/Galaco/Gource-Engine)
 
 
 # Contributing
-If you want to contribute, feel free to fork and raise a Pull Request for new additions.
+All contributions welcome. Known unsupported games/maps are especially useful.

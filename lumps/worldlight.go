@@ -1,40 +1,38 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/worldlight"
-	"unsafe"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/worldlight"
 	"log"
+	"unsafe"
 )
 
 /**
-	Lump 15: Worldlight
- */
+Lump 15: Worldlight
+*/
 type WorldLight struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.WorldLight
 }
 
-func (lump WorldLight) FromBytes(raw []byte, length int32) ILump {
+func (lump *WorldLight) FromBytes(raw []byte, length int32) {
+	lump.LumpInfo.SetLength(length)
 	if length == 0 {
-		return lump
+		return
 	}
 	lump.data = make([]primitives.WorldLight, length/int32(unsafe.Sizeof(primitives.WorldLight{})))
-	err := binary.Read(bytes.NewBuffer(raw[:]), binary.LittleEndian, &lump.data)
+	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
 		log.Fatal(err)
 	}
-	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump WorldLight) GetData() interface{} {
-	return &lump.data
+func (lump *WorldLight) GetData() []primitives.WorldLight {
+	return lump.data
 }
 
-func (lump WorldLight) ToBytes() []byte {
+func (lump *WorldLight) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

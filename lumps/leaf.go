@@ -1,25 +1,25 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/leaf"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	primitives "github.com/galaco/bsp/primitives/leaf"
 	"log"
 	"unsafe"
 )
 
 /**
-	Lump 10: Leaf
- */
+Lump 10: Leaf
+*/
 
- const MAX_MAP_LEAFS = 65536
+const MAX_MAP_LEAFS = 65536
 
 type Leaf struct {
-	LumpInfo
+	LumpGeneric
 	data []primitives.Leaf
 }
 
-func (lump Leaf) FromBytes(raw []byte, length int32) ILump {
+func (lump *Leaf) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Leaf, length/int32(unsafe.Sizeof(primitives.Leaf{})))
 	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
 	numLeafs := len(lump.data)
@@ -35,15 +35,13 @@ func (lump Leaf) FromBytes(raw []byte, length int32) ILump {
 		}
 	}
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump Leaf) GetData() interface{} {
-	return &lump.data
+func (lump *Leaf) GetData() []primitives.Leaf {
+	return lump.data
 }
 
-func (lump Leaf) ToBytes() []byte {
+func (lump *Leaf) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes()

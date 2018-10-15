@@ -1,28 +1,22 @@
 package lumps
 
 /**
-	Lump 28: PhysDisp
- */
+Lump 28: PhysDisp
+*/
 type PhysDisp struct {
-	LumpInfo
+	LumpGeneric
 	data []byte
 }
 
-func (lump PhysDisp) FromBytes(raw []byte, length int32) ILump {
-	if length == 0 {
-		return lump
-	}
-
+func (lump *PhysDisp) FromBytes(raw []byte, length int32) {
 	lump.data = raw
 	lump.LumpInfo.SetLength(length)
-
-	return lump
 }
 
-func (lump PhysDisp) GetData() interface{} {
-	return &lump.data
+func (lump *PhysDisp) GetData() []byte {
+	return lump.data
 }
 
-func (lump PhysDisp) ToBytes() []byte {
+func (lump *PhysDisp) ToBytes() []byte {
 	return lump.data
 }

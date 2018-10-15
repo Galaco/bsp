@@ -5,7 +5,7 @@ import (
 )
 
 type CubemapSample struct {
-	Origin mgl32.Vec3
-	Size byte
+	Origin           mgl32.Vec3
+	Size             byte
 	AlignmentPadding [3]byte
 }
