@@ -107,7 +107,7 @@ func (l *StaticPropV10) GetDiffuseModulation() float32 {
 }
 
 func (l *StaticPropV10) GetUnknown() float32 {
-	return l.Unknown
+	return 0
 }
 
 func (l *StaticPropV10) GetDisableXBox360() bool {

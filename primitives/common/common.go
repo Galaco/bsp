@@ -6,10 +6,10 @@ import (
 )
 
 type ColorRGBExponent32 struct {
-	R        byte
-	G        byte
-	B        byte
-	Exponent byte
+	R        uint8
+	G        uint8
+	B        uint8
+	Exponent int8
 }
 
 const MAX_POINTS_ON_FIXED_WINDING = 12
