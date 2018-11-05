@@ -34,7 +34,7 @@ func (lump *LumpGeneric) ToBytes() []byte {
 Helper info for a lump
 */
 type LumpInfo struct {
-	length int32
+	length  int32
 	version int32
 }
 

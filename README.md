@@ -1,3 +1,6 @@
+[![GoDoc](https://godoc.org/github.com/Galaco/bsp?status.svg)](https://godoc.org/github.com/Galaco/bsp)
+[![Go report card](https://goreportcard.com/badge/github.com/galaco/bsp)](https://goreportcard.com/badge/github.com/galaco/bsp)
+
 # Bsp
 Go library for manipulating Source Engine .bsp map files.
 

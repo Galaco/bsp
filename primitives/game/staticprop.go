@@ -1,6 +1,5 @@
 package game
 
-
 import (
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -34,9 +33,9 @@ type IStaticPropDataLump interface {
 	GetFadeMinDist() float32
 	GetFadeMaxDist() float32
 	GetLightingOrigin() mgl32.Vec3
-	GetForcedFadeScale() float32   // v5 onwards
-	GetMinDXLevel() uint16		   // v6+7 only
-	GetMaxDXLevel() uint16		   // v6+7 only
+	GetForcedFadeScale() float32 // v5 onwards
+	GetMinDXLevel() uint16       // v6+7 only
+	GetMaxDXLevel() uint16       // v6+7 only
 	GetMinCPULevel() uint8
 	GetMaxCPULevel() uint8
 	GetMinGPULevel() uint8

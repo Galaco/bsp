@@ -24,7 +24,7 @@ type StaticPropV11 struct {
 	DiffuseModulation float32
 	DisableXBox360    bool
 	UniformScale      float32
-	_ [7]byte
+	_                 [7]byte
 }
 
 func (l *StaticPropV11) GetOrigin() mgl32.Vec3 {
