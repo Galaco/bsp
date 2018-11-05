@@ -5,11 +5,11 @@ import (
 	"testing"
 )
 
-func TestgetReferenceLumpByIndex(t *testing.T) {
+func TestGetReferenceLumpByIndex(t *testing.T) {
 	for i := 0; i < 64; i++ {
 		lump, _ := getReferenceLumpByIndex(i, 20)
 		if lump != getExpectedLump(i) {
-			t.Errorf("Lump type does not match expected for identifer: %i\n", i)
+			t.Errorf("Lump type does not match expected for identifer: %d\n", i)
 		}
 	}
 

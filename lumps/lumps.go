@@ -34,7 +34,8 @@ func (lump *LumpGeneric) ToBytes() []byte {
 Helper info for a lump
 */
 type LumpInfo struct {
-	length int32
+	length  int32
+	version int32
 }
 
 /**
@@ -49,4 +50,11 @@ Set lump import length in bytes
 */
 func (info LumpInfo) SetLength(length int32) {
 	info.length = length
+}
+
+/**
+Set bsp version of lump
+*/
+func (info LumpInfo) SetVersion(version int32) {
+	info.version = version
 }

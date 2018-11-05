@@ -210,7 +210,7 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 			case 11:
 				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV11{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV11, numProps)
-				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}

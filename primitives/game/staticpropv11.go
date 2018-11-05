@@ -7,7 +7,6 @@ import (
 type StaticPropV11 struct {
 	Origin            mgl32.Vec3
 	Angles            mgl32.Vec3
-	UniformScale      float32
 	PropType          uint16
 	FirstLeaf         uint16
 	LeafCount         uint16
@@ -23,8 +22,9 @@ type StaticPropV11 struct {
 	MinGPULevel       uint8
 	MaxGPULevel       uint8
 	DiffuseModulation float32
-	Unknown           float32
 	DisableXBox360    bool
+	UniformScale      float32
+	_                 [7]byte
 }
 
 func (l *StaticPropV11) GetOrigin() mgl32.Vec3 {
@@ -108,7 +108,7 @@ func (l *StaticPropV11) GetDiffuseModulation() float32 {
 }
 
 func (l *StaticPropV11) GetUnknown() float32 {
-	return l.Unknown
+	return 0
 }
 
 func (l *StaticPropV11) GetDisableXBox360() bool {

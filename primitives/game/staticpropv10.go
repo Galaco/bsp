@@ -23,8 +23,7 @@ type StaticPropV10 struct {
 	MaxGPULevel       uint8
 	DiffuseModulation float32
 	Unknown           float32
-	DisableXBox360    bool
-	_                 [3]byte
+	//DisableXBox360    bool
 }
 
 func (l *StaticPropV10) GetOrigin() mgl32.Vec3 {
@@ -108,9 +107,9 @@ func (l *StaticPropV10) GetDiffuseModulation() float32 {
 }
 
 func (l *StaticPropV10) GetUnknown() float32 {
-	return l.Unknown
+	return 0
 }
 
 func (l *StaticPropV10) GetDisableXBox360() bool {
-	return l.DisableXBox360
+	return true
 }
