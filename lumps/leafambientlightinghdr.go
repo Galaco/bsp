@@ -8,14 +8,13 @@ import (
 	"unsafe"
 )
 
-/**
-Lump n: LeafAmbientLightingHDR
-*/
+// Lump 55: LeafAmbientLightingHDR
 type LeafAmbientLightingHDR struct {
 	LumpGeneric
 	data []primitives.LeafAmbientLighting
 }
 
+// Import this lump from raw byte data
 func (lump *LeafAmbientLightingHDR) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
@@ -28,10 +27,12 @@ func (lump *LeafAmbientLightingHDR) FromBytes(raw []byte, length int32) {
 	}
 }
 
+// Get internal format structure data
 func (lump *LeafAmbientLightingHDR) GetData() []primitives.LeafAmbientLighting {
 	return lump.data
 }
 
+// Dump this lump back to raw byte data
 func (lump *LeafAmbientLightingHDR) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)

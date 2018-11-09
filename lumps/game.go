@@ -9,10 +9,9 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 35.
-@TODO NOTE: This really needs per-game implementations to be useful, otherwise we might as well skip reading this lump entirely
-*/
+// Lump 35.
+// @TODO NOTE: This really needs per-game implementations to be completely useful,
+// otherwise we only get staticprop data from it
 type Game struct {
 	LumpGeneric
 	Header              primitives.Header
@@ -21,6 +20,7 @@ type Game struct {
 	areOffsetsCorrected bool
 }
 
+// Import this lump from raw byte data
 func (lump *Game) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 
@@ -56,10 +56,12 @@ func (lump *Game) FromBytes(raw []byte, length int32) {
 	}
 }
 
+// Get internal format structure data
 func (lump *Game) GetData() *Game {
 	return lump
 }
 
+// Dump this lump back to raw byte data
 func (lump *Game) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount)

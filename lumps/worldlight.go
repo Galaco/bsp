@@ -8,14 +8,13 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 15: Worldlight
-*/
+// Lump 15: Worldlight
 type WorldLight struct {
 	LumpGeneric
 	data []primitives.WorldLight
 }
 
+// Import this lump from raw byte data
 func (lump *WorldLight) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
@@ -28,10 +27,12 @@ func (lump *WorldLight) FromBytes(raw []byte, length int32) {
 	}
 }
 
+// Get internal format structure data
 func (lump *WorldLight) GetData() []primitives.WorldLight {
 	return lump.data
 }
 
+// Dump this lump back to raw byte data
 func (lump *WorldLight) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)

@@ -8,10 +8,7 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 10: Leaf
-*/
-
+// Lump 10: Leaf
 const MAX_MAP_LEAFS = 65536
 
 type Leaf struct {
@@ -19,6 +16,7 @@ type Leaf struct {
 	data []primitives.Leaf
 }
 
+// Import this lump from raw byte data
 func (lump *Leaf) FromBytes(raw []byte, length int32) {
 	lump.data = make([]primitives.Leaf, length/int32(unsafe.Sizeof(primitives.Leaf{})))
 	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
@@ -37,10 +35,12 @@ func (lump *Leaf) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
+// Get internal format structure data
 func (lump *Leaf) GetData() []primitives.Leaf {
 	return lump.data
 }
 
+// Dump this lump back to raw byte data
 func (lump *Leaf) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)

@@ -8,9 +8,7 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 9: Occlusion
-*/
+// Lump 9: Occlusion
 type Occlusion struct {
 	LumpGeneric
 	Count            int32
@@ -21,6 +19,7 @@ type Occlusion struct {
 	VertexIndices    []int32 //len(slice) = VertexIndexCount
 }
 
+// Import this lump from raw byte data
 func (lump *Occlusion) FromBytes(raw []byte, length int32) {
 	if length == 0 {
 		return
@@ -67,10 +66,12 @@ func (lump *Occlusion) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
+// Get internal format structure data
 func (lump *Occlusion) GetData() *Occlusion {
 	return lump
 }
 
+// Dump this lump back to raw byte data
 func (lump *Occlusion) ToBytes() []byte {
 	var buf bytes.Buffer
 	// write data

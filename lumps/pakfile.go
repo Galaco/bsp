@@ -8,14 +8,13 @@ import (
 	"strings"
 )
 
-/**
-Lump 40: Pakfile
-*/
+// Lump 40: Pakfile
 type Pakfile struct {
 	LumpGeneric
 	zipReader *zip.Reader
 }
 
+// Import this lump from raw byte data
 func (lump *Pakfile) FromBytes(raw []byte, length int32) {
 	lump.data = raw
 	lump.LumpInfo.SetLength(length)
@@ -27,8 +26,7 @@ func (lump *Pakfile) FromBytes(raw []byte, length int32) {
 	}
 }
 
-// Returns this lumps contents as whatever internal format this
-// lump uses (requires casting)
+// Get internal format structure data
 func (lump *Pakfile) GetData() *zip.Reader {
 	return lump.zipReader
 }
@@ -55,6 +53,7 @@ func (lump *Pakfile) GetFile(filePath string) ([]byte, error) {
 	return []byte{}, nil
 }
 
+// ensures that the requested path matches internal casing
 func (lump *Pakfile) sanitisePath(filePath string) string {
 	filePath = strings.ToLower(filePath)
 	filePath = strings.Replace(filePath, "/", "\\", -1)

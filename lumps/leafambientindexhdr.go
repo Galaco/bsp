@@ -8,14 +8,13 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 51: Leaf Ambient Index HDR
-*/
+// Lump 51: Leaf Ambient Index HDR
 type LeafAmbientIndexHDR struct {
 	LumpGeneric
 	data []primitives.LeafAmbientIndex
 }
 
+// Import this lump from raw byte data
 func (lump *LeafAmbientIndexHDR) FromBytes(raw []byte, length int32) {
 	if length == 0 {
 		return
@@ -28,10 +27,12 @@ func (lump *LeafAmbientIndexHDR) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
+// Get internal format structure data
 func (lump *LeafAmbientIndexHDR) GetData() []primitives.LeafAmbientIndex {
 	return lump.data
 }
 
+// Dump this lump back to raw byte data
 func (lump *LeafAmbientIndexHDR) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)

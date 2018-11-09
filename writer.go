@@ -65,22 +65,21 @@ func (w *Writer) Write() []byte {
 	return buf.Bytes()
 }
 
-/**
-Export a single lump to []byte.
-*/
+// Export a single lump to []byte.
 func (w *Writer) WriteLump(index int) []byte {
 	lump := w.data.GetLump(index)
 	return lump.ToBytes()
 }
 
-/**
-Return a new bsp writer instance.
-*/
+// Return a new bsp writer instance.
 func NewWriter() Writer {
 	w := Writer{}
 	return w
 }
 
+// Source compile tools write lumps out of order
+// While the ordering doesn't actually matter, it may
+// be useful/more performant to maintain the same order, particularly post-export
 func getDefaultLumpOrdering() [64]int {
 	return [64]int{
 		LUMP_PLANES,

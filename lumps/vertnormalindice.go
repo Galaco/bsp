@@ -6,14 +6,13 @@ import (
 	"log"
 )
 
-/**
-Lump 31: VertNormalIndice
-*/
+// Lump 31: VertNormalIndice
 type VertNormalIndice struct {
 	LumpGeneric
 	data []uint16
 }
 
+// Import this lump from raw byte data
 func (lump *VertNormalIndice) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
@@ -27,10 +26,12 @@ func (lump *VertNormalIndice) FromBytes(raw []byte, length int32) {
 	}
 }
 
+// Get internal format structure data
 func (lump *VertNormalIndice) GetData() []uint16 {
 	return lump.data
 }
 
+// Dump this lump back to raw byte data
 func (lump *VertNormalIndice) ToBytes() []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.LittleEndian, lump.data)

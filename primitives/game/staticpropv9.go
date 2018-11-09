@@ -4,6 +4,7 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+// StaticProp v9 type
 type StaticPropV9 struct {
 	Origin            mgl32.Vec3
 	Angles            mgl32.Vec3
@@ -25,14 +26,17 @@ type StaticPropV9 struct {
 	DisableXBox360    bool
 }
 
+// Origin of object in world
 func (l *StaticPropV9) GetOrigin() mgl32.Vec3 {
 	return l.Origin
 }
 
+// Rotation of object in world
 func (l *StaticPropV9) GetAngles() mgl32.Vec3 {
 	return l.Angles
 }
 
+// Not defined in v9
 func (l *StaticPropV9) GetUniformScale() float32 {
 	return 1
 }
@@ -41,10 +45,12 @@ func (l *StaticPropV9) GetPropType() uint16 {
 	return l.PropType
 }
 
+// Index into StaticPropLeafLump
 func (l *StaticPropV9) GetFirstLeaf() uint16 {
 	return l.FirstLeaf
 }
 
+// Number of leafs this prop is in
 func (l *StaticPropV9) GetLeafCount() uint16 {
 	return l.LeafCount
 }
@@ -57,18 +63,23 @@ func (l *StaticPropV9) GetFlags() uint8 {
 	return l.Flags
 }
 
+// Skin index of this prop
 func (l *StaticPropV9) GetSkin() int32 {
 	return l.Skin
 }
 
+// Distance from prop that it starts to fade
 func (l *StaticPropV9) GetFadeMinDist() float32 {
 	return l.FadeMinDist
 }
 
+// Distance from prop that it is fully invisible/not rendered
 func (l *StaticPropV9) GetFadeMaxDist() float32 {
 	return l.FadeMaxDist
 }
 
+// World position to sample light from.
+// This may differ from prop origin
 func (l *StaticPropV9) GetLightingOrigin() mgl32.Vec3 {
 	return l.LightingOrigin
 }
@@ -77,10 +88,12 @@ func (l *StaticPropV9) GetForcedFadeScale() float32 {
 	return l.ForcedFadeScale
 }
 
+// Not defined in v9
 func (l *StaticPropV9) GetMinDXLevel() uint16 {
 	return 0
 }
 
+// Not defined in v9
 func (l *StaticPropV9) GetMaxDXLevel() uint16 {
 	return 0
 }
@@ -105,6 +118,7 @@ func (l *StaticPropV9) GetDiffuseModulation() float32 {
 	return l.DiffuseModulation
 }
 
+// Not defined in v9
 func (l *StaticPropV9) GetUnknown() float32 {
 	return 0
 }
