@@ -2,4 +2,5 @@ github.com/go-gl/mathgl v0.0.0-20180804195959-cdf14b6b8f8a h1:2n5w2v3knlspzjJWyQ
 github.com/go-gl/mathgl v0.0.0-20180804195959-cdf14b6b8f8a/go.mod h1:dvrdneKbyWbK2skTda0nM4B9zSlS2GZSnjX7itr/skQ=
 golang.org/x/image v0.0.0-20181109002202-aa35264064ba h1:tKfAeDKyjJZwxAJ8TPBZaf6LpvauubUHT8wwpdz+OMM=
 golang.org/x/image v0.0.0-20181109002202-aa35264064ba/go.mod h1:ux5Hcp/YLpHSI86hEcLt0YII63i6oz57MZXIpbrjZUs=
+golang.org/x/image v0.0.0-20181206121112-cd38e8056d9b h1:9WPnadh+EKSlC7bAQtFhmNxmx/rQOj35pa7nFj6b/Dw=
 golang.org/x/image v0.0.0-20181206121112-cd38e8056d9b/go.mod h1:ux5Hcp/YLpHSI86hEcLt0YII63i6oz57MZXIpbrjZUs=

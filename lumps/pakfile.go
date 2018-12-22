@@ -45,7 +45,7 @@ func (lump *Pakfile) ToBytes() []byte {
 func (lump *Pakfile) GetFile(filePath string) ([]byte, error) {
 	filePath = lump.sanitisePath(filePath)
 	for _, f := range lump.zipReader.File {
-		if lump.sanitisePath(f.Name) == filePath {
+		if strings.EqualFold(filePath, lump.sanitisePath(f.Name)) == true {
 			rc, err := f.Open()
 			if err != nil {
 				return nil, err
@@ -58,5 +58,9 @@ func (lump *Pakfile) GetFile(filePath string) ([]byte, error) {
 
 // sanitisePath ensures that the requested path matches internal casing
 func (lump *Pakfile) sanitisePath(filePath string) string {
-	return strings.Replace(strings.ToLower(filePath), "\\", "/", -1)
+	return strings.Replace(
+		strings.Replace(strings.ToLower(filePath), "\\", "/", -1),
+		"//",
+		"/",
+		-1)
 }
