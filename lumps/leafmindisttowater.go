@@ -28,8 +28,8 @@ func (lump *LeafMinDistToWater) GetData() []uint16 {
 }
 
 // Dump this lump back to raw byte data
-func (lump *LeafMinDistToWater) ToBytes() []byte {
+func (lump *LeafMinDistToWater) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

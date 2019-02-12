@@ -28,8 +28,8 @@ func (lump *Surfedge) GetData() []int32 {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Surfedge) ToBytes() []byte {
+func (lump *Surfedge) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

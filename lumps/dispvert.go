@@ -34,8 +34,8 @@ func (lump *DispVert) GetData() []primitives.DispVert {
 }
 
 // Dump this lump back to raw byte data
-func (lump *DispVert) ToBytes() []byte {
+func (lump *DispVert) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

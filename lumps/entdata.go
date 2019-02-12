@@ -18,6 +18,6 @@ func (lump *EntData) GetData() string {
 }
 
 // Dump this lump back to raw byte data
-func (lump *EntData) ToBytes() []byte {
-	return []byte(lump.data)
+func (lump *EntData) ToBytes() ([]byte,error) {
+	return []byte(lump.data), nil
 }

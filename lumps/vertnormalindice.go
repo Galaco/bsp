@@ -32,8 +32,8 @@ func (lump *VertNormalIndice) GetData() []uint16 {
 }
 
 // Dump this lump back to raw byte data
-func (lump *VertNormalIndice) ToBytes() []byte {
+func (lump *VertNormalIndice) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

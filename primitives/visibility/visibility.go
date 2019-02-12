@@ -18,7 +18,7 @@ func (vis *Vis) GetVisibleClusters(clusterId int16) (visibleClusters []int16) {
 	pvs := vis.GetPVSForCluster(clusterId)
 
 	for id, visible := range pvs {
-		if visible == true {
+		if visible {
 			visibleClusters = append(visibleClusters, int16(id))
 		}
 	}

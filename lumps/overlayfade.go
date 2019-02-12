@@ -33,8 +33,8 @@ func (lump *OverlayFade) GetData() []primitives.OverlayFade {
 }
 
 // Dump this lump back to raw byte data
-func (lump *OverlayFade) ToBytes() []byte {
+func (lump *OverlayFade) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }
