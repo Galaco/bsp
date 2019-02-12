@@ -102,7 +102,7 @@ func (l *Lump) SetId(index int) {
 // Get the contents of a lump.
 // NOTE: Will need to be cast to the relevant lumps
 func (l *Lump) GetContents() lumps.ILump {
-	if l.loaded == false {
+	if !l.loaded {
 		l.data.FromBytes(l.raw, int32(len(l.raw)))
 		l.loaded = true
 	}

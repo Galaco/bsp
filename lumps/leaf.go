@@ -41,8 +41,8 @@ func (lump *Leaf) GetData() []primitives.Leaf {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Leaf) ToBytes() []byte {
+func (lump *Leaf) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

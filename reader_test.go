@@ -7,6 +7,7 @@ import (
 )
 
 func TestReadFromFile(t *testing.T) {
+	t.Skip()
 	_, err := ReadFromFile("maps/v20/de_dust2.bsp")
 	if err != nil {
 		t.Error(err)
@@ -14,6 +15,7 @@ func TestReadFromFile(t *testing.T) {
 }
 
 func TestReadFromStream(t *testing.T) {
+	t.Skip()
 	f, err := os.Open("maps/v20/de_dust2.bsp")
 	if err != nil {
 		t.Error(err)

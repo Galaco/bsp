@@ -33,8 +33,8 @@ func (lump *Vertex) GetData() []mgl32.Vec3 {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Vertex) ToBytes() []byte {
+func (lump *Vertex) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

@@ -32,10 +32,10 @@ func (lump *Pakfile) GetData() *zip.Reader {
 }
 
 // ToBytes Returns the contents of this lump as a []byte
-func (lump *Pakfile) ToBytes() []byte {
+func (lump *Pakfile) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }
 
 // GetFile Get a specific file from the pak
@@ -45,7 +45,7 @@ func (lump *Pakfile) ToBytes() []byte {
 func (lump *Pakfile) GetFile(filePath string) ([]byte, error) {
 	filePath = lump.sanitisePath(filePath)
 	for _, f := range lump.zipReader.File {
-		if strings.EqualFold(filePath, lump.sanitisePath(f.Name)) == true {
+		if strings.EqualFold(filePath, lump.sanitisePath(f.Name)) {
 			rc, err := f.Open()
 			if err != nil {
 				return nil, err

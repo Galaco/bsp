@@ -49,8 +49,8 @@ type MapDispInfo struct {
 	Power          int32
 	MinTess        int32
 	SmoothingAngle float32
-	uAxis          mgl32.Vec3
-	vAxis          mgl32.Vec3
+	UAxis          mgl32.Vec3
+	VAxis          mgl32.Vec3
 	StartPosition  mgl32.Vec3
 	AlphaValues    []float32
 	MaxDispDist    float32

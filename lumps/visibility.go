@@ -39,8 +39,8 @@ func (lump *Visibility) GetData() *primitives.Vis {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Visibility) ToBytes() []byte {
+func (lump *Visibility) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data.BitVectors)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data.BitVectors)
+	return buf.Bytes(),err
 }

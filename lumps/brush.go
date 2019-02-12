@@ -30,8 +30,8 @@ func (lump *Brush) GetData() []primitives.Brush {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Brush) ToBytes() []byte {
+func (lump *Brush) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

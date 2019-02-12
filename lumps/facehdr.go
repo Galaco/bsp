@@ -30,8 +30,8 @@ func (lump *FaceHDR) GetData() []primitives.Face {
 }
 
 // Dump this lump back to raw byte data
-func (lump *FaceHDR) ToBytes() []byte {
+func (lump *FaceHDR) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

@@ -72,24 +72,35 @@ func (lump *Occlusion) GetData() *Occlusion {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Occlusion) ToBytes() []byte {
+func (lump *Occlusion) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
 	// write data
-	binary.Write(&buf, binary.LittleEndian, lump.Count)
+	err := binary.Write(&buf, binary.LittleEndian, lump.Count)
+	if err != nil {
+		return nil, err
+	}
 	for _, data := range lump.Data {
-		binary.Write(&buf, binary.LittleEndian, data)
+		if err = binary.Write(&buf, binary.LittleEndian, data); err != nil {
+			return nil, err
+		}
 	}
 
 	// write polydata
-	binary.Write(&buf, binary.LittleEndian, lump.PolyDataCount)
+	if err = binary.Write(&buf, binary.LittleEndian, lump.PolyDataCount); err != nil {
+		return nil, err
+	}
 	for _, data := range lump.PolyData {
-		binary.Write(&buf, binary.LittleEndian, data)
+		if err = binary.Write(&buf, binary.LittleEndian, data); err != nil {
+			return nil, err
+		}
 	}
 
 	// write indices
-	binary.Write(&buf, binary.LittleEndian, lump.VertexIndexCount)
+	err = binary.Write(&buf, binary.LittleEndian, lump.VertexIndexCount)
 	for _, data := range lump.VertexIndices {
-		binary.Write(&buf, binary.LittleEndian, data)
+		if err = binary.Write(&buf, binary.LittleEndian, data); err != nil {
+			return nil, err
+		}
 	}
-	return buf.Bytes()
+	return buf.Bytes(),err
 }

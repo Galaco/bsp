@@ -22,7 +22,7 @@ func (w *Writer) SetBsp(file Bsp) {
 }
 
 // Write bsp to []byte.
-func (w *Writer) Write() []byte {
+func (w *Writer) Write() ([]byte,error) {
 	// First we need to update the header to reflect any lump changes
 	// At the same time we can dump our lumps as bytes to write later
 	lumpBytes := make([][]byte, 64)
@@ -36,7 +36,11 @@ func (w *Writer) Write() []byte {
 			w.data.lumps[index].SetContents(
 				gamelump.UpdateInternalOffsets(int32(currentOffset) - w.data.header.Lumps[index].Offset))
 		}
-		lumpBytes[index] = w.WriteLump(index)
+		exportBytes,err := w.WriteLump(index)
+		if err != nil {
+			return nil,err
+		}
+		lumpBytes[index] =  exportBytes
 
 		lumpSize := len(lumpBytes[index])
 
@@ -54,19 +58,23 @@ func (w *Writer) Write() []byte {
 	var buf bytes.Buffer
 
 	//Write Header
-	binary.Write(&buf, binary.LittleEndian, w.data.header)
+	err := binary.Write(&buf, binary.LittleEndian, w.data.header)
+	if err != nil {
+		return nil,err
+	}
 
 	//Write lumps
 	for _, lumpData := range lumpBytes {
-		binary.Write(&buf, binary.LittleEndian, lumpData)
-
+		if err = binary.Write(&buf, binary.LittleEndian, lumpData); err != nil {
+			return nil,err
+		}
 	}
 
-	return buf.Bytes()
+	return buf.Bytes(),nil
 }
 
 // Export a single lump to []byte.
-func (w *Writer) WriteLump(index int) []byte {
+func (w *Writer) WriteLump(index int) ([]byte,error) {
 	lump := w.data.GetLump(index)
 	return lump.ToBytes()
 }

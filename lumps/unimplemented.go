@@ -18,6 +18,6 @@ func (lump *Unimplemented) GetData() []byte {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Unimplemented) ToBytes() []byte {
-	return lump.data
+func (lump *Unimplemented) ToBytes() ([]byte,error) {
+	return lump.data,nil
 }

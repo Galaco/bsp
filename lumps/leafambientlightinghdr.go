@@ -33,8 +33,8 @@ func (lump *LeafAmbientLightingHDR) GetData() []primitives.LeafAmbientLighting {
 }
 
 // Dump this lump back to raw byte data
-func (lump *LeafAmbientLightingHDR) ToBytes() []byte {
+func (lump *LeafAmbientLightingHDR) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

@@ -35,8 +35,8 @@ func (lump *Area) GetData() []primitives.Area {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Area) ToBytes() []byte {
+func (lump *Area) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

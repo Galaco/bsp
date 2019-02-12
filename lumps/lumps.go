@@ -7,7 +7,7 @@ type ILump interface {
 	FromBytes([]byte, int32)
 
 	// Export lump structure back to []byte.
-	ToBytes() []byte
+	ToBytes() ([]byte,error)
 }
 
 type LumpGeneric struct {
@@ -22,8 +22,8 @@ func (lump *LumpGeneric) FromBytes(data []byte, length int32) {
 }
 
 // Dump this lump back to raw byte data
-func (lump *LumpGeneric) ToBytes() []byte {
-	return lump.data
+func (lump *LumpGeneric) ToBytes() ([]byte,error) {
+	return lump.data, nil
 }
 
 // Helper info for a lump

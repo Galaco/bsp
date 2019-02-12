@@ -34,8 +34,8 @@ func (lump *VertNormal) GetData() []primitives.VertNormal {
 }
 
 // Dump this lump back to raw byte data
-func (lump *VertNormal) ToBytes() []byte {
+func (lump *VertNormal) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

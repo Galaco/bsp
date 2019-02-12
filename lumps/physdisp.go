@@ -18,6 +18,6 @@ func (lump *PhysDisp) GetData() []byte {
 }
 
 // Dump this lump back to raw byte data
-func (lump *PhysDisp) ToBytes() []byte {
-	return lump.data
+func (lump *PhysDisp) ToBytes() ([]byte,error) {
+	return lump.data, nil
 }

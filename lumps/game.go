@@ -41,7 +41,7 @@ func (lump *Game) FromBytes(raw []byte, length int32) {
 	}
 
 	// Correct file offsets
-	if lump.areOffsetsCorrected == false {
+	if !lump.areOffsetsCorrected {
 		for index := range lump.Header.GameLumps {
 			lump.Header.GameLumps[index].FileOffset -= lump.LumpOffset
 		}
@@ -62,16 +62,26 @@ func (lump *Game) GetData() *Game {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Game) ToBytes() []byte {
+func (lump *Game) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount)
+	err := binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount)
+	if err != nil {
+		return nil,err
+	}
 	for _, lumpHeader := range lump.Header.GameLumps {
-		binary.Write(&buf, binary.LittleEndian, lumpHeader)
+		if err = binary.Write(&buf, binary.LittleEndian, lumpHeader); err != nil {
+			return nil,err
+		}
 	}
 	for _, l := range lump.GameLumps {
-		binary.Write(&buf, binary.LittleEndian, l)
+		if err = binary.Write(&buf, binary.LittleEndian, l.Length); err != nil {
+			return nil,err
+		}
+		if err = binary.Write(&buf, binary.LittleEndian, l.Data); err != nil {
+			return nil,err
+		}
 	}
-	return buf.Bytes()
+	return buf.Bytes(),err
 }
 
 // This update the lumps offsets to be relative to the lump, rather
@@ -210,7 +220,6 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
 				}
 			case 11:
-				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV11{})) * int(numProps)
 				vprops := make([]primitives.StaticPropV11, numProps)
 				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:]), binary.LittleEndian, &vprops)
 				if err != nil {

@@ -105,12 +105,19 @@ func (r *Reader) readLump(reader *bytes.Reader, header Header, index int) ([]byt
 // Use ReadFromStream if you already have a file handle
 func ReadFromFile(filepath string) (*Bsp, error) {
 	f, err := os.Open(filepath)
-	defer f.Close()
 	if err != nil {
 		return nil, err
 	}
 	b, err := ReadFromStream(f)
+	if err != nil {
+		err2 := f.Close()
+		if err2 != nil {
+			return nil,err2
+		}
+		return nil, err
+	}
 
+	err = f.Close()
 	return b, err
 }
 

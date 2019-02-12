@@ -33,8 +33,8 @@ func (lump *Lighting) GetData() []primitives.ColorRGBExponent32 {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Lighting) ToBytes() []byte {
+func (lump *Lighting) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

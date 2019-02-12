@@ -30,8 +30,8 @@ func (lump *TexInfo) GetData() []primitives.TexInfo {
 }
 
 // Dump this lump back to raw byte data
-func (lump *TexInfo) ToBytes() []byte {
+func (lump *TexInfo) ToBytes() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

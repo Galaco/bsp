@@ -18,6 +18,6 @@ func (lump *TexdataStringData) GetData() string {
 }
 
 // Dump this lump back to raw byte data
-func (lump *TexdataStringData) ToBytes() []byte {
-	return []byte(lump.data)
+func (lump *TexdataStringData) ToBytes() ([]byte,error) {
+	return []byte(lump.data),nil
 }
