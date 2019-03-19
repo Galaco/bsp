@@ -31,26 +31,26 @@ func (w *Writer) Write() ([]byte,error) {
 	for _, index := range getDefaultLumpOrdering() {
 		// We have to handle lump 35 (GameData differently)
 		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
-		if index == LUMP_GAME_LUMP {
-			gamelump := w.data.lumps[index].GetContents().(*lumps.Game)
-			w.data.lumps[index].SetContents(
-				gamelump.UpdateInternalOffsets(int32(currentOffset) - w.data.header.Lumps[index].Offset))
+		if index == LumpGame {
+			gamelump := w.data.lumps[int(index)].GetContents().(*lumps.Game)
+			w.data.lumps[int(index)].SetContents(
+				gamelump.UpdateInternalOffsets(int32(currentOffset) - w.data.header.Lumps[int(index)].Offset))
 		}
 		exportBytes,err := w.WriteLump(index)
 		if err != nil {
 			return nil,err
 		}
-		lumpBytes[index] =  exportBytes
+		lumpBytes[int(index)] =  exportBytes
 
-		lumpSize := len(lumpBytes[index])
+		lumpSize := len(lumpBytes[int(index)])
 
-		w.data.header.Lumps[index].Length = int32(lumpSize)
-		w.data.header.Lumps[index].Offset = int32(currentOffset)
+		w.data.header.Lumps[int(index)].Length = int32(lumpSize)
+		w.data.header.Lumps[int(index)].Offset = int32(currentOffset)
 
 		currentOffset += lumpSize
 
 		// Finally 4byte align each lump.
-		lumpBytes[index] = append(lumpBytes[index], make([]byte, currentOffset%4)...)
+		lumpBytes[int(index)] = append(lumpBytes[int(index)], make([]byte, currentOffset%4)...)
 		currentOffset += currentOffset % 4
 	}
 
@@ -74,7 +74,7 @@ func (w *Writer) Write() ([]byte,error) {
 }
 
 // Export a single lump to []byte.
-func (w *Writer) WriteLump(index int) ([]byte,error) {
+func (w *Writer) WriteLump(index LumpId) ([]byte,error) {
 	lump := w.data.GetLump(index)
 	return lump.ToBytes()
 }
@@ -88,65 +88,65 @@ func NewWriter() Writer {
 // Source compile tools write lumps out of order
 // While the ordering doesn't actually matter, it may
 // be useful/more performant to maintain the same order, particularly post-export
-func getDefaultLumpOrdering() [64]int {
-	return [64]int{
-		LUMP_PLANES,
-		LUMP_LEAFS,
-		LUMP_LEAF_AMBIENT_LIGHTING,
-		LUMP_LEAF_AMBIENT_INDEX,
-		LUMP_LEAF_AMBIENT_INDEX_HDR,
-		LUMP_LEAF_AMBIENT_LIGHTING_HDR,
-		LUMP_VERTEXES,
-		LUMP_NODES,
-		LUMP_TEXINFO,
-		LUMP_TEXDATA,
-		LUMP_DISPINFO,
-		LUMP_DISP_VERTS,
-		LUMP_DISP_TRIS,
-		LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS,
-		LUMP_FACE_MACRO_TEXTURE_INFO,
-		LUMP_PRIMITIVES,
-		LUMP_PRIMVERTS,
-		LUMP_PRIMINDICES,
-		LUMP_FACES,
-		LUMP_FACES_HDR,
-		LUMP_FACEIDS,
-		LUMP_ORIGINALFACES,
-		LUMP_BRUSHES,
-		LUMP_BRUSHSIDES,
-		LUMP_LEAFFACES,
-		LUMP_LEAFBRUSHES,
-		LUMP_SURFEDGES,
-		LUMP_EDGES,
-		LUMP_MODELS,
-		LUMP_AREAS,
-		LUMP_AREAPORTALS,
-		LUMP_LIGHTING,
-		LUMP_LIGHTING_HDR,
-		LUMP_VISIBILITY,
-		LUMP_ENTITIES,
-		LUMP_WORLDLIGHTS,
-		LUMP_WORLDLIGHTS_HDR,
-		LUMP_LEAFWATERDATA,
-		LUMP_OCCLUSION,
-		LUMP_MAP_FLAGS,
-		LUMP_PORTALS,
-		LUMP_CLUSTERS,
-		LUMP_PORTALVERTS,
-		LUMP_CLUSTERPORTALS,
-		LUMP_CLIPPORTALVERTS,
-		LUMP_CUBEMAPS,
-		LUMP_TEXDATA_STRING_DATA,
-		LUMP_TEXDATA_STRING_TABLE,
-		LUMP_OVERLAYS,
-		LUMP_WATEROVERLAYS,
-		LUMP_OVERLAY_FADES,
-		LUMP_PHYSCOLLIDE,
-		LUMP_PHYSDISP,
-		LUMP_VERTNORMALS,
-		LUMP_VERTNORMALINDICES,
-		LUMP_LEAFMINDISTTOWATER,
-		LUMP_GAME_LUMP,
-		LUMP_PAKFILE,
+func getDefaultLumpOrdering() [64]LumpId {
+	return [64]LumpId{
+		LumpPlanes,
+		LumpLeafs,
+		LumpLeafAmbientLighting,
+		LumpLeafAmbientIndex,
+		LumpLeafAmbientIndexHDR,
+		LumpLeafAmbientLightingHDR,
+		LumpVertexes,
+		LumpNodes,
+		LumpTexInfo,
+		LumpTexData,
+		LumpDispInfo,
+		LumpDispVerts,
+		LumpDispTris,
+		LumpDispLightmapSamplePositions,
+		LumpFaceMacroTextureInfo,
+		LumpPrimitives,
+		LumpPrimVerts,
+		LumpPrimIndices,
+		LumpFaces,
+		LumpFacesHDR,
+		LumpFaceIds,
+		LumpOriginalFaces,
+		LumpBrushes,
+		LumpBrushSides,
+		LumpLeafFaces,
+		LumpLeafBrushes,
+		LumpSurfEdges,
+		LumpEdges,
+		LumpModels,
+		LumpAreas,
+		LumpAreaPortals,
+		LumpLighting,
+		LumpLightingHDR,
+		LumpVisibility,
+		LumpEntities,
+		LumpWorldLights,
+		LumpWorldLightsHDR,
+		LumpLeafWaterData,
+		LumpOcclusion,
+		LumpMapFlags,
+		LumpPortals,
+		LumpClusters,
+		LumpPortalVerts,
+		LumpClusterPortals,
+		LumpClipPortalVerts,
+		LumpCubemaps,
+		LumpTexDataStringData,
+		LumpTexDataStringTable,
+		LumpOverlays,
+		LumpWaterOverlays,
+		LumpOverlayFades,
+		LumpPhysCollide,
+		LumpPhysDisp,
+		LumpVertNormals,
+		LumpVertNormalIndices,
+		LumpLeafMinDistToWater,
+		LumpGame,
+		LumpPakfile,
 	}
 }

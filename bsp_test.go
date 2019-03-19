@@ -17,8 +17,8 @@ func TestLumpExports(t *testing.T) {
 	// Verify lump lengths
 	lumpIndex := 0
 	for lumpIndex < 64 {
-		lump := file.GetLump(lumpIndex)
-		rawLump := file.GetLumpRaw(lumpIndex)
+		lump := file.GetLump(LumpId(lumpIndex))
+		rawLump := file.GetLumpRaw(LumpId(lumpIndex))
 		lumpBytes,err := lump.ToBytes()
 		if err != nil {
 			t.Error(err)

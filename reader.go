@@ -49,7 +49,7 @@ func (r *Reader) Read() (*Bsp, error) {
 		// Game lump lumps have offset data relative to file start, not lump start
 		// This will correct the offsets to the start of the lump.
 		// @NOTE: Portal2 console uses relative offsets. This game+platform are not supported currently
-		if index == LUMP_GAME_LUMP {
+		if index == int(LumpGame) {
 			refLump.(*lumps.Game).UpdateInternalOffsets(bsp.header.Lumps[index].Offset)
 		}
 

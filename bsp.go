@@ -32,16 +32,16 @@ func (bsp *Bsp) GetHeader() Header {
 }
 
 // Get the lump for a given index.
-func (bsp *Bsp) GetLump(index int) lumps.ILump {
+func (bsp *Bsp) GetLump(index LumpId) lumps.ILump {
 	return bsp.GetLumpRaw(index).GetContents()
 }
 
 // Get the lump for a given index.
-func (bsp *Bsp) GetLumpRaw(index int) *Lump {
-	return &bsp.lumps[index]
+func (bsp *Bsp) GetLumpRaw(index LumpId) *Lump {
+	return &bsp.lumps[int(index)]
 }
 
 // Set the lump data for a given index.
-func (bsp *Bsp) SetLump(index int, lump Lump) {
-	bsp.lumps[index] = lump
+func (bsp *Bsp) SetLump(index LumpId, lump Lump) {
+	bsp.lumps[int(index)] = lump
 }
