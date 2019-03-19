@@ -8,13 +8,13 @@ import (
 	"unsafe"
 )
 
-// Lump 47: FaceMacroTextureInfo
+// FaceMacroTextureInfo is Lump 47: FaceMacroTextureInfo
 type FaceMacroTextureInfo struct {
 	LumpGeneric
 	data []primitives.FaceMacroTextureInfo
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *FaceMacroTextureInfo) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
@@ -28,14 +28,14 @@ func (lump *FaceMacroTextureInfo) Unmarshall(raw []byte, length int32) {
 	}
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *FaceMacroTextureInfo) GetData() []primitives.FaceMacroTextureInfo {
 	return lump.data
 }
 
-// Dump this lump back to raw byte data
-func (lump *FaceMacroTextureInfo) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *FaceMacroTextureInfo) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }

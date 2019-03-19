@@ -8,13 +8,13 @@ import (
 	"unsafe"
 )
 
-// Lump 5: Node
+// Node is Lump 5: Node
 type Node struct {
 	LumpGeneric
 	data []primitives.Node // MAP_MAX_NODES = 65536
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *Node) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]primitives.Node, length/int32(unsafe.Sizeof(primitives.Node{})))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
@@ -24,14 +24,14 @@ func (lump *Node) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *Node) GetData() []primitives.Node {
 	return lump.data
 }
 
-// Dump this lump back to raw byte data
-func (lump *Node) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *Node) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }

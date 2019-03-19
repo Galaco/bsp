@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetLumpForVersion(t *testing.T) {
-	l,err := GetLumpForVersion(987, 1)
+	l, err := GetLumpForVersion(987, 1)
 	if err != nil {
 		t.Error(err)
 	}
@@ -15,7 +15,7 @@ func TestGetLumpForVersion(t *testing.T) {
 		t.Error("Lump type mismatch.")
 	}
 
-	l,err = GetLumpForVersion(19, 4)
+	l, err = GetLumpForVersion(19, 4)
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +23,7 @@ func TestGetLumpForVersion(t *testing.T) {
 		t.Error("Lump type mismatch.")
 	}
 
-	l,err = GetLumpForVersion(20, 4)
+	l, err = GetLumpForVersion(20, 4)
 	if err != nil {
 		t.Error(err)
 	}
@@ -31,7 +31,7 @@ func TestGetLumpForVersion(t *testing.T) {
 		t.Error("Lump type mismatch.")
 	}
 
-	l,err = GetLumpForVersion(21, 4)
+	l, err = GetLumpForVersion(21, 4)
 	if err != nil {
 		t.Error(err)
 	}

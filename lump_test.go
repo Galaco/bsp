@@ -61,7 +61,7 @@ func getExpectedLump(index int) lumps.ILump {
 		&lumps.Pakfile{},
 		&lumps.ClipPortalVerts{},
 		&lumps.Cubemap{},
-		&lumps.TexdataStringData{},
+		&lumps.TexDataStringData{},
 		&lumps.TexDataStringTable{},
 		&lumps.Overlay{},
 		&lumps.LeafMinDistToWater{},

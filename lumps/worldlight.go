@@ -8,13 +8,13 @@ import (
 	"unsafe"
 )
 
-// Lump 15: Worldlight
+// WorldLight is Lump 15: Worldlight
 type WorldLight struct {
 	LumpGeneric
 	data []primitives.WorldLight
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *WorldLight) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
@@ -27,14 +27,14 @@ func (lump *WorldLight) Unmarshall(raw []byte, length int32) {
 	}
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *WorldLight) GetData() []primitives.WorldLight {
 	return lump.data
 }
 
-// Dump this lump back to raw byte data
-func (lump *WorldLight) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *WorldLight) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }

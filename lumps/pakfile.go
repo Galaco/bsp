@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-// Lump 40: Pakfile
+// Pakfile is Lump 40: Pakfile
 type Pakfile struct {
 	LumpGeneric
 	zipReader *zip.Reader
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *Pakfile) Unmarshall(raw []byte, length int32) {
 	lump.data = raw
 	lump.LumpInfo.SetLength(length)
@@ -26,16 +26,16 @@ func (lump *Pakfile) Unmarshall(raw []byte, length int32) {
 	}
 }
 
-// GetData Get internal format structure data
+// GetData GetData gets internal format structure data
 func (lump *Pakfile) GetData() *zip.Reader {
 	return lump.zipReader
 }
 
 // Marshall Returns the contents of this lump as a []byte
-func (lump *Pakfile) Marshall() ([]byte,error) {
+func (lump *Pakfile) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }
 
 // GetFile Get a specific file from the pak

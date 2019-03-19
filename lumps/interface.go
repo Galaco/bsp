@@ -7,6 +7,5 @@ type ILump interface {
 	Unmarshall([]byte, int32)
 
 	// Marshall Exports lump structure back to []byte.
-	Marshall() ([]byte,error)
+	Marshall() ([]byte, error)
 }
-

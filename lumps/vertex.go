@@ -8,13 +8,13 @@ import (
 	"unsafe"
 )
 
-// Lump 3: Vertex
+// Vertex is Lump 3: Vertex
 type Vertex struct {
 	LumpGeneric
 	data []mgl32.Vec3
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *Vertex) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
@@ -27,14 +27,14 @@ func (lump *Vertex) Unmarshall(raw []byte, length int32) {
 	}
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *Vertex) GetData() []mgl32.Vec3 {
 	return lump.data
 }
 
-// Dump this lump back to raw byte data
-func (lump *Vertex) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *Vertex) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }

@@ -15,7 +15,7 @@ func (lump *LumpGeneric) Unmarshall(data []byte, length int32) {
 }
 
 // Marshall Dumps this lump back to raw byte data
-func (lump *LumpGeneric) Marshall() ([]byte,error) {
+func (lump *LumpGeneric) Marshall() ([]byte, error) {
 	return lump.data, nil
 }
 
