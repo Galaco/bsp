@@ -8,13 +8,13 @@ import (
 	"unsafe"
 )
 
-// Lump 14: Model
+// Model is Lump 14: Model
 type Model struct {
 	LumpGeneric
 	data []primitives.Model
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *Model) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]primitives.Model, length/int32(unsafe.Sizeof(primitives.Model{})))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
@@ -24,14 +24,14 @@ func (lump *Model) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *Model) GetData() []primitives.Model {
 	return lump.data
 }
 
-// Dump this lump back to raw byte data
-func (lump *Model) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *Model) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }

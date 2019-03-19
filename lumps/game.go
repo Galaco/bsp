@@ -9,7 +9,7 @@ import (
 	"unsafe"
 )
 
-// Lump 35.
+// Game is Lump 35.
 // @TODO NOTE: This really needs per-game implementations to be completely useful,
 // otherwise we only get staticprop data from it
 type Game struct {
@@ -20,7 +20,7 @@ type Game struct {
 	areOffsetsCorrected bool
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *Game) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 
@@ -56,32 +56,32 @@ func (lump *Game) Unmarshall(raw []byte, length int32) {
 	}
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *Game) GetData() *Game {
 	return lump
 }
 
-// Dump this lump back to raw byte data
-func (lump *Game) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *Game) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	for _, lumpHeader := range lump.Header.GameLumps {
 		if err = binary.Write(&buf, binary.LittleEndian, lumpHeader); err != nil {
-			return nil,err
+			return nil, err
 		}
 	}
 	for _, l := range lump.GameLumps {
 		if err = binary.Write(&buf, binary.LittleEndian, l.Length); err != nil {
-			return nil,err
+			return nil, err
 		}
 		if err = binary.Write(&buf, binary.LittleEndian, l.Data); err != nil {
-			return nil,err
+			return nil, err
 		}
 	}
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }
 
 // This update the lumps offsets to be relative to the lump, rather

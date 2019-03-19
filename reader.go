@@ -127,7 +127,7 @@ func ReadFromFile(filepath string) (*Bsp, error) {
 	if err != nil {
 		err2 := f.Close()
 		if err2 != nil {
-			return nil,err2
+			return nil, err2
 		}
 		return nil, err
 	}

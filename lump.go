@@ -1,11 +1,10 @@
 package bsp
 
 import (
-	"github.com/galaco/bsp/lumps"
 	"github.com/galaco/bsp/internal/versions"
+	"github.com/galaco/bsp/lumps"
 	"log"
 )
-
 
 // Container for a lump. Also includes metadata about the lump.
 // N.B. Some information mirrors the header's lump descriptor, but header information should not be trusted after

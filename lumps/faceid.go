@@ -8,13 +8,13 @@ import (
 	"unsafe"
 )
 
-// Lump 11: FaceIds
+// FaceId is Lump 11: FaceIds
 type FaceId struct {
 	LumpGeneric
 	data []primitives.FaceId
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *FaceId) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
@@ -27,14 +27,14 @@ func (lump *FaceId) Unmarshall(raw []byte, length int32) {
 	}
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *FaceId) GetData() []primitives.FaceId {
 	return lump.data
 }
 
-// Dump this lump back to raw byte data
-func (lump *FaceId) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *FaceId) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }

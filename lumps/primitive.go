@@ -8,13 +8,13 @@ import (
 	"unsafe"
 )
 
-// Lump 36: Primitive
+// Primitive is Lump 36: Primitive
 type Primitive struct {
 	LumpGeneric
 	data []primitives.Primitive
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *Primitive) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
@@ -28,14 +28,14 @@ func (lump *Primitive) Unmarshall(raw []byte, length int32) {
 	}
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *Primitive) GetData() []primitives.Primitive {
 	return lump.data
 }
 
-// Dump this lump back to raw byte data
-func (lump *Primitive) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *Primitive) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }

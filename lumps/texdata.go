@@ -8,13 +8,13 @@ import (
 	"unsafe"
 )
 
-// Lump 2: TexData
+// TexData is Lump 2: TexData
 type TexData struct {
 	LumpGeneric
 	data []primitives.TexData
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *TexData) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]primitives.TexData, length/int32(unsafe.Sizeof(primitives.TexData{})))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
@@ -24,14 +24,14 @@ func (lump *TexData) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *TexData) GetData() []primitives.TexData {
 	return lump.data
 }
 
-// Dump this lump back to raw byte data
-func (lump *TexData) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *TexData) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }

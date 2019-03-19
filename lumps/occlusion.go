@@ -8,7 +8,7 @@ import (
 	"unsafe"
 )
 
-// Lump 9: Occlusion
+// Occlusion is Lump 9: Occlusion
 type Occlusion struct {
 	LumpGeneric
 	Count            int32
@@ -19,7 +19,7 @@ type Occlusion struct {
 	VertexIndices    []int32 //len(slice) = VertexIndexCount
 }
 
-// Import this lump from raw byte data
+// Unmarshall Imports this lump from raw byte data
 func (lump *Occlusion) Unmarshall(raw []byte, length int32) {
 	if length == 0 {
 		return
@@ -66,13 +66,13 @@ func (lump *Occlusion) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
-// Get internal format structure data
+// GetData gets internal format structure data
 func (lump *Occlusion) GetData() *Occlusion {
 	return lump
 }
 
-// Dump this lump back to raw byte data
-func (lump *Occlusion) Marshall() ([]byte,error) {
+// Marshall dumps this lump back to raw byte data
+func (lump *Occlusion) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
 	// write data
 	err := binary.Write(&buf, binary.LittleEndian, lump.Count)
@@ -102,5 +102,5 @@ func (lump *Occlusion) Marshall() ([]byte,error) {
 			return nil, err
 		}
 	}
-	return buf.Bytes(),err
+	return buf.Bytes(), err
 }

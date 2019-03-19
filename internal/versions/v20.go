@@ -96,7 +96,7 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	case 42:
 		ret = &lumps.Cubemap{}
 	case 43:
-		ret = &lumps.TexdataStringData{}
+		ret = &lumps.TexDataStringData{}
 	case 44:
 		ret = &lumps.TexDataStringTable{}
 	case 45:
