@@ -4,27 +4,17 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-/* Assuming this is 8bits
-enum emittype_t
-{
-	emit_surface,		// 90 degree spotlight
-	emit_point,			// simple point light source
-	emit_spotlight,		// spotlight with penumbra
-	emit_skylight,		// directional light with no falloff (surface must trace to SKY texture)
-	emit_quakelight,	// linear falloff, non-lambertian
-	emit_skyambient,	// spherical light source with no falloff (surface must trace to SKY texture)
-};
-*/
+type EmitType uint8 // assumed this is 1 byte..
 
-type EmitType uint8
+const EMIT_SURFACE EmitType = 0    // 90 degree spotlight
+const EMIT_POINT EmitType = 1      // simple point light source
+const EMIT_SPOTLIGHT EmitType = 2  // spotlight with penumbra
+const EMIT_SKYLIGHT EmitType = 3   // directional light with no falloff (surface must trace to SKY texture)
+const EMIT_QUAKELIGHT EmitType = 4 // linear falloff, non-lambertian
+const EMIT_SKYAMBIENT EmitType = 5 // spherical light source with no falloff (surface must trace to SKY texture)
 
-const EMIT_SURFACE EmitType = 0
-const EMIT_POINT EmitType = 1
-const EMIT_SPOTLIGHT EmitType = 2
-const EMIT_SKYLIGHT EmitType = 3
-const EMIT_QUAKELIGHT EmitType = 4
-const EMIT_SKYAMBIENT EmitType = 5
-
+// A single light in the world
+// This data may also be stored in entdata
 type WorldLight struct {
 	Origin               mgl32.Vec3
 	Intensity            mgl32.Vec3

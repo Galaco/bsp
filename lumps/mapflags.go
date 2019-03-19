@@ -7,15 +7,14 @@ import (
 	"log"
 )
 
-/**
-Lump 59: MapFlags
-*/
+// Lump 59: MapFlags
 type MapFlags struct {
 	LumpGeneric
 	data primitives.MapFlags
 }
 
-func (lump *MapFlags) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *MapFlags) Unmarshall(raw []byte, length int32) {
 	if length == 0 {
 		return
 	}
@@ -27,12 +26,14 @@ func (lump *MapFlags) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
+// Get internal format structure data
 func (lump *MapFlags) GetData() *primitives.MapFlags {
 	return &lump.data
 }
 
-func (lump *MapFlags) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *MapFlags) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

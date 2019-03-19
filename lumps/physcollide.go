@@ -8,15 +8,14 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 20: PhysCollide
-*/
+// Lump 20: PhysCollide
 type PhysCollide struct {
 	LumpGeneric
 	data []primitives.PhysCollideEntry
 }
 
-func (lump *PhysCollide) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *PhysCollide) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -29,12 +28,30 @@ func (lump *PhysCollide) FromBytes(raw []byte, length int32) {
 	}
 }
 
+// Get internal format structure data
 func (lump *PhysCollide) GetData() []primitives.PhysCollideEntry {
 	return lump.data
 }
 
-func (lump *PhysCollide) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *PhysCollide) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	for _,entry := range lump.data {
+		err := binary.Write(&buf, binary.LittleEndian, entry.ModelHeader)
+		if err != nil {
+			return nil,err
+		}
+		for _,solid := range entry.Solids {
+			if err = binary.Write(&buf, binary.LittleEndian, solid.Size); err != nil {
+				return nil,err
+			}
+			if err = binary.Write(&buf, binary.LittleEndian, solid.CollisionBinary); err != nil {
+				return nil,err
+			}
+		}
+		if err = binary.Write(&buf, binary.LittleEndian, []byte(entry.TextBuffer)); err != nil {
+			return nil,err
+		}
+	}
+	return buf.Bytes(),nil
 }

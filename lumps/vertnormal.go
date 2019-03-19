@@ -8,15 +8,14 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 30: VertNormal
-*/
+// Lump 30: VertNormal
 type VertNormal struct {
 	LumpGeneric
 	data []primitives.VertNormal
 }
 
-func (lump *VertNormal) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *VertNormal) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -29,12 +28,14 @@ func (lump *VertNormal) FromBytes(raw []byte, length int32) {
 	}
 }
 
+// Get internal format structure data
 func (lump *VertNormal) GetData() []primitives.VertNormal {
 	return lump.data
 }
 
-func (lump *VertNormal) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *VertNormal) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

@@ -3,26 +3,41 @@ package bsp
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"github.com/galaco/bsp/lumps"
 	"io"
 	"os"
 	"unsafe"
 )
 
-// Bsp File reader.
+// Reader is a Bsp File reader.
 type Reader struct {
 	stream io.Reader
 }
 
-// Reads the BSP into internal byte structure
+// Read reads the BSP into internal byte structure
 // Note that parsing is somewhat lazy. Proper data structures are only generated for
 // lumps that are requested at a later time. This generated the header, then []byte
 // data for each lump
-func (r *Reader) Read() (*Bsp, error) {
-	bsp := Bsp{}
+func (r *Reader) Read() (bsp *Bsp, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			bsp = nil
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("unknown panic")
+			}
+		}
+	}()
+
+	bsp = &Bsp{}
 
 	buf := bytes.Buffer{}
-	_, err := buf.ReadFrom(r.stream)
+	_, err = buf.ReadFrom(r.stream)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +56,7 @@ func (r *Reader) Read() (*Bsp, error) {
 		if err != nil {
 			return nil, err
 		}
-		bsp.lumps[index].SetId(index)
+		bsp.lumps[index].SetId(LumpId(index))
 		bsp.lumps[index].SetRawContents(lp)
 		refLump, err := getReferenceLumpByIndex(index, bsp.header.Version)
 
@@ -49,7 +64,7 @@ func (r *Reader) Read() (*Bsp, error) {
 		// Game lump lumps have offset data relative to file start, not lump start
 		// This will correct the offsets to the start of the lump.
 		// @NOTE: Portal2 console uses relative offsets. This game+platform are not supported currently
-		if index == LUMP_GAME_LUMP {
+		if index == int(LumpGame) {
 			refLump.(*lumps.Game).UpdateInternalOffsets(bsp.header.Lumps[index].Offset)
 		}
 
@@ -59,10 +74,10 @@ func (r *Reader) Read() (*Bsp, error) {
 		bsp.lumps[index].SetContents(refLump)
 	}
 
-	return &bsp, err
+	return bsp, err
 }
 
-// Parse header from the bsp file.
+// readHeader Parses header from the bsp file.
 func (r *Reader) readHeader(reader *bytes.Reader, header Header) (*Header, error) {
 	headerSize := unsafe.Sizeof(header)
 	headerBytes := make([]byte, headerSize)
@@ -81,7 +96,7 @@ func (r *Reader) readHeader(reader *bytes.Reader, header Header) (*Header, error
 	return &header, nil
 }
 
-// Reads a single lumps data
+// readLump Reads a single lumps data
 // Expect a byte reader containing the lump data, as well as the
 // header and lump identifier (index)
 func (r *Reader) readLump(reader *bytes.Reader, header Header, index int) ([]byte, error) {
@@ -101,20 +116,27 @@ func (r *Reader) readLump(reader *bytes.Reader, header Header, index int) ([]byt
 	return raw, nil
 }
 
-// Wraps ReadFromStream to control the file access as well.
+// ReadFromFile Wraps ReadFromStream to control the file access as well.
 // Use ReadFromStream if you already have a file handle
 func ReadFromFile(filepath string) (*Bsp, error) {
 	f, err := os.Open(filepath)
-	defer f.Close()
 	if err != nil {
 		return nil, err
 	}
 	b, err := ReadFromStream(f)
+	if err != nil {
+		err2 := f.Close()
+		if err2 != nil {
+			return nil,err2
+		}
+		return nil, err
+	}
 
+	err = f.Close()
 	return b, err
 }
 
-// Read from any struct that implements io.Reader
+// ReadFromStream Reads from any struct that implements io.Reader
 // handy for passing in a string/bytes/other stream
 func ReadFromStream(reader io.Reader) (*Bsp, error) {
 	r := &Reader{

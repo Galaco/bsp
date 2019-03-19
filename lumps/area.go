@@ -8,15 +8,14 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 20: Areas
-*/
+// Lump 20: Areas
 type Area struct {
 	LumpGeneric
 	data []primitives.Area
 }
 
-func (lump *Area) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *Area) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -30,12 +29,14 @@ func (lump *Area) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
+// Get internal format structure data
 func (lump *Area) GetData() []primitives.Area {
 	return lump.data
 }
 
-func (lump *Area) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *Area) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

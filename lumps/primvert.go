@@ -8,15 +8,14 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 37: PrimVert
-*/
+// Lump 37: PrimVert
 type PrimVert struct {
 	LumpGeneric
 	data []primitives.PrimVert
 }
 
-func (lump *PrimVert) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *PrimVert) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -29,12 +28,14 @@ func (lump *PrimVert) FromBytes(raw []byte, length int32) {
 	}
 }
 
+// Get internal format structure data
 func (lump *PrimVert) GetData() []primitives.PrimVert {
 	return lump.data
 }
 
-func (lump *PrimVert) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *PrimVert) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

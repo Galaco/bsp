@@ -6,16 +6,14 @@ import (
 	"log"
 )
 
-/**
-Lump 46: LeafMinDistToWater
-*/
-
+// Lump 46: LeafMinDistToWater
 type LeafMinDistToWater struct {
 	LumpGeneric
 	data []uint16
 }
 
-func (lump *LeafMinDistToWater) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *LeafMinDistToWater) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]uint16, length/int32(2))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -24,12 +22,14 @@ func (lump *LeafMinDistToWater) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
+// Get internal format structure data
 func (lump *LeafMinDistToWater) GetData() []uint16 {
 	return lump.data
 }
 
-func (lump *LeafMinDistToWater) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *LeafMinDistToWater) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

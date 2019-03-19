@@ -13,9 +13,8 @@ type Visibility struct {
 	data primitives.Vis
 }
 
-// FromBytes
-// Populate receiver lump from byte slice
-func (lump *Visibility) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *Visibility) Unmarshall(raw []byte, length int32) {
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.NumClusters)
 	if err != nil {
 		log.Fatal(err)
@@ -34,18 +33,14 @@ func (lump *Visibility) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
-// GetData
-// Get internal lump data structure
-// Returns interface{} to fulfill interface
-// Should be typecasted to expected type
+// Get internal format structure data
 func (lump *Visibility) GetData() *primitives.Vis {
 	return &lump.data
 }
 
-// ToBytes
-// Convert internal data structure into a byte slice
-func (lump *Visibility) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *Visibility) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data.BitVectors)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data.BitVectors)
+	return buf.Bytes(),err
 }

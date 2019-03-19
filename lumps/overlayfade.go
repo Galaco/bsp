@@ -8,15 +8,14 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 60: Overlayfades
-*/
+// Lump 60: Overlayfades
 type OverlayFade struct {
 	LumpGeneric
 	data []primitives.OverlayFade
 }
 
-func (lump *OverlayFade) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *OverlayFade) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -28,12 +27,14 @@ func (lump *OverlayFade) FromBytes(raw []byte, length int32) {
 	}
 }
 
+// Get internal format structure data
 func (lump *OverlayFade) GetData() []primitives.OverlayFade {
 	return lump.data
 }
 
-func (lump *OverlayFade) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *OverlayFade) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

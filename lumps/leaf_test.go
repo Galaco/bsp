@@ -10,15 +10,15 @@ import (
 const C_STRUCT_SIZE = 32
 
 // Assert leaf data when read from bytes is valid
-func TestLeafDataFromBytes(t *testing.T) {
-	l := primitives.Leaf{}
+func TestLeafDataUnmarshall(t *testing.T) {
+	l := unsafe.Sizeof(primitives.Leaf{})
 
-	if unsafe.Sizeof(l) != C_STRUCT_SIZE {
-		t.Errorf("Leaf struct is of incorrect size, expected: %d, actual: %d", C_STRUCT_SIZE, unsafe.Sizeof(l))
+	if l != C_STRUCT_SIZE {
+		t.Errorf("Leaf struct is of incorrect size, expected: %d, actual: %d", C_STRUCT_SIZE, l)
 	}
 
 	lump := Leaf{}
-	lump.FromBytes(GetTestDataBytes(), int32(len(GetTestDataBytes())))
+	lump.Unmarshall(GetTestDataBytes(), int32(len(GetTestDataBytes())))
 	expected := GetTestLeafData()
 	actual := lump.GetData()[0]
 

@@ -8,15 +8,14 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 5: Node
-*/
+// Lump 5: Node
 type Node struct {
 	LumpGeneric
 	data []primitives.Node // MAP_MAX_NODES = 65536
 }
 
-func (lump *Node) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *Node) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]primitives.Node, length/int32(unsafe.Sizeof(primitives.Node{})))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -25,12 +24,14 @@ func (lump *Node) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
+// Get internal format structure data
 func (lump *Node) GetData() []primitives.Node {
 	return lump.data
 }
 
-func (lump *Node) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *Node) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

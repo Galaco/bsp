@@ -15,7 +15,8 @@ type Overlay struct {
 	data []primitives.Overlay
 }
 
-func (lump *Overlay) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *Overlay) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -27,12 +28,14 @@ func (lump *Overlay) FromBytes(raw []byte, length int32) {
 	}
 }
 
+// Get internal format structure data
 func (lump *Overlay) GetData() []primitives.Overlay {
 	return lump.data
 }
 
-func (lump *Overlay) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *Overlay) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }

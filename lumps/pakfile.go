@@ -8,15 +8,14 @@ import (
 	"strings"
 )
 
-/**
-Lump 40: Pakfile
-*/
+// Lump 40: Pakfile
 type Pakfile struct {
 	LumpGeneric
 	zipReader *zip.Reader
 }
 
-func (lump *Pakfile) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *Pakfile) Unmarshall(raw []byte, length int32) {
 	lump.data = raw
 	lump.LumpInfo.SetLength(length)
 
@@ -27,24 +26,26 @@ func (lump *Pakfile) FromBytes(raw []byte, length int32) {
 	}
 }
 
-// Returns this lumps contents as whatever internal format this
-// lump uses (requires casting)
+// GetData Get internal format structure data
 func (lump *Pakfile) GetData() *zip.Reader {
 	return lump.zipReader
 }
 
-// Returns the contents of this lump as a []byte
-func (lump *Pakfile) ToBytes() []byte {
+// Marshall Returns the contents of this lump as a []byte
+func (lump *Pakfile) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
-	binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes()
+	err := binary.Write(&buf, binary.LittleEndian, lump.data)
+	return buf.Bytes(),err
 }
 
-// Get a specific file from the pak
+// GetFile Get a specific file from the pak
+// This function does have the expectation that filenames are case-insensitive,
+// so in the (shouldn't happen) case of name collisions over case-insensitivity,
+// there may be issues
 func (lump *Pakfile) GetFile(filePath string) ([]byte, error) {
 	filePath = lump.sanitisePath(filePath)
 	for _, f := range lump.zipReader.File {
-		if strings.ToLower(f.Name) == filePath {
+		if strings.EqualFold(filePath, lump.sanitisePath(f.Name)) {
 			rc, err := f.Open()
 			if err != nil {
 				return nil, err
@@ -55,8 +56,11 @@ func (lump *Pakfile) GetFile(filePath string) ([]byte, error) {
 	return []byte{}, nil
 }
 
+// sanitisePath ensures that the requested path matches internal casing
 func (lump *Pakfile) sanitisePath(filePath string) string {
-	filePath = strings.ToLower(filePath)
-	filePath = strings.Replace(filePath, "/", "\\", -1)
-	return filePath
+	return strings.Replace(
+		strings.Replace(strings.ToLower(filePath), "\\", "/", -1),
+		"//",
+		"/",
+		-1)
 }

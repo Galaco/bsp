@@ -4,22 +4,33 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+// Staticprop lump contains all information
+// relating to staticprop entries
 type StaticPropLump struct {
 	DictLump  StaticPropDictLump
 	LeafLump  StaticPropLeafLump
 	PropLumps []IStaticPropDataLump
 }
 
-// Note: Nothing below here is actually implemented, as its primarily game/version specific data.
+// Flat array that consists of a unique list of all
+// model filename+paths used by staticprops
 type StaticPropDictLump struct {
 	DictEntries int32
 	Name        []string // Slice length must equal dictEntries. Validation to be added
 }
+
+// Represents a flat array of leaf indexes for all staticprops.
+// A staticprop will have an offset and number on entries into the array that
+// specify what leafs a given staticprop is contained in.
 type StaticPropLeafLump struct {
 	LeafEntries int32
 	Leaf        []uint16 // Slice length must equal leafEntries. Validation to be added
 }
 
+// There are many different staticprop versions
+// This interface should be up to date with all possible properties
+// for any version.
+// Missing properties across version should return 0,false,"" etc
 type IStaticPropDataLump interface {
 	GetOrigin() mgl32.Vec3
 	GetAngles() mgl32.Vec3

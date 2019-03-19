@@ -8,9 +8,7 @@ import (
 	"unsafe"
 )
 
-/**
-Lump 9: Occlusion
-*/
+// Lump 9: Occlusion
 type Occlusion struct {
 	LumpGeneric
 	Count            int32
@@ -21,7 +19,8 @@ type Occlusion struct {
 	VertexIndices    []int32 //len(slice) = VertexIndexCount
 }
 
-func (lump *Occlusion) FromBytes(raw []byte, length int32) {
+// Import this lump from raw byte data
+func (lump *Occlusion) Unmarshall(raw []byte, length int32) {
 	if length == 0 {
 		return
 	}
@@ -67,28 +66,41 @@ func (lump *Occlusion) FromBytes(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 }
 
+// Get internal format structure data
 func (lump *Occlusion) GetData() *Occlusion {
 	return lump
 }
 
-func (lump *Occlusion) ToBytes() []byte {
+// Dump this lump back to raw byte data
+func (lump *Occlusion) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	// write data
-	binary.Write(&buf, binary.LittleEndian, lump.Count)
+	err := binary.Write(&buf, binary.LittleEndian, lump.Count)
+	if err != nil {
+		return nil, err
+	}
 	for _, data := range lump.Data {
-		binary.Write(&buf, binary.LittleEndian, data)
+		if err = binary.Write(&buf, binary.LittleEndian, data); err != nil {
+			return nil, err
+		}
 	}
 
 	// write polydata
-	binary.Write(&buf, binary.LittleEndian, lump.PolyDataCount)
+	if err = binary.Write(&buf, binary.LittleEndian, lump.PolyDataCount); err != nil {
+		return nil, err
+	}
 	for _, data := range lump.PolyData {
-		binary.Write(&buf, binary.LittleEndian, data)
+		if err = binary.Write(&buf, binary.LittleEndian, data); err != nil {
+			return nil, err
+		}
 	}
 
 	// write indices
-	binary.Write(&buf, binary.LittleEndian, lump.VertexIndexCount)
+	err = binary.Write(&buf, binary.LittleEndian, lump.VertexIndexCount)
 	for _, data := range lump.VertexIndices {
-		binary.Write(&buf, binary.LittleEndian, data)
+		if err = binary.Write(&buf, binary.LittleEndian, data); err != nil {
+			return nil, err
+		}
 	}
-	return buf.Bytes()
+	return buf.Bytes(),err
 }
