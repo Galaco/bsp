@@ -15,7 +15,7 @@ type TexData struct {
 }
 
 // Import this lump from raw byte data
-func (lump *TexData) FromBytes(raw []byte, length int32) {
+func (lump *TexData) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]primitives.TexData, length/int32(unsafe.Sizeof(primitives.TexData{})))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -30,7 +30,7 @@ func (lump *TexData) GetData() []primitives.TexData {
 }
 
 // Dump this lump back to raw byte data
-func (lump *TexData) ToBytes() ([]byte,error) {
+func (lump *TexData) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

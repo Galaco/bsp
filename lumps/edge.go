@@ -13,7 +13,7 @@ type Edge struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Edge) FromBytes(raw []byte, length int32) {
+func (lump *Edge) Unmarshall(raw []byte, length int32) {
 	lump.data = make([][2]uint16, length/4)
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -28,7 +28,7 @@ func (lump *Edge) GetData() [][2]uint16 {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Edge) ToBytes() ([]byte,error) {
+func (lump *Edge) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

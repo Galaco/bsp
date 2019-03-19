@@ -20,7 +20,7 @@ type Occlusion struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Occlusion) FromBytes(raw []byte, length int32) {
+func (lump *Occlusion) Unmarshall(raw []byte, length int32) {
 	if length == 0 {
 		return
 	}
@@ -72,7 +72,7 @@ func (lump *Occlusion) GetData() *Occlusion {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Occlusion) ToBytes() ([]byte,error) {
+func (lump *Occlusion) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	// write data
 	err := binary.Write(&buf, binary.LittleEndian, lump.Count)

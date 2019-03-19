@@ -15,7 +15,7 @@ type PrimVert struct {
 }
 
 // Import this lump from raw byte data
-func (lump *PrimVert) FromBytes(raw []byte, length int32) {
+func (lump *PrimVert) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -34,7 +34,7 @@ func (lump *PrimVert) GetData() []primitives.PrimVert {
 }
 
 // Dump this lump back to raw byte data
-func (lump *PrimVert) ToBytes() ([]byte,error) {
+func (lump *PrimVert) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

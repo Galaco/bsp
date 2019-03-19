@@ -15,7 +15,7 @@ type VertNormal struct {
 }
 
 // Import this lump from raw byte data
-func (lump *VertNormal) FromBytes(raw []byte, length int32) {
+func (lump *VertNormal) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -34,7 +34,7 @@ func (lump *VertNormal) GetData() []primitives.VertNormal {
 }
 
 // Dump this lump back to raw byte data
-func (lump *VertNormal) ToBytes() ([]byte,error) {
+func (lump *VertNormal) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

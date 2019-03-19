@@ -15,7 +15,7 @@ type OverlayFade struct {
 }
 
 // Import this lump from raw byte data
-func (lump *OverlayFade) FromBytes(raw []byte, length int32) {
+func (lump *OverlayFade) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -33,7 +33,7 @@ func (lump *OverlayFade) GetData() []primitives.OverlayFade {
 }
 
 // Dump this lump back to raw byte data
-func (lump *OverlayFade) ToBytes() ([]byte,error) {
+func (lump *OverlayFade) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

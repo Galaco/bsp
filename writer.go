@@ -6,17 +6,17 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-// Bsp export writer.
+// Writer is a Bsp export writer.
 type Writer struct {
 	data Bsp
 }
 
-// Get bsp file to write.
+// GetBsp Gets bsp file to write.
 func (w *Writer) GetBsp() Bsp {
 	return w.data
 }
 
-// Set bsp file to write.
+// SetBsp Sets bsp file to write.
 func (w *Writer) SetBsp(file Bsp) {
 	w.data = file
 }
@@ -73,18 +73,19 @@ func (w *Writer) Write() ([]byte,error) {
 	return buf.Bytes(),nil
 }
 
-// Export a single lump to []byte.
+// WriteLump Exports a single lump to []byte.
 func (w *Writer) WriteLump(index LumpId) ([]byte,error) {
 	lump := w.data.GetLump(index)
-	return lump.ToBytes()
+	return lump.Marshall()
 }
 
-// Return a new bsp writer instance.
+// NewWriter Returns a new bsp writer instance.
 func NewWriter() Writer {
 	w := Writer{}
 	return w
 }
 
+// getDefaultLumpOrdering gets Source Engines default export order.
 // Source compile tools write lumps out of order
 // While the ordering doesn't actually matter, it may
 // be useful/more performant to maintain the same order, particularly post-export

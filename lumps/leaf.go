@@ -17,7 +17,7 @@ type Leaf struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Leaf) FromBytes(raw []byte, length int32) {
+func (lump *Leaf) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]primitives.Leaf, length/int32(unsafe.Sizeof(primitives.Leaf{})))
 	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
 	numLeafs := len(lump.data)
@@ -41,7 +41,7 @@ func (lump *Leaf) GetData() []primitives.Leaf {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Leaf) ToBytes() ([]byte,error) {
+func (lump *Leaf) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

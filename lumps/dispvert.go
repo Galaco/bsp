@@ -15,7 +15,7 @@ type DispVert struct {
 }
 
 // Import this lump from raw byte data
-func (lump *DispVert) FromBytes(raw []byte, length int32) {
+func (lump *DispVert) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -34,7 +34,7 @@ func (lump *DispVert) GetData() []primitives.DispVert {
 }
 
 // Dump this lump back to raw byte data
-func (lump *DispVert) ToBytes() ([]byte,error) {
+func (lump *DispVert) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

@@ -15,7 +15,7 @@ type LeafAmbientIndex struct {
 }
 
 // Import this lump from raw byte data
-func (lump *LeafAmbientIndex) FromBytes(raw []byte, length int32) {
+func (lump *LeafAmbientIndex) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -33,7 +33,7 @@ func (lump *LeafAmbientIndex) GetData() []primitives.LeafAmbientIndex {
 }
 
 // Dump this lump back to raw byte data
-func (lump *LeafAmbientIndex) ToBytes() ([]byte,error) {
+func (lump *LeafAmbientIndex) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

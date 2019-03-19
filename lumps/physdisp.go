@@ -7,7 +7,7 @@ type PhysDisp struct {
 }
 
 // Import this lump from raw byte data
-func (lump *PhysDisp) FromBytes(raw []byte, length int32) {
+func (lump *PhysDisp) Unmarshall(raw []byte, length int32) {
 	lump.data = raw
 	lump.LumpInfo.SetLength(length)
 }
@@ -18,6 +18,6 @@ func (lump *PhysDisp) GetData() []byte {
 }
 
 // Dump this lump back to raw byte data
-func (lump *PhysDisp) ToBytes() ([]byte,error) {
+func (lump *PhysDisp) Marshall() ([]byte,error) {
 	return lump.data, nil
 }

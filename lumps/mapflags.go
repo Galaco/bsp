@@ -14,7 +14,7 @@ type MapFlags struct {
 }
 
 // Import this lump from raw byte data
-func (lump *MapFlags) FromBytes(raw []byte, length int32) {
+func (lump *MapFlags) Unmarshall(raw []byte, length int32) {
 	if length == 0 {
 		return
 	}
@@ -32,7 +32,7 @@ func (lump *MapFlags) GetData() *primitives.MapFlags {
 }
 
 // Dump this lump back to raw byte data
-func (lump *MapFlags) ToBytes() ([]byte,error) {
+func (lump *MapFlags) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

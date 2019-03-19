@@ -15,7 +15,7 @@ type Node struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Node) FromBytes(raw []byte, length int32) {
+func (lump *Node) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]primitives.Node, length/int32(unsafe.Sizeof(primitives.Node{})))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -30,7 +30,7 @@ func (lump *Node) GetData() []primitives.Node {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Node) ToBytes() ([]byte,error) {
+func (lump *Node) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

@@ -15,7 +15,7 @@ type PhysCollide struct {
 }
 
 // Import this lump from raw byte data
-func (lump *PhysCollide) FromBytes(raw []byte, length int32) {
+func (lump *PhysCollide) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -34,7 +34,7 @@ func (lump *PhysCollide) GetData() []primitives.PhysCollideEntry {
 }
 
 // Dump this lump back to raw byte data
-func (lump *PhysCollide) ToBytes() ([]byte,error) {
+func (lump *PhysCollide) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	for _,entry := range lump.data {
 		err := binary.Write(&buf, binary.LittleEndian, entry.ModelHeader)

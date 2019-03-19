@@ -21,7 +21,7 @@ type Game struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Game) FromBytes(raw []byte, length int32) {
+func (lump *Game) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 
 	if len(raw) == 0 {
@@ -62,7 +62,7 @@ func (lump *Game) GetData() *Game {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Game) ToBytes() ([]byte,error) {
+func (lump *Game) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount)
 	if err != nil {

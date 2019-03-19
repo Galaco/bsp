@@ -13,7 +13,7 @@ type PrimIndice struct {
 }
 
 // Import this lump from raw byte data
-func (lump *PrimIndice) FromBytes(raw []byte, length int32) {
+func (lump *PrimIndice) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -32,7 +32,7 @@ func (lump *PrimIndice) GetData() []uint16 {
 }
 
 // Dump this lump back to raw byte data
-func (lump *PrimIndice) ToBytes() ([]byte,error) {
+func (lump *PrimIndice) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

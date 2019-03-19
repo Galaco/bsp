@@ -15,7 +15,7 @@ type Brush struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Brush) FromBytes(raw []byte, length int32) {
+func (lump *Brush) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]primitives.Brush, length/int32(unsafe.Sizeof(primitives.Brush{})))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -30,7 +30,7 @@ func (lump *Brush) GetData() []primitives.Brush {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Brush) ToBytes() ([]byte,error) {
+func (lump *Brush) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

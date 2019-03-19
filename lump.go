@@ -14,13 +14,13 @@ type Lump struct {
 	raw    []byte
 	data   lumps.ILump
 	length int32
-	index  int
+	index  LumpId
 	loaded bool
 }
 
 // Get lump identifier
 // Id is the lump type index (not the index for the order the lumps are stored)
-func (l *Lump) SetId(index int) {
+func (l *Lump) SetId(index LumpId) {
 	l.index = index
 }
 
@@ -28,7 +28,7 @@ func (l *Lump) SetId(index int) {
 // NOTE: Will need to be cast to the relevant lumps
 func (l *Lump) GetContents() lumps.ILump {
 	if !l.loaded {
-		l.data.FromBytes(l.raw, int32(len(l.raw)))
+		l.data.Unmarshall(l.raw, int32(len(l.raw)))
 		l.loaded = true
 	}
 	return l.data
@@ -41,7 +41,7 @@ func (l *Lump) SetContents(data lumps.ILump) {
 }
 
 // Get the raw []byte contents of a lump.
-// N.B. This is the raw imported value. To get the raw value of a modified lump, use GetContents().ToBytes()
+// N.B. This is the raw imported value. To get the raw value of a modified lump, use GetContents().Marshall()
 func (l *Lump) GetRawContents() []byte {
 	return l.raw
 }

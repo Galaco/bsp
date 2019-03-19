@@ -19,7 +19,7 @@ func TestLumpExports(t *testing.T) {
 	for lumpIndex < 64 {
 		lump := file.GetLump(LumpId(lumpIndex))
 		rawLump := file.GetLumpRaw(LumpId(lumpIndex))
-		lumpBytes,err := lump.ToBytes()
+		lumpBytes,err := lump.Marshall()
 		if err != nil {
 			t.Error(err)
 		}

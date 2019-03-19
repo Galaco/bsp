@@ -16,7 +16,7 @@ type Overlay struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Overlay) FromBytes(raw []byte, length int32) {
+func (lump *Overlay) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -34,7 +34,7 @@ func (lump *Overlay) GetData() []primitives.Overlay {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Overlay) ToBytes() ([]byte,error) {
+func (lump *Overlay) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

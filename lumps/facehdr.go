@@ -15,7 +15,7 @@ type FaceHDR struct {
 }
 
 // Import this lump from raw byte data
-func (lump *FaceHDR) FromBytes(raw []byte, length int32) {
+func (lump *FaceHDR) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]primitives.Face, length/int32(unsafe.Sizeof(primitives.Face{})))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -30,7 +30,7 @@ func (lump *FaceHDR) GetData() []primitives.Face {
 }
 
 // Dump this lump back to raw byte data
-func (lump *FaceHDR) ToBytes() ([]byte,error) {
+func (lump *FaceHDR) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

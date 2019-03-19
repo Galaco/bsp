@@ -15,7 +15,7 @@ type Pakfile struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Pakfile) FromBytes(raw []byte, length int32) {
+func (lump *Pakfile) Unmarshall(raw []byte, length int32) {
 	lump.data = raw
 	lump.LumpInfo.SetLength(length)
 
@@ -31,8 +31,8 @@ func (lump *Pakfile) GetData() *zip.Reader {
 	return lump.zipReader
 }
 
-// ToBytes Returns the contents of this lump as a []byte
-func (lump *Pakfile) ToBytes() ([]byte,error) {
+// Marshall Returns the contents of this lump as a []byte
+func (lump *Pakfile) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

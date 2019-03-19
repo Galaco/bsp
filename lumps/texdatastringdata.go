@@ -7,7 +7,7 @@ type TexdataStringData struct {
 }
 
 // Import this lump from raw byte data
-func (lump *TexdataStringData) FromBytes(raw []byte, length int32) {
+func (lump *TexdataStringData) Unmarshall(raw []byte, length int32) {
 	lump.data = string(raw)
 	lump.LumpInfo.SetLength(length)
 }
@@ -18,6 +18,6 @@ func (lump *TexdataStringData) GetData() string {
 }
 
 // Dump this lump back to raw byte data
-func (lump *TexdataStringData) ToBytes() ([]byte,error) {
+func (lump *TexdataStringData) Marshall() ([]byte,error) {
 	return []byte(lump.data),nil
 }

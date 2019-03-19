@@ -7,7 +7,7 @@ type Unimplemented struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Unimplemented) FromBytes(raw []byte, length int32) {
+func (lump *Unimplemented) Unmarshall(raw []byte, length int32) {
 	lump.data = raw
 	lump.LumpInfo.SetLength(length)
 }
@@ -18,6 +18,6 @@ func (lump *Unimplemented) GetData() []byte {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Unimplemented) ToBytes() ([]byte,error) {
+func (lump *Unimplemented) Marshall() ([]byte,error) {
 	return lump.data,nil
 }

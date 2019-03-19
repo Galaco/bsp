@@ -15,7 +15,7 @@ type WorldLightHDR struct {
 }
 
 // Import this lump from raw byte data
-func (lump *WorldLightHDR) FromBytes(raw []byte, length int32) {
+func (lump *WorldLightHDR) Unmarshall(raw []byte, length int32) {
 	lump.LumpInfo.SetLength(length)
 	if length == 0 {
 		return
@@ -33,7 +33,7 @@ func (lump *WorldLightHDR) GetData() []primitives.WorldLight {
 }
 
 // Dump this lump back to raw byte data
-func (lump *WorldLightHDR) ToBytes() ([]byte,error) {
+func (lump *WorldLightHDR) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

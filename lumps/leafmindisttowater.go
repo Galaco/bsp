@@ -13,7 +13,7 @@ type LeafMinDistToWater struct {
 }
 
 // Import this lump from raw byte data
-func (lump *LeafMinDistToWater) FromBytes(raw []byte, length int32) {
+func (lump *LeafMinDistToWater) Unmarshall(raw []byte, length int32) {
 	lump.data = make([]uint16, length/int32(2))
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
@@ -28,7 +28,7 @@ func (lump *LeafMinDistToWater) GetData() []uint16 {
 }
 
 // Dump this lump back to raw byte data
-func (lump *LeafMinDistToWater) ToBytes() ([]byte,error) {
+func (lump *LeafMinDistToWater) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data)
 	return buf.Bytes(),err

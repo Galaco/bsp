@@ -14,7 +14,7 @@ type Visibility struct {
 }
 
 // Import this lump from raw byte data
-func (lump *Visibility) FromBytes(raw []byte, length int32) {
+func (lump *Visibility) Unmarshall(raw []byte, length int32) {
 	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.NumClusters)
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +39,7 @@ func (lump *Visibility) GetData() *primitives.Vis {
 }
 
 // Dump this lump back to raw byte data
-func (lump *Visibility) ToBytes() ([]byte,error) {
+func (lump *Visibility) Marshall() ([]byte,error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.data.BitVectors)
 	return buf.Bytes(),err
