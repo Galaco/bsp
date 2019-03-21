@@ -1,7 +1,7 @@
 [![GoDoc](https://godoc.org/github.com/Galaco/bsp?status.svg)](https://godoc.org/github.com/Galaco/bsp)
 [![Go report card](https://goreportcard.com/badge/github.com/galaco/bsp)](https://goreportcard.com/badge/github.com/galaco/bsp)
 [![GolangCI](https://golangci.com/badges/github.com/galaco/bsp.svg)](https://golangci.com)
-[![Build Status](https://travis-ci.com/Galaco/bsp.svg?branch=dev)](https://travis-ci.com/Galaco/bsp)
+[![Build Status](https://travis-ci.com/Galaco/bsp.svg?branch=master)](https://travis-ci.com/Galaco/bsp)
 [![CircleCI](https://circleci.com/gh/Galaco/bsp.svg?style=svg)](https://circleci.com/gh/Galaco/bsp)
 
 # Bsp
@@ -105,8 +105,9 @@ func main() {
 ```
 
 ## Real World examples
-* Replace game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
-* Proof of concept BSP viewer: [https://github.com/Galaco/Gource-Engine](https://github.com/Galaco/Gource-Engine)
+* Insert game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
+* Bspzip filelist generator from a mountable resource directory: [https://github.com/Galaco/bspzip-traverser](https://github.com/Galaco/bspzip-traverser)
+* Proof of concept BSP viewer: [https://github.com/Galaco/Lambda-Client](https://github.com/Galaco/Lambda-Client)
 
 
 # Contributing

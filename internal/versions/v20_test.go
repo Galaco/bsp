@@ -13,4 +13,9 @@ func TestGetv20Lump(t *testing.T) {
 			reflect.TypeOf(l),
 			reflect.TypeOf(lumps.Visibility{}))
 	}
+
+	_, err := Getv20Lump(65)
+	if err == nil {
+		t.Error("invalid lump index provided, but not error returned")
+	}
 }

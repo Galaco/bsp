@@ -1,11 +1,18 @@
 package visibility
 
-const MAX_MAP_VISIBILITY = 0x1000000
-const DVIS_PVS = 0
-const DVIS_PAS = 1
-const MAX_CLUSTER_SIZE_PER_VIS = 8
+// MaxMapVisibility
+const MaxMapVisibility = 0x1000000
 
-// Visibility data for clusters
+// VisPVS index
+const VisPVS = 0
+
+// VisPAS index
+const VisPAS = 1
+
+// MaxClusterSizePerVIS
+const MaxClusterSizePerVIS = 8
+
+// Vis contains visibility data for clusters
 // Includes both PVS (Potential Visible Set) and PAS (Potential Audible Set)
 type Vis struct {
 	NumClusters int32
@@ -13,7 +20,7 @@ type Vis struct {
 	BitVectors  []byte     // Compressed bit vectors, contains run-length compression PVS data
 }
 
-// Get all visible clusters ids for a given cluster
+// GetVisibleClusters returns all visible clusters ids for a given cluster
 func (vis *Vis) GetVisibleClusters(clusterId int16) (visibleClusters []int16) {
 	pvs := vis.GetPVSForCluster(clusterId)
 
@@ -26,11 +33,11 @@ func (vis *Vis) GetVisibleClusters(clusterId int16) (visibleClusters []int16) {
 	return visibleClusters
 }
 
-// Decompress vis data for a given cluster
+// GetPVSForCluster decompresses vis data for a given cluster
 // see https://developer.valvesoftware.com/wiki/Source_BSP_File_Format#Visibility for more
 func (vis *Vis) GetPVSForCluster(clusterId int16) []bool {
 	visibleClusterIds := make([]bool, vis.NumClusters)
-	v := vis.ByteOffset[clusterId][0] // pvs offset for cluster
+	v := vis.ByteOffset[clusterId][VisPVS] // pvs offset for cluster
 
 	for currentClusterIdx := int32(0); currentClusterIdx < vis.NumClusters; v++ {
 		if int(vis.BitVectors[v]) == 0 {

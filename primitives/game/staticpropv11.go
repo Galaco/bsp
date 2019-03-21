@@ -102,7 +102,7 @@ func (l *StaticPropV11) GetMaxDXLevel() uint16 {
 }
 
 func (l *StaticPropV11) GetMinCPULevel() uint8 {
-	return l.MaxCPULevel
+	return l.MinCPULevel
 }
 
 func (l *StaticPropV11) GetMaxCPULevel() uint8 {
