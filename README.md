@@ -2,7 +2,8 @@
 [![Go report card](https://goreportcard.com/badge/github.com/galaco/bsp)](https://goreportcard.com/badge/github.com/galaco/bsp)
 [![GolangCI](https://golangci.com/badges/github.com/galaco/bsp.svg)](https://golangci.com)
 [![Build Status](https://travis-ci.com/Galaco/bsp.svg?branch=master)](https://travis-ci.com/Galaco/bsp)
-[![CircleCI](https://circleci.com/gh/Galaco/bsp.svg?style=svg)](https://circleci.com/gh/Galaco/bsp)
+[![CircleCI](https://circleci.com/gh/Galaco/bsp/tree/master.svg?style=svg)](https://circleci.com/gh/Galaco/bsp/tree/master)
+[![codecov](https://codecov.io/gh/Galaco/bsp/branch/master/graph/badge.svg)](https://codecov.io/gh/Galaco/bsp)
 
 # Bsp
 Go library for manipulating Source Engine .bsp map files.
