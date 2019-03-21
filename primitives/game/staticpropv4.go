@@ -4,7 +4,7 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-// StaticProp v4 type
+// StaticPropV4 v4 type
 type StaticPropV4 struct {
 	Origin         mgl32.Vec3
 	Angles         mgl32.Vec3
@@ -19,32 +19,33 @@ type StaticPropV4 struct {
 	LightingOrigin mgl32.Vec3
 }
 
-// Origin of object in world
+// GetOrigin Origin of object in world
 func (l *StaticPropV4) GetOrigin() mgl32.Vec3 {
 	return l.Origin
 }
 
-// Rotation of object in world
+// GetAngles Rotation of object in world
 func (l *StaticPropV4) GetAngles() mgl32.Vec3 {
 	return l.Angles
 }
 
-// Uniform scale of object in world
+// GetUniformScale Uniform scale of object in world
 // Not defined in v4
 func (l *StaticPropV4) GetUniformScale() float32 {
 	return 1
 }
 
+// GetPropType
 func (l *StaticPropV4) GetPropType() uint16 {
 	return l.PropType
 }
 
-// Index into StaticPropLeafLump
+// GetFirstLeaf Index into StaticPropLeafLump
 func (l *StaticPropV4) GetFirstLeaf() uint16 {
 	return l.FirstLeaf
 }
 
-// Number of leafs this prop is in
+// GetLeafCount Number of leafs this prop is in
 func (l *StaticPropV4) GetLeafCount() uint16 {
 	return l.LeafCount
 }
@@ -57,22 +58,22 @@ func (l *StaticPropV4) GetFlags() uint8 {
 	return l.Flags
 }
 
-// Skin index of this prop
+// GetSkin Skin index of this prop
 func (l *StaticPropV4) GetSkin() int32 {
 	return l.Skin
 }
 
-// Distance from prop that it starts to fade
+// GetFadeMinDist Distance from prop that it starts to fade
 func (l *StaticPropV4) GetFadeMinDist() float32 {
 	return l.FadeMinDist
 }
 
-// Distance from prop that it is fully invisible/not rendered
+// GetFadeMaxDist Distance from prop that it is fully invisible/not rendered
 func (l *StaticPropV4) GetFadeMaxDist() float32 {
 	return l.FadeMaxDist
 }
 
-// World position to sample light from.
+// GetLightingOrigin World position to sample light from.
 // This may differ from prop origin
 func (l *StaticPropV4) GetLightingOrigin() mgl32.Vec3 {
 	return l.LightingOrigin
@@ -83,25 +84,25 @@ func (l *StaticPropV4) GetForcedFadeScale() float32 {
 	return 0
 }
 
-// Minimum directx level to render this prop
+// GetMinDXLevel Minimum directx level to render this prop
 // Not defined in v4
 func (l *StaticPropV4) GetMinDXLevel() uint16 {
 	return 0
 }
 
-// Maximum directx level to render this prop
+// GetMaxDXLevel Maximum directx level to render this prop
 // Not defined in v4
 func (l *StaticPropV4) GetMaxDXLevel() uint16 {
 	return 0
 }
 
-// Minimum CPU type to render this prop
+// GetMinCPULevel Minimum CPU type to render this prop
 // Not defined in v4
 func (l *StaticPropV4) GetMinCPULevel() uint8 {
 	return 0
 }
 
-// Maximum CPU type to render this prop
+// GetMaxCPULevel Maximum CPU type to render this prop
 // Not defined in v4
 func (l *StaticPropV4) GetMaxCPULevel() uint8 {
 	return 0
@@ -127,7 +128,7 @@ func (l *StaticPropV4) GetUnknown() float32 {
 	return 0
 }
 
-// Should be disabled on xbox 360
+// GetDisableXBox360 Should be disabled on xbox 360
 // Not defined in v4
 func (l *StaticPropV4) GetDisableXBox360() bool {
 	return false

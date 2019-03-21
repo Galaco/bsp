@@ -26,8 +26,12 @@ public:
 	Vector		vecBasisNormal;
 };
 */
+// Overlay
 type Overlay struct {
-	NId              int32
-	NTexInfo         int16
+	// NId
+	NId int32
+	// NTexInfo
+	NTexInfo int16
+	// AlignmentPadding
 	AlignmentPadding int16
 }

@@ -1,19 +1,31 @@
 package physcollide
 
+// PhysCollideEntry
 type PhysCollideEntry struct {
+	// ModelHeader
 	ModelHeader PhysModel
-	Solids      []Solid
-	TextBuffer  string
+	// Solids
+	Solids []Solid
+	// TextBuffer
+	TextBuffer string
 }
 
+// PhysModel
 type PhysModel struct {
-	ModelIndex  int32
-	DataSize    int32
+	// ModelIndex
+	ModelIndex int32
+	// DataSize
+	DataSize int32
+	// KeydataSize
 	KeydataSize int32
-	SolidCount  int32
+	// SolidCount
+	SolidCount int32
 }
 
+// Solid
 type Solid struct {
-	Size            int32
+	// Size
+	Size int32
+	// CollisionBinary
 	CollisionBinary []int32
 }

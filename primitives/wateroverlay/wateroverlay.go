@@ -33,5 +33,6 @@ public:
 };
 */
 
+// WaterOverlay
 type WaterOverlay struct {
 }

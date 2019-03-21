@@ -4,12 +4,18 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-// Texture properties
+// TexData contains texture properties
 type TexData struct {
-	Reflectivity      mgl32.Vec3
+	// Reflectivity is reflectivity vector
+	Reflectivity mgl32.Vec3
+	// NameStringTableID
 	NameStringTableID int32
-	Width             int32
-	Height            int32
-	ViewWidth         int32
-	ViewHeight        int32
+	// Width is texture width
+	Width int32
+	// Height is texture height
+	Height int32
+	// ViewWidth
+	ViewWidth int32
+	// ViewHeight
+	ViewHeight int32
 }

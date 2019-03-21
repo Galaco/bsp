@@ -30,7 +30,7 @@ func (lump *Game) Unmarshall(raw []byte, length int32) {
 
 	// First reconstruct the header to be of the right size
 	lumpCount := binary.LittleEndian.Uint32(raw[:4])
-	lump.Header = lump.Header.SetLumpCount(int32(lumpCount))
+	lump.Header.SetLumpCount(int32(lumpCount))
 
 	// Read header
 	lump.Header.GameLumps = make([]primitives.LumpDef, lumpCount)
@@ -84,7 +84,7 @@ func (lump *Game) Marshall() ([]byte, error) {
 	return buf.Bytes(), err
 }
 
-// This update the lumps offsets to be relative to the lump, rather
+// UpdateInternalOffsets updates the lumps offsets to be relative to the lump, rather
 // than the bsp start
 func (lump *Game) UpdateInternalOffsets(fileOffset int32) *Game {
 	lump.LumpOffset = fileOffset
@@ -92,6 +92,7 @@ func (lump *Game) UpdateInternalOffsets(fileOffset int32) *Game {
 	return lump
 }
 
+// GetStaticPropLump returns the staticprop lump
 func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 	for i, gameLump := range lump.Header.GameLumps {
 		if gameLump.Id == primitives.StaticPropLumpId {

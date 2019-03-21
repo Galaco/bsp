@@ -1,9 +1,9 @@
 package bsp
 
 import (
+	"fmt"
 	"github.com/galaco/bsp/internal/versions"
 	"github.com/galaco/bsp/lumps"
-	"log"
 )
 
 // Container for a lump. Also includes metadata about the lump.
@@ -58,7 +58,7 @@ func (l *Lump) GetLength() int32 {
 // Return an instance of a Lump for a given offset.
 func getReferenceLumpByIndex(index int, version int32) (lumps.ILump, error) {
 	if index < 0 || index > 63 {
-		log.Fatalf("Invalid lump index: %d provided\n", index)
+		return nil, fmt.Errorf("invalid lump index: %d provided", index)
 	}
 
 	return versions.GetLumpForVersion(int(version), index)

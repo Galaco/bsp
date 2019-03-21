@@ -14,6 +14,50 @@ func TestGetReferenceLumpByIndex(t *testing.T) {
 		}
 	}
 
+	_, err := getReferenceLumpByIndex(65, 20)
+	if err == nil {
+		t.Error("invalid lump provided, but no error returned")
+	}
+}
+
+func TestLump_GetContents(t *testing.T) {
+
+}
+
+func TestLump_GetLength(t *testing.T) {
+	sut := Lump{}
+	sut.length = 32
+	if sut.GetLength() != 32 {
+		t.Error("incorrect length returned for lump")
+	}
+}
+
+func TestLump_GetRawContents(t *testing.T) {
+	t.Skip()
+}
+
+func TestLump_SetContents(t *testing.T) {
+	t.Skip()
+}
+
+func TestLump_SetId(t *testing.T) {
+	sut := Lump{}
+	sut.SetId(LumpPakfile)
+
+	if sut.index != LumpPakfile {
+		t.Error("incorrect lump id")
+	}
+}
+
+func TestLump_SetRawContents(t *testing.T) {
+	sut := Lump{}
+	data := []byte{0, 1, 4, 3, 2}
+	sut.SetRawContents(data)
+	for idx, b := range sut.GetRawContents() {
+		if data[idx] != b {
+			t.Error("raw lump data mismatch")
+		}
+	}
 }
 
 func getExpectedLump(index int) lumps.ILump {
