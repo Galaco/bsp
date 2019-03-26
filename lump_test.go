@@ -44,7 +44,7 @@ func TestLump_SetId(t *testing.T) {
 	sut := Lump{}
 	sut.SetId(LumpPakfile)
 
-	if sut.index != LumpPakfile {
+	if sut.id != LumpPakfile {
 		t.Error("incorrect lump id")
 	}
 }

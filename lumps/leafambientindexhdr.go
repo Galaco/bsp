@@ -4,27 +4,29 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/leafambientindex"
-	"log"
 	"unsafe"
 )
 
 // LeafAmbientIndexHDR is Lump 51: Leaf Ambient Index HDR
 type LeafAmbientIndexHDR struct {
-	LumpGeneric
+	Generic
 	data []primitives.LeafAmbientIndex
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *LeafAmbientIndexHDR) Unmarshall(raw []byte, length int32) {
+func (lump *LeafAmbientIndexHDR) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
 	if length == 0 {
 		return
 	}
-	lump.data = make([]primitives.LeafAmbientIndex, length/int32(unsafe.Sizeof(primitives.LeafAmbientIndex{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	lump.data = make([]primitives.LeafAmbientIndex, length/int(unsafe.Sizeof(primitives.LeafAmbientIndex{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return err
 }
 
 // GetData gets internal format structure data

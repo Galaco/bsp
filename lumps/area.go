@@ -4,29 +4,31 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/area"
-	"log"
 	"unsafe"
 )
 
 // Area is Lump 20: Areas
 type Area struct {
-	LumpGeneric
+	Generic
 	data []primitives.Area
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Area) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *Area) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
-		return
+		return nil
 	}
 
-	lump.data = make([]primitives.Area, length/int32(unsafe.Sizeof(primitives.Area{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	lump.data = make([]primitives.Area, length/int(unsafe.Sizeof(primitives.Area{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return nil
 }
 
 // GetData gets internal format structure data

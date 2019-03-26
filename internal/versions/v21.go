@@ -4,7 +4,7 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-// Returns an empty bsp v19 lump for the specified lump id
+// Getv21Lump returns the corresponding v21 lump for provided index
 func Getv21Lump(index int) (lumps.ILump, error) {
 	return Getv20Lump(index)
 }

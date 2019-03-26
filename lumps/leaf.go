@@ -15,27 +15,30 @@ const (
 
 // Leaf is Lump 10: Leaf
 type Leaf struct {
-	LumpGeneric
+	Generic
 	data []primitives.Leaf
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Leaf) Unmarshall(raw []byte, length int32) {
-	lump.data = make([]primitives.Leaf, length/int32(unsafe.Sizeof(primitives.Leaf{})))
+func (lump *Leaf) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.data = make([]primitives.Leaf, length/int(unsafe.Sizeof(primitives.Leaf{})))
 	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
 	numLeafs := len(lump.data)
 	i := 0
 	for i < numLeafs {
-		err := binary.Read(bytes.NewBuffer(raw[(structSize*i):(structSize*i)+structSize]), binary.LittleEndian, &lump.data[i])
+		err = binary.Read(bytes.NewBuffer(raw[(structSize*i):(structSize*i)+structSize]), binary.LittleEndian, &lump.data[i])
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		i++
 		if i > MaxMapLeafs {
 			log.Fatalf("Leaf count overflows maximum allowed size of %d\n", MaxMapLeafs)
 		}
 	}
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return err
 }
 
 // GetData gets internal format structure data

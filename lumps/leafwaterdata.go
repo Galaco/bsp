@@ -4,28 +4,26 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/leafwaterdata"
-	"log"
 	"unsafe"
 )
 
 // LeafWaterData is Lump 36: leafwaterdata
 type LeafWaterData struct {
-	LumpGeneric
+	Generic
 	data []primitives.LeafWaterData
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *LeafWaterData) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *LeafWaterData) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
 		return
 	}
-	lump.data = make([]primitives.LeafWaterData, length/int32(unsafe.Sizeof(primitives.LeafWaterData{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	lump.data = make([]primitives.LeafWaterData, length/int(unsafe.Sizeof(primitives.LeafWaterData{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 
+	return err
 }
 
 // GetData gets internal format structure data

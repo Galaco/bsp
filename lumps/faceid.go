@@ -4,27 +4,26 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/faceid"
-	"log"
 	"unsafe"
 )
 
 // FaceId is Lump 11: FaceIds
 type FaceId struct {
-	LumpGeneric
+	Generic
 	data []primitives.FaceId
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *FaceId) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *FaceId) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
 		return
 	}
-	lump.data = make([]primitives.FaceId, length/int32(unsafe.Sizeof(primitives.FaceId{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	lump.data = make([]primitives.FaceId, length/int(unsafe.Sizeof(primitives.FaceId{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+
+	return err
 }
 
 // GetData gets internal format structure data

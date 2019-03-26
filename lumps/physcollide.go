@@ -4,28 +4,27 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/physcollide"
-	"log"
 	"unsafe"
 )
 
 // PhysCollide is Lump 20: PhysCollide
 type PhysCollide struct {
-	LumpGeneric
+	Generic
 	data []primitives.PhysCollideEntry
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *PhysCollide) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *PhysCollide) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
 		return
 	}
 
-	lump.data = make([]primitives.PhysCollideEntry, length/int32(unsafe.Sizeof(primitives.PhysCollideEntry{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	lump.data = make([]primitives.PhysCollideEntry, length/int(unsafe.Sizeof(primitives.PhysCollideEntry{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+
+	return err
 }
 
 // GetData gets internal format structure data

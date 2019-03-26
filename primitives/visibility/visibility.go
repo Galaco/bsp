@@ -1,6 +1,6 @@
 package visibility
 
-// MaxMapVisibility
+// MaxMapVisibility is the maximum size of visibility data in bytes
 const MaxMapVisibility = 0x1000000
 
 // VisPVS index
@@ -9,15 +9,16 @@ const VisPVS = 0
 // VisPAS index
 const VisPAS = 1
 
-// MaxClusterSizePerVIS
-const MaxClusterSizePerVIS = 8
-
 // Vis contains visibility data for clusters
 // Includes both PVS (Potential Visible Set) and PAS (Potential Audible Set)
 type Vis struct {
+	// NumClusters is number of computed cluster
 	NumClusters int32
-	ByteOffset  [][2]int32 // Slice length = NumClusters [0]=offset to PVS bit array for cluster
-	BitVectors  []byte     // Compressed bit vectors, contains run-length compression PVS data
+	// ByteOffset contains offsets for cluster pvs and pas
+	// Slice length = NumClusters [0]=offset to PVS bit array for cluster
+	ByteOffset [][2]int32
+	// BitVectors are compressed bit vectors, contains run-length compression PVS data
+	BitVectors []byte
 }
 
 // GetVisibleClusters returns all visible clusters ids for a given cluster

@@ -4,27 +4,26 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/overlayfade"
-	"log"
 	"unsafe"
 )
 
 // OverlayFade is Lump 60: Overlayfades
 type OverlayFade struct {
-	LumpGeneric
+	Generic
 	data []primitives.OverlayFade
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *OverlayFade) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *OverlayFade) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
 		return
 	}
-	lump.data = make([]primitives.OverlayFade, length/int32(unsafe.Sizeof(primitives.OverlayFade{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	lump.data = make([]primitives.OverlayFade, length/int(unsafe.Sizeof(primitives.OverlayFade{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+
+	return err
 }
 
 // GetData gets internal format structure data

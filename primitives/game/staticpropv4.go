@@ -24,7 +24,7 @@ func (l *StaticPropV4) GetOrigin() mgl32.Vec3 {
 	return l.Origin
 }
 
-// GetAngles Rotation of object in world
+// GetAngles rotation of object in world
 func (l *StaticPropV4) GetAngles() mgl32.Vec3 {
 	return l.Angles
 }
@@ -35,7 +35,7 @@ func (l *StaticPropV4) GetUniformScale() float32 {
 	return 1
 }
 
-// GetPropType
+// GetPropType prop type
 func (l *StaticPropV4) GetPropType() uint16 {
 	return l.PropType
 }
@@ -50,15 +50,17 @@ func (l *StaticPropV4) GetLeafCount() uint16 {
 	return l.LeafCount
 }
 
+// GetSolid is solid
 func (l *StaticPropV4) GetSolid() uint8 {
 	return l.Solid
 }
 
+// GetFlags prop flags
 func (l *StaticPropV4) GetFlags() uint8 {
 	return l.Flags
 }
 
-// GetSkin Skin index of this prop
+// GetSkin skin index of this prop (default 0)
 func (l *StaticPropV4) GetSkin() int32 {
 	return l.Skin
 }
@@ -79,6 +81,7 @@ func (l *StaticPropV4) GetLightingOrigin() mgl32.Vec3 {
 	return l.LightingOrigin
 }
 
+// GetForcedFadeScale
 // Not defined in v4
 func (l *StaticPropV4) GetForcedFadeScale() float32 {
 	return 0
@@ -108,21 +111,25 @@ func (l *StaticPropV4) GetMaxCPULevel() uint8 {
 	return 0
 }
 
+// GetMinGPULevel minimum GPU to render
 // Not defined in v4
 func (l *StaticPropV4) GetMinGPULevel() uint8 {
 	return 0
 }
 
+// GetMaxGPULevel Maximum GPU to render
 // Not defined in v4
 func (l *StaticPropV4) GetMaxGPULevel() uint8 {
 	return 0
 }
 
+// GetDiffuseModulation
 // Not defined in v4
 func (l *StaticPropV4) GetDiffuseModulation() float32 {
 	return 0
 }
 
+// GetUnknown
 // Not defined in v4
 func (l *StaticPropV4) GetUnknown() float32 {
 	return 0

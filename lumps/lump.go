@@ -1,41 +1,48 @@
 package lumps
 
-// LumpGeneric is a raw byte lump
+// Generic is a raw byte lump
 // It should be used in cases where the data has no or unknown
 // structures.
-type LumpGeneric struct {
-	LumpInfo
+type Generic struct {
+	Metadata
 	data []byte
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *LumpGeneric) Unmarshall(data []byte, length int32) {
-	lump.length = length
+func (lump *Generic) Unmarshall(data []byte) (err error) {
+	lump.length = len(data)
 	lump.data = data
+
+	return err
 }
 
 // Marshall Dumps this lump back to raw byte data
-func (lump *LumpGeneric) Marshall() ([]byte, error) {
+func (lump *Generic) Marshall() ([]byte, error) {
 	return lump.data, nil
 }
 
-// LumpInfo is a Helper info for a lump
-type LumpInfo struct {
-	length  int32
+// Metadata is a Helper info for a lump
+type Metadata struct {
+	length  int
 	version int32
 }
 
-// GetLength Returns lump import length in bytes.
-func (info LumpInfo) GetLength() int32 {
+// Length Returns lump import length in bytes.
+func (info *Metadata) Length() int {
 	return info.length
 }
 
 // SetLength sets lump import length in bytes
-func (info LumpInfo) SetLength(length int32) {
+func (info *Metadata) SetLength(length int) {
 	info.length = length
 }
 
+// Version Returns lump import version in bytes.
+func (info *Metadata) Version() int32 {
+	return info.version
+}
+
 // SetVersion sets bsp version of lump
-func (info LumpInfo) SetVersion(version int32) {
+func (info *Metadata) SetVersion(version int32) {
 	info.version = version
 }

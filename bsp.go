@@ -31,17 +31,17 @@ func (bsp *Bsp) GetHeader() Header {
 	return bsp.header
 }
 
-// GetLump gets the lump for a given index.
+// GetLump gets the lump for a given id.
 func (bsp *Bsp) GetLump(index LumpId) lumps.ILump {
 	return bsp.GetLumpRaw(index).GetContents()
 }
 
-// GetLumpRaw gets the lump for a given index.
+// GetLumpRaw gets the lump for a given id.
 func (bsp *Bsp) GetLumpRaw(index LumpId) *Lump {
 	return &bsp.lumps[int(index)]
 }
 
-// SetLump sets the lump data for a given index.
+// SetLump sets the lump data for a given id.
 func (bsp *Bsp) SetLump(index LumpId, lump Lump) {
 	bsp.lumps[int(index)] = lump
 }

@@ -3,23 +3,25 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	"log"
 )
 
 // TexDataStringTable is Lump 44: TexDataStringTable
 type TexDataStringTable struct {
-	LumpGeneric
+	Generic
 	data []int32 // MAX_MAP_TEXINFO = 2048
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *TexDataStringTable) Unmarshall(raw []byte, length int32) {
+func (lump *TexDataStringTable) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
 	lump.data = make([]int32, length/4)
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return nil
 }
 
 // GetData gets internal format structure data

@@ -4,24 +4,26 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/plane"
-	"log"
 	"unsafe"
 )
 
 // Planes is Lump 1: Planes
 type Planes struct {
-	LumpGeneric
+	Generic
 	data []primitives.Plane // MAP_MAX_PLANES = 65536
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Planes) Unmarshall(raw []byte, length int32) {
-	lump.data = make([]primitives.Plane, length/int32(unsafe.Sizeof(primitives.Plane{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+func (lump *Planes) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.data = make([]primitives.Plane, length/int(unsafe.Sizeof(primitives.Plane{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return err
 }
 
 // GetData gets internal format structure data
