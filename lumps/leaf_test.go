@@ -4,25 +4,20 @@ import (
 	primitives "github.com/galaco/bsp/primitives/leaf"
 	"log"
 	"testing"
-	"unsafe"
 )
 
 const leafStructSizeRaw = 32
 
 // Assert leaf data when read from bytes is valid
 func TestLeafUnmarshall(t *testing.T) {
-	l := unsafe.Sizeof(primitives.Leaf{})
-
-	if l != leafStructSizeRaw {
-		t.Errorf("Leaf struct is of incorrect size, expected: %d, actual: %d", leafStructSizeRaw, l)
-	}
-
 	lump := Leaf{}
+	lump.SetVersion(20)
 	err := lump.Unmarshall(GetTestDataBytes())
 	if err != nil {
 		t.Error(err)
 	}
 	expected := GetTestLeafData()
+	log.Println(lump)
 	actual := lump.GetData()[0]
 
 	if actual != expected {

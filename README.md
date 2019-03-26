@@ -5,16 +5,16 @@
 [![CircleCI](https://circleci.com/gh/Galaco/bsp.svg?style=svg)](https://circleci.com/gh/Galaco/bsp)
 
 # Bsp
-Go library for manipulating Source Engine .bsp map files.
+Go library for handling Source Engine .bsp map files.
 
 ### Features:
-* Read support for (most) non-xbox360 bsps.
-* Freely modify and resize any Lump data.
-* Limited write support
+* Read support for (most) non-xbox360 bsps (v20,21). v19 support limited, may work
+* Freely modify and resize any Lump data
+* Limited write support, mostly untested
 
 ##### Not all lumps are current supported, but can be freely read and modified, as they are treated as `[]byte`
 
-The following lumps currently have a full implementation for v20 bsp's (tested against CS:S & CS:GO):
+The following lumps currently have a full implementation for v20 & v21 bsp's (tested against CS:S & CS:GO):
 
 ```
 0: Entdata
@@ -82,6 +82,7 @@ package main
 
 import (
 	"github.com/galaco/bsp"
+	"github.com/galaco/bsp/lumps"
 	"log"
 	"os"
 )
@@ -99,15 +100,15 @@ func main() {
 	}
 	f.Close()
     
-	lump := file.GetLump(bsp.LUMP_ENTITIES).(*lump.Entities)
+	lump := file.Lump(bsp.LumpEntities).(*lumps.Entities)
 	log.Println(lump.GetData())
 }
 ```
 
 ## Real World examples
+* Proof of concept BSP viewer: [https://github.com/Galaco/Lambda-Client](https://github.com/Galaco/Lambda-Client)
 * Insert game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
 * Bspzip filelist generator from a mountable resource directory: [https://github.com/Galaco/bspzip-traverser](https://github.com/Galaco/bspzip-traverser)
-* Proof of concept BSP viewer: [https://github.com/Galaco/Lambda-Client](https://github.com/Galaco/Lambda-Client)
 
 
 # Contributing

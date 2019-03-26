@@ -26,18 +26,18 @@ type HeaderLump struct {
 	Id      [4]byte
 }
 
-// GetHeader gets the header for a bsp.
-func (bsp *Bsp) GetHeader() Header {
+// Header gets the header for a bsp.
+func (bsp *Bsp) Header() Header {
 	return bsp.header
 }
 
-// GetLump gets the lump for a given id.
-func (bsp *Bsp) GetLump(index LumpId) lumps.ILump {
-	return bsp.GetLumpRaw(index).GetContents()
+// Lump gets the lump for a given id.
+func (bsp *Bsp) Lump(index LumpId) lumps.ILump {
+	return bsp.RawLump(index).Contents()
 }
 
-// GetLumpRaw gets the lump for a given id.
-func (bsp *Bsp) GetLumpRaw(index LumpId) *Lump {
+// RawLump gets the lump for a given id.
+func (bsp *Bsp) RawLump(index LumpId) *Lump {
 	return &bsp.lumps[int(index)]
 }
 

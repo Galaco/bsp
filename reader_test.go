@@ -26,5 +26,5 @@ func TestReadFromStream(t *testing.T) {
 		t.Error(err)
 	}
 
-	r.GetLump(LumpGame).(*lumps.Game).GetStaticPropLump()
+	r.Lump(LumpGame).(*lumps.Game).GetStaticPropLump()
 }

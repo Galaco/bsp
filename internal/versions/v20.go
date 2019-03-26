@@ -11,133 +11,133 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	var err error
 	switch index {
 	case 0:
-		ret = &lumps.EntData{}
+		ret = new(lumps.EntData)
 	case 1:
-		ret = &lumps.Planes{}
+		ret = new(lumps.Planes)
 	case 2:
-		ret = &lumps.TexData{}
+		ret = new(lumps.TexData)
 	case 3:
-		ret = &lumps.Vertex{}
+		ret = new(lumps.Vertex)
 	case 4:
-		ret = &lumps.Visibility{}
+		ret = new(lumps.Visibility)
 	case 5:
-		ret = &lumps.Node{}
+		ret = new(lumps.Node)
 	case 6:
-		ret = &lumps.TexInfo{}
+		ret = new(lumps.TexInfo)
 	case 7:
-		ret = &lumps.Face{}
+		ret = new(lumps.Face)
 	case 8:
-		ret = &lumps.Lighting{}
+		ret = new(lumps.Lighting)
 	case 9:
-		ret = &lumps.Occlusion{}
+		ret = new(lumps.Occlusion)
 	case 10:
-		ret = &lumps.Leaf{}
+		ret = new(lumps.Leaf)
 	case 11:
-		ret = &lumps.FaceId{}
+		ret = new(lumps.FaceId)
 	case 12:
-		ret = &lumps.Edge{}
+		ret = new(lumps.Edge)
 	case 13:
-		ret = &lumps.Surfedge{}
+		ret = new(lumps.Surfedge)
 	case 14:
-		ret = &lumps.Model{}
+		ret = new(lumps.Model)
 	case 15:
-		ret = &lumps.WorldLight{}
+		ret = new(lumps.WorldLight)
 	case 16:
-		ret = &lumps.LeafFace{}
+		ret = new(lumps.LeafFace)
 	case 17:
-		ret = &lumps.LeafBrush{}
+		ret = new(lumps.LeafBrush)
 	case 18:
-		ret = &lumps.Brush{}
+		ret = new(lumps.Brush)
 	case 19:
-		ret = &lumps.BrushSide{}
+		ret = new(lumps.BrushSide)
 	case 20:
-		ret = &lumps.Area{}
+		ret = new(lumps.Area)
 	case 21:
-		ret = &lumps.AreaPortal{}
+		ret = new(lumps.AreaPortal)
 	case 22:
-		ret = &lumps.Unimplemented{} //portals | unused0 | propcollision
+		ret = new(lumps.Unimplemented) //portals | unused0 | propcollision
 	case 23:
-		ret = &lumps.Unimplemented{} //clusters | unused1 | prophulls
+		ret = new(lumps.Unimplemented) //clusters | unused1 | prophulls
 	case 24:
-		ret = &lumps.Unimplemented{} //portalverts | unused2 | prophullverts
+		ret = new(lumps.Unimplemented) //portalverts | unused2 | prophullverts
 	case 25:
-		ret = &lumps.Unimplemented{} //clusterportals | unused3 | proptris
+		ret = new(lumps.Unimplemented) //clusterportals | unused3 | proptris
 	case 26:
-		ret = &lumps.DispInfo{}
+		ret = new(lumps.DispInfo)
 	case 27:
-		ret = &lumps.Face{}
+		ret = new(lumps.Face)
 	case 28:
-		ret = &lumps.PhysDisp{}
+		ret = new(lumps.PhysDisp)
 	case 29:
-		ret = &lumps.Unimplemented{} //physcollide - IN PROGRESS
+		ret = new(lumps.Unimplemented) //physcollide - IN PROGRESS
 	case 30:
-		ret = &lumps.VertNormal{}
+		ret = new(lumps.VertNormal)
 	case 31:
-		ret = &lumps.VertNormalIndice{}
+		ret = new(lumps.VertNormalIndice)
 	case 32:
-		ret = &lumps.Unimplemented{} //disp lightmap alphas - IS STRIPPED ANYWAY?
+		ret = new(lumps.Unimplemented) //disp lightmap alphas - IS STRIPPED ANYWAY?
 	case 33:
-		ret = &lumps.DispVert{}
+		ret = new(lumps.DispVert)
 	case 34:
-		ret = &lumps.DispLightmapSamplePosition{}
+		ret = new(lumps.DispLightmapSamplePosition)
 	case 35:
-		ret = &lumps.Game{}
+		ret = new(lumps.Game)
 	case 36:
-		ret = &lumps.LeafWaterData{}
+		ret = new(lumps.LeafWaterData)
 	case 37:
-		ret = &lumps.Unimplemented{} //primitives FIXME - Appears to be 4bytes unaccounted for at end of lump?
+		ret = new(lumps.Unimplemented) //primitives FIXME - Appears to be 4bytes unaccounted for at end of lump?
 	case 38:
-		ret = &lumps.PrimVert{}
+		ret = new(lumps.PrimVert)
 	case 39:
-		ret = &lumps.PrimIndice{}
+		ret = new(lumps.PrimIndice)
 	case 40:
-		ret = &lumps.Pakfile{} //pakfile
+		ret = new(lumps.Pakfile) //pakfile
 	case 41:
-		ret = &lumps.ClipPortalVerts{}
+		ret = new(lumps.ClipPortalVerts)
 	case 42:
-		ret = &lumps.Cubemap{}
+		ret = new(lumps.Cubemap)
 	case 43:
-		ret = &lumps.TexDataStringData{}
+		ret = new(lumps.TexDataStringData)
 	case 44:
-		ret = &lumps.TexDataStringTable{}
+		ret = new(lumps.TexDataStringTable)
 	case 45:
-		ret = &lumps.Overlay{}
+		ret = new(lumps.Overlay)
 	case 46:
-		ret = &lumps.LeafMinDistToWater{}
+		ret = new(lumps.LeafMinDistToWater)
 	case 47:
-		ret = &lumps.FaceMacroTextureInfo{}
+		ret = new(lumps.FaceMacroTextureInfo)
 	case 48:
-		ret = &lumps.DispTris{}
+		ret = new(lumps.DispTris)
 	case 49:
-		ret = &lumps.Unimplemented{} //physcollidesurface | prop blob
+		ret = new(lumps.Unimplemented) //physcollidesurface | prop blob
 	case 50:
-		ret = &lumps.Unimplemented{} //wateroverlays
+		ret = new(lumps.Unimplemented) //wateroverlays
 	case 51:
-		ret = &lumps.LeafAmbientIndexHDR{}
+		ret = new(lumps.LeafAmbientIndexHDR)
 	case 52:
-		ret = &lumps.LeafAmbientIndex{}
+		ret = new(lumps.LeafAmbientIndex)
 	case 53:
-		ret = &lumps.Unimplemented{} //lighting hdr
+		ret = new(lumps.Unimplemented) //lighting hdr
 	case 54:
-		ret = &lumps.WorldLightHDR{} //worldlights hdr
+		ret = new(lumps.WorldLightHDR) //worldlights hdr
 	case 55:
-		ret = &lumps.LeafAmbientLightingHDR{}
+		ret = new(lumps.LeafAmbientLightingHDR)
 	case 56:
-		ret = &lumps.LeafAmbientLighting{} //leaf ambient lighting
+		ret = new(lumps.LeafAmbientLighting) //leaf ambient lighting
 	case 57:
-		ret = &lumps.Unimplemented{} //xzippakfile
+		ret = new(lumps.Unimplemented) //xzippakfile
 	case 58:
-		ret = &lumps.FaceHDR{}
+		ret = new(lumps.FaceHDR)
 	case 59:
-		ret = &lumps.MapFlags{}
+		ret = new(lumps.MapFlags)
 	case 60:
-		ret = &lumps.OverlayFade{}
+		ret = new(lumps.OverlayFade)
 	case 61:
-		ret = &lumps.Unimplemented{} //overlay system levels
+		ret = new(lumps.Unimplemented) //overlay system levels
 	case 62:
-		ret = &lumps.Unimplemented{} //physlevel
+		ret = new(lumps.Unimplemented) //physlevel
 	case 63:
-		ret = &lumps.Unimplemented{} //disp multiblend
+		ret = new(lumps.Unimplemented) //disp multiblend
 	default:
 		err = errors.New("invalid lump id")
 	}

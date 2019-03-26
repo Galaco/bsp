@@ -17,15 +17,15 @@ type Lump struct {
 	loaded bool
 }
 
-// SetId Get lump identifier
+// SetId sets lump identifier
 // Id is the lump type id (not the id for the order the lumps are stored)
 func (l *Lump) SetId(index LumpId) {
 	l.id = index
 }
 
-// GetContents Get the contents of a lump.
+// Contents Get the contents of a lump.
 // NOTE: Will need to be cast to the relevant lumps
-func (l *Lump) GetContents() lumps.ILump {
+func (l *Lump) Contents() lumps.ILump {
 	if !l.loaded {
 		if l.data.Unmarshall(l.raw) != nil {
 			return nil
@@ -41,9 +41,9 @@ func (l *Lump) SetContents(data lumps.ILump) {
 	l.loaded = false
 }
 
-// GetRawContents Get the raw []byte contents of a lump.
-// N.B. This is the raw imported value. To get the raw value of a modified lump, use GetContents().Marshall()
-func (l *Lump) GetRawContents() []byte {
+// RawContents Get the raw []byte contents of a lump.
+// N.B. This is the raw imported value. To get the raw value of a modified lump, use Contents().Marshall()
+func (l *Lump) RawContents() []byte {
 	return l.raw
 }
 
@@ -52,8 +52,8 @@ func (l *Lump) SetRawContents(raw []byte) {
 	l.raw = raw
 }
 
-// GetLength Get length of a lump in bytes.
-func (l *Lump) GetLength() int32 {
+// Length Get length of a lump in bytes.
+func (l *Lump) Length() int32 {
 	return l.length
 }
 
@@ -63,5 +63,12 @@ func getReferenceLumpByIndex(index int, version int32) (lumps.ILump, error) {
 		return nil, fmt.Errorf("invalid lump id: %d provided", index)
 	}
 
-	return versions.GetLumpForVersion(int(version), index)
+	l, err := versions.GetLumpForVersion(int(version), index)
+	if err != nil {
+		return nil, err
+	}
+
+	l.SetVersion(version)
+
+	return l, nil
 }
