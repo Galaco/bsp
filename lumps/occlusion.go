@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/occlusion"
-	"log"
 	"unsafe"
 )
 
 // Occlusion is Lump 9: Occlusion
 type Occlusion struct {
-	LumpGeneric
+	Generic
 	Count            int32
 	Data             []primitives.OcclusionData // len(slice) = Count
 	PolyDataCount    int32
@@ -20,50 +19,53 @@ type Occlusion struct {
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Occlusion) Unmarshall(raw []byte, length int32) {
+func (lump *Occlusion) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
 	if length == 0 {
 		return
 	}
 	offset := 0
 	// data
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Count)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Count)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	offset += 4
 	lump.Data = make([]primitives.OcclusionData, lump.Count)
 	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.Data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	offset += int(unsafe.Sizeof(primitives.OcclusionData{})) * int(lump.Count)
 
 	// polydata
 	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.PolyDataCount)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	offset += 4
 	lump.PolyData = make([]primitives.OcclusionPolyData, lump.PolyDataCount)
 	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.PolyData)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	offset += int(unsafe.Sizeof(primitives.OcclusionPolyData{})) * int(lump.PolyDataCount)
 
 	// vertexdata
 	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.VertexIndexCount)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	offset += 4
 	lump.VertexIndices = make([]int32, lump.VertexIndexCount)
 	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.VertexIndices)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return err
 }
 
 // GetData gets internal format structure data

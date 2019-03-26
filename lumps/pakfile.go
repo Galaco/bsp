@@ -10,20 +10,23 @@ import (
 
 // Pakfile is Lump 40: Pakfile
 type Pakfile struct {
-	LumpGeneric
+	Generic
 	zipReader *zip.Reader
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Pakfile) Unmarshall(raw []byte, length int32) {
+func (lump *Pakfile) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
 	lump.data = raw
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
 
 	b := bytes.NewReader(raw)
 	zipReader, err := zip.NewReader(b, int64(length))
 	if err == nil {
 		lump.zipReader = zipReader
 	}
+
+	return err
 }
 
 // GetData GetData gets internal format structure data

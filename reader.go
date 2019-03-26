@@ -98,7 +98,7 @@ func (r *Reader) readHeader(reader *bytes.Reader, header Header) (*Header, error
 
 // readLump Reads a single lumps data
 // Expect a byte reader containing the lump data, as well as the
-// header and lump identifier (index)
+// header and lump identifier (id)
 func (r *Reader) readLump(reader *bytes.Reader, header Header, index int) ([]byte, error) {
 	//Limit lump data to declared size
 	lumpHeader := header.Lumps[index]

@@ -3,14 +3,16 @@ package lumps
 // DispLightmapSamplePosition is Lump 34: DispLightmapSamplePosition
 // NOTE: This does NOT have a mapped format yet, and is readable as []byte only
 type DispLightmapSamplePosition struct {
-	LumpGeneric
+	Generic
 	data []byte
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *DispLightmapSamplePosition) Unmarshall(raw []byte, length int32) {
+func (lump *DispLightmapSamplePosition) Unmarshall(raw []byte) (err error) {
 	lump.data = raw
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(len(raw))
+
+	return nil
 }
 
 // GetData gets internal format structure data

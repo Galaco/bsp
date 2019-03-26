@@ -5,6 +5,7 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
+// Getv20Lump returns the corresponding v20 lump for provided index
 func Getv20Lump(index int) (lumps.ILump, error) {
 	var ret lumps.ILump
 	var err error

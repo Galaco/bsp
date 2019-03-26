@@ -4,33 +4,35 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/visibility"
-	"log"
 )
 
 // Visibility is Lump 4: Visibility
 type Visibility struct {
-	LumpGeneric
+	Generic
 	data primitives.Vis
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Visibility) Unmarshall(raw []byte, length int32) {
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.NumClusters)
+func (lump *Visibility) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.NumClusters)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	lump.data.ByteOffset = make([][2]int32, lump.data.NumClusters)
 	err = binary.Read(bytes.NewBuffer(raw[4:]), binary.LittleEndian, &lump.data.ByteOffset)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	lump.data.BitVectors = make([]byte, length)
 	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.BitVectors)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return nil
 }
 
 // GetData gets internal format structure data

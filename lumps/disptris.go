@@ -4,28 +4,27 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/disptris"
-	"log"
 	"unsafe"
 )
 
 // DispTris is Lump 48: DispTris
 type DispTris struct {
-	LumpGeneric
+	Generic
 	data []primitives.DispTri
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *DispTris) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *DispTris) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
 		return
 	}
 
-	lump.data = make([]primitives.DispTri, length/int32(unsafe.Sizeof(primitives.DispTri{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	lump.data = make([]primitives.DispTri, length/int(unsafe.Sizeof(primitives.DispTri{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+
+	return err
 }
 
 // GetData gets internal format structure data

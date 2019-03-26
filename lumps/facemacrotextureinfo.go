@@ -4,28 +4,27 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/facemacrotextureinfo"
-	"log"
 	"unsafe"
 )
 
 // FaceMacroTextureInfo is Lump 47: FaceMacroTextureInfo
 type FaceMacroTextureInfo struct {
-	LumpGeneric
+	Generic
 	data []primitives.FaceMacroTextureInfo
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *FaceMacroTextureInfo) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *FaceMacroTextureInfo) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
 		return
 	}
 
-	lump.data = make([]primitives.FaceMacroTextureInfo, length/int32(unsafe.Sizeof(primitives.FaceMacroTextureInfo{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	lump.data = make([]primitives.FaceMacroTextureInfo, length/int(unsafe.Sizeof(primitives.FaceMacroTextureInfo{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+
+	return err
 }
 
 // GetData gets internal format structure data

@@ -3,27 +3,25 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	"log"
 )
 
 // VertNormalIndice is Lump 31: VertNormalIndice
 type VertNormalIndice struct {
-	LumpGeneric
+	Generic
 	data []uint16
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *VertNormalIndice) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *VertNormalIndice) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
 		return
 	}
 
-	lump.data = make([]uint16, length/int32(2))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	lump.data = make([]uint16, length/2)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	return err
 }
 
 // GetData gets internal format structure data

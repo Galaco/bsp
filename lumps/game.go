@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/game"
-	"log"
 	"strings"
 	"unsafe"
 )
@@ -13,7 +12,7 @@ import (
 // @TODO NOTE: This really needs per-game implementations to be completely useful,
 // otherwise we only get staticprop data from it
 type Game struct {
-	LumpGeneric
+	Generic
 	Header              primitives.Header
 	GameLumps           []primitives.GenericGameLump
 	LumpOffset          int32
@@ -21,8 +20,9 @@ type Game struct {
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Game) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *Game) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 
 	if len(raw) == 0 {
 		return
@@ -35,9 +35,9 @@ func (lump *Game) Unmarshall(raw []byte, length int32) {
 	// Read header
 	lump.Header.GameLumps = make([]primitives.LumpDef, lumpCount)
 	headerSize := 4 + (int32(unsafe.Sizeof(primitives.LumpDef{})) * int32(lumpCount))
-	err := binary.Read(bytes.NewBuffer(raw[4:headerSize]), binary.LittleEndian, &lump.Header.GameLumps)
+	err = binary.Read(bytes.NewBuffer(raw[4:headerSize]), binary.LittleEndian, &lump.Header.GameLumps)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Correct file offsets
@@ -54,6 +54,8 @@ func (lump *Game) Unmarshall(raw []byte, length int32) {
 		lump.GameLumps[i].Length = lumpHeader.FileLength
 		lump.GameLumps[i].Data = raw[lumpHeader.FileOffset : lumpHeader.FileOffset+lumpHeader.FileLength]
 	}
+
+	return err
 }
 
 // GetData gets internal format structure data

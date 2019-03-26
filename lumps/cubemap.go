@@ -4,27 +4,29 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/cubemap"
-	"log"
 	"unsafe"
 )
 
 // Cubemap is Lump 42: Cubemaps
 type Cubemap struct {
-	LumpGeneric
+	Generic
 	data []primitives.CubemapSample
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Cubemap) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *Cubemap) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
 		return
 	}
-	lump.data = make([]primitives.CubemapSample, length/int32(unsafe.Sizeof(primitives.CubemapSample{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	lump.data = make([]primitives.CubemapSample, length/int(unsafe.Sizeof(primitives.CubemapSample{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 // GetData gets internal format structure data

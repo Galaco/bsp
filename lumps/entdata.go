@@ -2,14 +2,17 @@ package lumps
 
 // EntData is Lump 0: Entdata
 type EntData struct {
-	LumpGeneric
+	Generic
 	data string
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *EntData) Unmarshall(raw []byte, length int32) {
+func (lump *EntData) Unmarshall(raw []byte) (err error) {
 	lump.data = string(raw)
-	lump.LumpInfo.SetLength(length)
+	length := len(raw)
+	lump.Metadata.SetLength(length)
+
+	return err
 }
 
 // GetData gets internal format structure data

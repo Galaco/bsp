@@ -3,7 +3,8 @@ package leaf
 const bitmaskLower9 = 0x1FF // 511 (2^9 - 1)
 const bitmaskLower7 = 0x7F  // 127 (2^7 - 1)
 
-// Leaf
+// Leaf represents a single convex volume that contains 0 or more
+// faces (or entities) within its bounds
 type Leaf struct {
 	// Contents
 	Contents int32
@@ -28,7 +29,7 @@ type Leaf struct {
 	_               [2]byte
 }
 
-// Flags returns flags (second 7 bits)
+// Area returns area (first 9 bits)
 func (b *Leaf) Area() int16 {
 	return int16((b.BitField) & bitmaskLower7)
 }
@@ -39,7 +40,7 @@ func (b *Leaf) SetArea(area int16) {
 	b.BitField = int16((v & bitmaskLower9) | (area))
 }
 
-// Area returns area (first 9 bits)
+// Flags returns flags (second 7 bits)
 func (b *Leaf) Flags() int16 {
 	return int16((b.BitField >> 9) & bitmaskLower9)
 }

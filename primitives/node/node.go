@@ -1,7 +1,7 @@
 package node
 
 // Node is a bsp node that has 2 children, because it was splittable along a plane.
-// It represents a convex volume with child volumes
+// It represents a non-convex volume with child volumes
 type Node struct {
 	// PlaneNum is index of splitting place
 	PlaneNum int32

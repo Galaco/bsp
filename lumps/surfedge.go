@@ -3,23 +3,25 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	"log"
 )
 
 // Surfedge is Lump 13: Surfedge
 type Surfedge struct {
-	LumpGeneric
+	Generic
 	data []int32 // MAX_MAP_SURFEDGES = 512000
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Surfedge) Unmarshall(raw []byte, length int32) {
+func (lump *Surfedge) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
 	lump.data = make([]int32, length/4)
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return err
 }
 
 // GetData gets internal format structure data

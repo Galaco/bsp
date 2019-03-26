@@ -4,27 +4,25 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/worldlight"
-	"log"
 	"unsafe"
 )
 
 // WorldLight is Lump 15: Worldlight
 type WorldLight struct {
-	LumpGeneric
+	Generic
 	data []primitives.WorldLight
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *WorldLight) Unmarshall(raw []byte, length int32) {
-	lump.LumpInfo.SetLength(length)
+func (lump *WorldLight) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
+	lump.Metadata.SetLength(length)
 	if length == 0 {
 		return
 	}
-	lump.data = make([]primitives.WorldLight, length/int32(unsafe.Sizeof(primitives.WorldLight{})))
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	lump.data = make([]primitives.WorldLight, length/int(unsafe.Sizeof(primitives.WorldLight{})))
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	return err
 }
 
 // GetData gets internal format structure data

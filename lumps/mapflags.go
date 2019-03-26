@@ -4,26 +4,28 @@ import (
 	"bytes"
 	"encoding/binary"
 	primitives "github.com/galaco/bsp/primitives/mapflags"
-	"log"
 )
 
 // MapFlags is Lump 59: MapFlags
 type MapFlags struct {
-	LumpGeneric
+	Generic
 	data primitives.MapFlags
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *MapFlags) Unmarshall(raw []byte, length int32) {
+func (lump *MapFlags) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
 	if length == 0 {
 		return
 	}
 
-	err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return err
 }
 
 // GetData gets internal format structure data

@@ -2,14 +2,17 @@ package lumps
 
 // PhysDisp is Lump 28: PhysDisp
 type PhysDisp struct {
-	LumpGeneric
+	Generic
 	data []byte
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *PhysDisp) Unmarshall(raw []byte, length int32) {
+func (lump *PhysDisp) Unmarshall(raw []byte) (err error) {
+	length := len(raw)
 	lump.data = raw
-	lump.LumpInfo.SetLength(length)
+	lump.Metadata.SetLength(length)
+
+	return err
 }
 
 // GetData gets internal format structure data
