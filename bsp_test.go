@@ -17,17 +17,17 @@ func TestLumpExports(t *testing.T) {
 	// Verify lump lengths
 	lumpIndex := 0
 	for lumpIndex < 64 {
-		lump := file.GetLump(LumpId(lumpIndex))
-		rawLump := file.GetLumpRaw(LumpId(lumpIndex))
+		lump := file.Lump(LumpId(lumpIndex))
+		rawLump := file.RawLump(LumpId(lumpIndex))
 		lumpBytes, err := lump.Marshall()
 		if err != nil {
 			t.Error(err)
 		}
-		if len(lumpBytes) != int(file.GetHeader().Lumps[lumpIndex].Length) {
+		if len(lumpBytes) != int(file.Header().Lumps[lumpIndex].Length) {
 			t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(lumpBytes), file.header.Lumps[lumpIndex].Length)
 		} else {
-			log.Printf("Index: %d, Expected: %d, Actual: %d\n", lumpIndex, len(rawLump.GetRawContents()), len(lumpBytes))
-			if !bytes.Equal(lumpBytes, rawLump.GetRawContents()) {
+			log.Printf("Index: %d, Expected: %d, Actual: %d\n", lumpIndex, len(rawLump.RawContents()), len(lumpBytes))
+			if !bytes.Equal(lumpBytes, rawLump.RawContents()) {
 				t.Errorf("Lump: %d data mismatch", lumpIndex)
 			}
 		}

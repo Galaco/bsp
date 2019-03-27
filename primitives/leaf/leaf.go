@@ -1,5 +1,9 @@
 package leaf
 
+import (
+	"github.com/galaco/bsp/primitives/common"
+)
+
 const bitmaskLower9 = 0x1FF // 511 (2^9 - 1)
 const bitmaskLower7 = 0x7F  // 127 (2^7 - 1)
 
@@ -26,7 +30,11 @@ type Leaf struct {
 	NumLeafBrushes uint16
 	// LeafWaterDataID
 	LeafWaterDataID int16
-	_               [2]byte
+
+	// LightSample
+	LightSample common.CompressedLightCube
+
+	_ [2]byte
 }
 
 // Area returns area (first 9 bits)

@@ -8,4 +8,6 @@ type ILump interface {
 
 	// Marshall Exports lump structure back to []byte.
 	Marshall() ([]byte, error)
+
+	SetVersion(version int32)
 }

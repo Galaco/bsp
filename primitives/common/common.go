@@ -104,3 +104,9 @@ type MapDispInfo struct {
 	// Elevation float32
 	// OffsetNormals []Vector
 }
+
+// CompressedLightCube
+type CompressedLightCube struct {
+	// Color
+	Color [6]ColorRGBExponent32
+}
