@@ -42,11 +42,13 @@ func (lump *Leaf) Unmarshall(raw []byte) (err error) {
 	i := 0
 
 	for i < numLeafs {
-		rawLeaf := bytes.NewBuffer(raw[(structSize * i) : (structSize*i)+structSize])
+		leafBuf := make([]byte, structSize)
+		copy(leafBuf, raw[(structSize * i) : (structSize*i)+structSize])
 		// Pad the raw data to the correct size of a leaf
 		if lump.Version() > maxBspVersionOfV0Leaf {
-			rawLeaf.Write(make([]byte, int(unsafe.Sizeof(common.CompressedLightCube{}))))
+			leafBuf = append(leafBuf, make([]byte, int(unsafe.Sizeof(common.CompressedLightCube{})))...)
 		}
+		rawLeaf := bytes.NewBuffer(leafBuf)
 		err = binary.Read(rawLeaf, binary.LittleEndian, &lump.data[i])
 		if err != nil {
 			return err
