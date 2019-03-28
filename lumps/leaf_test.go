@@ -6,8 +6,6 @@ import (
 	"testing"
 )
 
-const leafStructSizeRaw = 32
-
 // Assert leaf data when read from bytes is valid
 func TestLeafUnmarshall(t *testing.T) {
 	lump := Leaf{}
