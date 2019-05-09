@@ -27,8 +27,8 @@ type HeaderLump struct {
 }
 
 // Header gets the header for a bsp.
-func (bsp *Bsp) Header() Header {
-	return bsp.header
+func (bsp *Bsp) Header() *Header {
+	return &bsp.header
 }
 
 // Lump gets the lump for a given id.

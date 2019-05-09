@@ -21,7 +21,13 @@ func TestGetReferenceLumpByIndex(t *testing.T) {
 }
 
 func TestLump_Contents(t *testing.T) {
-
+	sut := new(Lump)
+	l := new(lumps.Generic)
+	l.SetLength(654)
+	sut.SetContents(l)
+	if sut.Contents() != l {
+		t.Error("unexpected lump data returned")
+	}
 }
 
 func TestLump_Length(t *testing.T) {
@@ -33,11 +39,22 @@ func TestLump_Length(t *testing.T) {
 }
 
 func TestLump_RawContents(t *testing.T) {
-	t.Skip()
+	sut := new(Lump)
+	data := []byte{0,1,3,4,5,6}
+	sut.SetRawContents(data)
+	if len(sut.RawContents()) != len(data) {
+		t.Error("unexpected lump data returned")
+	}
 }
 
 func TestLump_SetContents(t *testing.T) {
-	t.Skip()
+	sut := new(Lump)
+	l := new(lumps.Generic)
+	l.SetLength(654)
+	sut.SetContents(l)
+	if sut.Contents() != l {
+		t.Error("unexpected lump data returned")
+	}
 }
 
 func TestLump_SetId(t *testing.T) {
