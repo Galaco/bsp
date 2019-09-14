@@ -2,6 +2,8 @@ github.com/go-gl/mathgl v0.0.0-20180804195959-cdf14b6b8f8a h1:2n5w2v3knlspzjJWyQ
 github.com/go-gl/mathgl v0.0.0-20180804195959-cdf14b6b8f8a/go.mod h1:dvrdneKbyWbK2skTda0nM4B9zSlS2GZSnjX7itr/skQ=
 github.com/go-gl/mathgl v0.0.0-20190430161326-c4601bc793c7 h1:qN2tH07P5I5jJxzbEW0+FpspEEF7nGZ6BnZ6///s3H8=
 github.com/go-gl/mathgl v0.0.0-20190430161326-c4601bc793c7/go.mod h1:yhpkQzEiH9yPyxDUGzkmgScbaBVlhC06qodikEM0ZwQ=
+github.com/go-gl/mathgl v0.0.0-20190713194549-592312d8590a h1:yoAEv7yeWqfL/l9A/J5QOndXIJCldv+uuQB1DSNQbS0=
+github.com/go-gl/mathgl v0.0.0-20190713194549-592312d8590a/go.mod h1:yhpkQzEiH9yPyxDUGzkmgScbaBVlhC06qodikEM0ZwQ=
 golang.org/x/image v0.0.0-20181109002202-aa35264064ba h1:tKfAeDKyjJZwxAJ8TPBZaf6LpvauubUHT8wwpdz+OMM=
 golang.org/x/image v0.0.0-20181109002202-aa35264064ba/go.mod h1:ux5Hcp/YLpHSI86hEcLt0YII63i6oz57MZXIpbrjZUs=
 golang.org/x/image v0.0.0-20181206121112-cd38e8056d9b h1:9WPnadh+EKSlC7bAQtFhmNxmx/rQOj35pa7nFj6b/Dw=
@@ -10,9 +12,12 @@ golang.org/x/image v0.0.0-20190209063113-ef4a1470e0dc/go.mod h1:ux5Hcp/YLpHSI86h
 golang.org/x/image v0.0.0-20190220224229-31aff87c08e9 h1:NR6w0q42xLWn1hkq7aXoJfHkxB+5DwodOYc1MEagNjk=
 golang.org/x/image v0.0.0-20190220224229-31aff87c08e9/go.mod h1:kZ7UVZpmo3dzQBMxlp+ypCbDeSB+sBbTgSJuh5dn5js=
 golang.org/x/image v0.0.0-20190228004658-0694c2d4d067/go.mod h1:kZ7UVZpmo3dzQBMxlp+ypCbDeSB+sBbTgSJuh5dn5js=
+golang.org/x/image v0.0.0-20190321063152-3fc05d484e9f h1:FO4MZ3N56GnxbqxGKqh+YTzUWQ2sDwtFQEZgLOxh9Jc=
 golang.org/x/image v0.0.0-20190321063152-3fc05d484e9f/go.mod h1:kZ7UVZpmo3dzQBMxlp+ypCbDeSB+sBbTgSJuh5dn5js=
 golang.org/x/image v0.0.0-20190321074427-3fc05d484e9f h1:z/o0u5qyWy3JuPnwyx0pAuT5AZs4UHHkb6IgeEJ6oR0=
 golang.org/x/image v0.0.0-20190321074427-3fc05d484e9f/go.mod h1:kZ7UVZpmo3dzQBMxlp+ypCbDeSB+sBbTgSJuh5dn5js=
 golang.org/x/image v0.0.0-20190424163755-59b11bec70c7 h1:l3PrunxUNiC+ROq8KsfeKBQyJtkcNGGX6IrjUc7lhEA=
 golang.org/x/image v0.0.0-20190424163755-59b11bec70c7/go.mod h1:kZ7UVZpmo3dzQBMxlp+ypCbDeSB+sBbTgSJuh5dn5js=
+golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a h1:gHevYm0pO4QUbwy8Dmdr01R5r1BuKtfYqRqF0h/Cbh0=
+golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a/go.mod h1:FeLwcggjj3mMvU+oOTbSwawSJRM1uh48EjtB4UJZlP0=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
