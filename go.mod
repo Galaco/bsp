@@ -1,6 +1,10 @@
 module github.com/galaco/bsp
 
+go 1.13
+
+replace golang.org/x/image => golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a
+
 require (
-	github.com/go-gl/mathgl v0.0.0-20190430161326-c4601bc793c7
-	golang.org/x/image v0.0.0-20190424163755-59b11bec70c7 // indirect
+	github.com/go-gl/mathgl v0.0.0-20190713194549-592312d8590a
+	golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a // indirect
 )
