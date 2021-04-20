@@ -24,8 +24,11 @@ type StaticPropV10 struct {
 	MinGPULevel       uint8
 	MaxGPULevel       uint8
 	DiffuseModulation float32
-	Unknown           float32
-	//DisableXBox360    bool
+	DisableXBox360    bool
+	ExtraFlags        int32
+	_ byte
+	_ byte
+	_ byte
 }
 
 // GetOrigin Origin of object in world
@@ -132,13 +135,17 @@ func (l *StaticPropV10) GetDiffuseModulation() float32 {
 	return l.DiffuseModulation
 }
 
+// GetExtraFlags
+func (l *StaticPropV10) GetExtraFlags() int32 {
+	return l.ExtraFlags
+}
+
 // GetUnknown
-// Not defined in v10
 func (l *StaticPropV10) GetUnknown() float32 {
 	return 0
 }
 
 // GetDisableXBox360 should disable on XBox 360
 func (l *StaticPropV10) GetDisableXBox360() bool {
-	return true
+	return l.DisableXBox360
 }
