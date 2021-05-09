@@ -117,7 +117,7 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	case 52:
 		ret = new(lumps.LeafAmbientIndex)
 	case 53:
-		ret = new(lumps.Unimplemented) //lighting hdr
+		ret = new(lumps.Lighting) //lighting hdr
 	case 54:
 		ret = new(lumps.WorldLightHDR) //worldlights hdr
 	case 55:
