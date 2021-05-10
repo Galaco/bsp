@@ -9,13 +9,13 @@
 Go library for handling Source Engine .bsp map files.
 
 ### Features:
-* Read support for (most) non-xbox360 bsps (v20,21). v19 support limited, may work
+* Read support for (most) non-xbox360 BSPs (v20,21). v19 support limited, may work
 * Freely modify and resize any Lump data
 * Limited write support, mostly untested
 
-##### Not all lumps are current supported, but can be freely read and modified, as they are treated as `[]byte`
+##### Not all lumps are currently supported, but can be freely read and modified, as they are treated as `[]byte`
 
-The following lumps currently have a full implementation for v20 & v21 bsp's (tested against CS:S & CS:GO):
+The following lumps currently have a full implementation for v20 & v21 BSPs (tested against CS:S & CS:GO):
 
 ```
 0: Entdata
@@ -63,6 +63,7 @@ The following lumps currently have a full implementation for v20 & v21 bsp's (te
 48: DispTris
 51: LeafAmbientIndexHDR
 52: LeafAmbientIndex
+53: WorldLightHDR
 54: WorldLightHDR
 55: LeafAmbientLightingHDR
 56: LeafAmbientLighting

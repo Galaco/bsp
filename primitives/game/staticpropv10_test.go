@@ -24,7 +24,7 @@ func TestStaticPropV10_GetDiffuseModulation(t *testing.T) {
 
 func TestStaticPropV10_GetDisableXBox360(t *testing.T) {
 	sut := getStaticPropV10()
-	if sut.GetDisableXBox360() != true {
+	if sut.GetDisableXBox360() != false {
 		t.Error("unexpected value for unknown property")
 	}
 
@@ -174,7 +174,13 @@ func TestStaticPropV10_GetUniformScale(t *testing.T) {
 	if sut.GetUniformScale() != 1 {
 		t.Error("unexpected value for uniformScale property")
 	}
+}
 
+func TestStaticPropV10_GetExtraFlags(t *testing.T) {
+	sut := getStaticPropV10()
+	if sut.GetExtraFlags() != 0 {
+		t.Error("unexpected value for extra flags property")
+	}
 }
 
 func TestStaticPropV10_GetUnknown(t *testing.T) {
@@ -182,7 +188,6 @@ func TestStaticPropV10_GetUnknown(t *testing.T) {
 	if sut.GetUnknown() != 0 {
 		t.Error("unexpected value for unknown property")
 	}
-
 }
 
 func getStaticPropV10() *StaticPropV10 {

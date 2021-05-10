@@ -132,7 +132,7 @@ func getExpectedLump(index int) lumps.ILump {
 		&lumps.Unimplemented{},
 		&lumps.LeafAmbientIndexHDR{},
 		&lumps.LeafAmbientIndex{},
-		&lumps.Unimplemented{},
+		&lumps.Lighting{},
 		&lumps.WorldLightHDR{},
 		&lumps.LeafAmbientLightingHDR{},
 		&lumps.LeafAmbientLighting{},
