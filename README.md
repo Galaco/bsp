@@ -108,7 +108,7 @@ func main() {
 ```
 
 ## Real World examples
-* Proof of concept BSP viewer: [https://github.com/Galaco/Lambda-Client](https://github.com/Galaco/Lambda-Client)
+* Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)
 * Insert game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
 * Bspzip filelist generator from a mountable resource directory: [https://github.com/Galaco/bspzip-traverser](https://github.com/Galaco/bspzip-traverser)
 
