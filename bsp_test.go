@@ -2,9 +2,12 @@ package bsp
 
 import (
 	"bytes"
-	"github.com/galaco/bsp/lumps"
+	"hash/crc32"
 	"log"
+	"sort"
 	"testing"
+
+	"github.com/galaco/bsp/lumps"
 )
 
 // Test that resultant lump data matches expected.
@@ -78,5 +81,47 @@ func TestBsp_SetLump(t *testing.T) {
 
 	if sut.RawLump(0).data != ld {
 		t.Error("unexpected lump returned")
+	}
+}
+
+func TestBsp_Crc(t *testing.T) {
+	file, err := ReadFromFile("de_inferno.bsp")
+	if err != nil {
+		t.Error(err)
+	}
+
+	const lumpCount = 64
+
+	crc := crc32.NewIEEE()
+
+	lumpList := make([]LumpId, lumpCount)
+	for i := 0; i < lumpCount; i++ {
+		lumpList[i] = LumpId(i)
+	}
+
+	sort.Slice(lumpList, func(i, j int) bool {
+		return file.header.Lumps[i].Offset < file.header.Lumps[j].Offset
+	})
+
+	for i := 0; i < lumpCount; i++ {
+		l := lumpList[i]
+		if l == LumpEntities {
+			continue
+		}
+
+		b := file.RawLump(l).raw
+
+		if len(b) != int(file.header.Lumps[l].Length) {
+			panic("???")
+		}
+
+		_, err := crc.Write(b)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	if crc.Sum32() != uint32(4271092677) {
+		panic(crc.Sum32())
 	}
 }
