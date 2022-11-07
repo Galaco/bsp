@@ -1,6 +1,6 @@
 module github.com/galaco/bsp
 
-go 1.12
+go 1.19
 
 require (
 	github.com/go-gl/mathgl v1.0.0
