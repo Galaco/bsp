@@ -26,9 +26,9 @@ type StaticPropV10 struct {
 	DiffuseModulation float32
 	DisableXBox360    bool
 	ExtraFlags        int32
-	_ byte
-	_ byte
-	_ byte
+	_                 byte
+	_                 byte
+	_                 byte
 }
 
 // GetOrigin Origin of object in world
