@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/facemacrotextureinfo"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/facemacrotextureinfo"
 )
 
 // FaceMacroTextureInfo is Lump 47: FaceMacroTextureInfo
 type FaceMacroTextureInfo struct {
-	Generic
+	Metadata
 	data []primitives.FaceMacroTextureInfo
 }
 

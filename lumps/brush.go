@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/brush"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/brush"
 )
 
 // Brush is Lump 18: Brush
 type Brush struct {
-	Generic
+	Metadata
 	data []primitives.Brush
 }
 

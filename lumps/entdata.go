@@ -2,7 +2,7 @@ package lumps
 
 // EntData is Lump 0: Entdata
 type EntData struct {
-	Generic
+	Metadata
 	data string
 }
 

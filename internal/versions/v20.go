@@ -2,6 +2,7 @@ package versions
 
 import (
 	"errors"
+
 	"github.com/galaco/bsp/lumps"
 )
 
@@ -55,13 +56,13 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	case 21:
 		ret = new(lumps.AreaPortal)
 	case 22:
-		ret = new(lumps.Unimplemented) //portals | unused0 | propcollision
+		ret = new(lumps.RawBytes) //portals | unused0 | propcollision
 	case 23:
-		ret = new(lumps.Unimplemented) //clusters | unused1 | prophulls
+		ret = new(lumps.RawBytes) //clusters | unused1 | prophulls
 	case 24:
-		ret = new(lumps.Unimplemented) //portalverts | unused2 | prophullverts
+		ret = new(lumps.RawBytes) //portalverts | unused2 | prophullverts
 	case 25:
-		ret = new(lumps.Unimplemented) //clusterportals | unused3 | proptris
+		ret = new(lumps.RawBytes) //clusterportals | unused3 | proptris
 	case 26:
 		ret = new(lumps.DispInfo)
 	case 27:
@@ -69,13 +70,13 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	case 28:
 		ret = new(lumps.PhysDisp)
 	case 29:
-		ret = new(lumps.Unimplemented) //physcollide - IN PROGRESS
+		ret = new(lumps.RawBytes) //physcollide - IN PROGRESS
 	case 30:
 		ret = new(lumps.VertNormal)
 	case 31:
 		ret = new(lumps.VertNormalIndice)
 	case 32:
-		ret = new(lumps.Unimplemented) //disp lightmap alphas - IS STRIPPED ANYWAY?
+		ret = new(lumps.RawBytes) //disp lightmap alphas - IS STRIPPED ANYWAY?
 	case 33:
 		ret = new(lumps.DispVert)
 	case 34:
@@ -85,7 +86,7 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	case 36:
 		ret = new(lumps.LeafWaterData)
 	case 37:
-		ret = new(lumps.Unimplemented) //primitives FIXME - Appears to be 4bytes unaccounted for at end of lump?
+		ret = new(lumps.RawBytes) //primitives FIXME - Appears to be 4bytes unaccounted for at end of lump?
 	case 38:
 		ret = new(lumps.PrimVert)
 	case 39:
@@ -109,9 +110,9 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	case 48:
 		ret = new(lumps.DispTris)
 	case 49:
-		ret = new(lumps.Unimplemented) //physcollidesurface | prop blob
+		ret = new(lumps.RawBytes) //physcollidesurface | prop blob
 	case 50:
-		ret = new(lumps.Unimplemented) //wateroverlays
+		ret = new(lumps.RawBytes) //wateroverlays
 	case 51:
 		ret = new(lumps.LeafAmbientIndexHDR)
 	case 52:
@@ -125,7 +126,7 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	case 56:
 		ret = new(lumps.LeafAmbientLighting) //leaf ambient lighting
 	case 57:
-		ret = new(lumps.Unimplemented) //xzippakfile
+		ret = new(lumps.RawBytes) //xzippakfile
 	case 58:
 		ret = new(lumps.FaceHDR)
 	case 59:
@@ -133,11 +134,11 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	case 60:
 		ret = new(lumps.OverlayFade)
 	case 61:
-		ret = new(lumps.Unimplemented) //overlay system levels
+		ret = new(lumps.RawBytes) //overlay system levels
 	case 62:
-		ret = new(lumps.Unimplemented) //physlevel
+		ret = new(lumps.RawBytes) //physlevel
 	case 63:
-		ret = new(lumps.Unimplemented) //disp multiblend
+		ret = new(lumps.RawBytes) //disp multiblend
 	default:
 		err = errors.New("invalid lump id")
 	}

@@ -3,12 +3,13 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
+
 	primitives "github.com/galaco/bsp/primitives/visibility"
 )
 
 // Visibility is Lump 4: Visibility
 type Visibility struct {
-	Generic
+	Metadata
 	data primitives.Vis
 }
 

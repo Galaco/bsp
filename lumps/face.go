@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/face"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/face"
 )
 
 // Face is Lump 7: Face
 type Face struct {
-	Generic
+	Metadata
 	data []primitives.Face
 }
 

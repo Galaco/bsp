@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/model"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/model"
 )
 
 // Model is Lump 14: Model
 type Model struct {
-	Generic
+	Metadata
 	data []primitives.Model
 }
 

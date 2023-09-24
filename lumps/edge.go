@@ -7,7 +7,7 @@ import (
 
 // Edge is Lump 12: Edge
 type Edge struct {
-	Generic
+	Metadata
 	data [][2]uint16 // MAX_MAP_EDGES = 256000
 }
 

@@ -14,6 +14,6 @@ func GetLumpForVersion(bspVersion int, lumpId int) (lumps.ILump, error) {
 	case 21:
 		return Getv21Lump(lumpId)
 	default:
-		return new(lumps.Unimplemented), nil
+		return new(lumps.RawBytes), nil
 	}
 }

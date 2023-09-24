@@ -38,7 +38,7 @@ func (bsp *Bsp) Lump(index LumpId) lumps.ILump {
 
 // RawLump gets the lump for a given id.
 func (bsp *Bsp) RawLump(index LumpId) *Lump {
-	return &bsp.lumps[int(index)]
+	return &bsp.lumps[index]
 }
 
 // SetLump sets the lump data for a given id.

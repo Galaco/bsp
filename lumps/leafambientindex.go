@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/leafambientindex"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/leafambientindex"
 )
 
 // LeafAmbientIndex is Lump 52: Leaf Ambient Index
 type LeafAmbientIndex struct {
-	Generic
+	Metadata
 	data []primitives.LeafAmbientIndex
 }
 

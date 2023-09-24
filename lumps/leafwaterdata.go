@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/leafwaterdata"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/leafwaterdata"
 )
 
 // LeafWaterData is Lump 36: leafwaterdata
 type LeafWaterData struct {
-	Generic
+	Metadata
 	data []primitives.LeafWaterData
 }
 

@@ -2,7 +2,7 @@ package lumps
 
 // PhysDisp is Lump 28: PhysDisp
 type PhysDisp struct {
-	Generic
+	Metadata
 	data []byte
 }
 

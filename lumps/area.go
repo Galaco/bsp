@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/area"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/area"
 )
 
 // Area is Lump 20: Areas
 type Area struct {
-	Generic
+	Metadata
 	data []primitives.Area
 }
 
@@ -39,6 +40,8 @@ func (lump *Area) GetData() []primitives.Area {
 // Marshall dumps this lump back to raw byte data
 func (lump *Area) Marshall() ([]byte, error) {
 	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+	if err := binary.Write(&buf, binary.LittleEndian, lump.data); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

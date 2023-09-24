@@ -7,7 +7,7 @@ import (
 
 // LeafMinDistToWater is Lump 46: LeafMinDistToWater
 type LeafMinDistToWater struct {
-	Generic
+	Metadata
 	data []uint16
 }
 

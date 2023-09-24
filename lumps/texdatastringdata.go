@@ -2,7 +2,7 @@ package lumps
 
 // TexDataStringData is Lump 43: TexDataStringData
 type TexDataStringData struct {
-	Generic
+	Metadata
 	data string // MAX_MAP_TEXDATA_STRING_DATA = 256000, TEXTURE_NAME_LENGTH = 128
 }
 

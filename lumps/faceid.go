@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/faceid"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/faceid"
 )
 
 // FaceId is Lump 11: FaceIds
 type FaceId struct {
-	Generic
+	Metadata
 	data []primitives.FaceId
 }
 

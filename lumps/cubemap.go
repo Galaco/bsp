@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/cubemap"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/cubemap"
 )
 
 // Cubemap is Lump 42: Cubemaps
 type Cubemap struct {
-	Generic
+	Metadata
 	data []primitives.CubemapSample
 }
 

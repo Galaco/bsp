@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/go-gl/mathgl/mgl32"
 	"unsafe"
+
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 // ClipPortalVerts is Lump 41: ClipPortalVerts
 type ClipPortalVerts struct {
-	Generic
+	Metadata
 	data []mgl32.Vec3
 }
 

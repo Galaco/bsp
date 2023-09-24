@@ -10,7 +10,8 @@ import (
 
 // Pakfile is Lump 40: Pakfile
 type Pakfile struct {
-	Generic
+	Metadata
+	RawBytes
 	zipReader *zip.Reader
 }
 

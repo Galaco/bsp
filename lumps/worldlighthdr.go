@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/worldlight"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/worldlight"
 )
 
 // WorldLightHDR is Lump 15: Worldlight
 type WorldLightHDR struct {
-	Generic
+	Metadata
 	data []primitives.WorldLight
 }
 

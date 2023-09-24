@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/areaportal"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/areaportal"
 )
 
 // AreaPortal is Lump 21: Areaportals
 type AreaPortal struct {
-	Generic
+	Metadata
 	data []primitives.AreaPortal
 }
 

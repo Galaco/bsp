@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/brushside"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/brushside"
 )
 
 // BrushSide is Lump 19: BrushSide
 type BrushSide struct {
-	Generic
+	Metadata
 	data []primitives.BrushSide // MAX_MAP_BRUSHSIDES = 65536
 }
 

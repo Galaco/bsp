@@ -7,7 +7,7 @@ import (
 
 // VertNormalIndice is Lump 31: VertNormalIndice
 type VertNormalIndice struct {
-	Generic
+	Metadata
 	data []uint16
 }
 

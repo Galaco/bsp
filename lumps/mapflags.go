@@ -3,12 +3,13 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
+
 	primitives "github.com/galaco/bsp/primitives/mapflags"
 )
 
 // MapFlags is Lump 59: MapFlags
 type MapFlags struct {
-	Generic
+	Metadata
 	data primitives.MapFlags
 }
 

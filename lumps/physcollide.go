@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/physcollide"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/physcollide"
 )
 
 // PhysCollide is Lump 20: PhysCollide
 type PhysCollide struct {
-	Generic
+	Metadata
 	data []primitives.PhysCollideEntry
 }
 

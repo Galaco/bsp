@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/dispinfo"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/dispinfo"
 )
 
 // DispInfo is Lump 26: DispInfo
 type DispInfo struct {
-	Generic
+	Metadata
 	data []primitives.DispInfo
 }
 

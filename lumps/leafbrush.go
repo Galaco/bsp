@@ -7,7 +7,7 @@ import (
 
 // LeafBrush is Lump 17: LeafBrush
 type LeafBrush struct {
-	Generic
+	Metadata
 	data []uint16 // MAX_MAP_LEAFBRUSHES = 65536
 }
 

@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/plane"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/plane"
 )
 
 // Planes is Lump 1: Planes
 type Planes struct {
-	Generic
+	Metadata
 	data []primitives.Plane // MAP_MAX_PLANES = 65536
 }
 

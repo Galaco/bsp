@@ -2,6 +2,7 @@ package bsp
 
 import (
 	"fmt"
+
 	"github.com/galaco/bsp/internal/versions"
 	"github.com/galaco/bsp/lumps"
 )

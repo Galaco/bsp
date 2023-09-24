@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/face"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/face"
 )
 
 // FaceHDR is Lump 58: FaceHDR
 type FaceHDR struct {
-	Generic
+	Metadata
 	data []primitives.Face
 }
 

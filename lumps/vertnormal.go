@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/vertnormal"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/vertnormal"
 )
 
 // VertNormal is Lump 30: VertNormal
 type VertNormal struct {
-	Generic
+	Metadata
 	data []primitives.VertNormal
 }
 

@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"unsafe"
+
 	"github.com/galaco/bsp/primitives/common"
 	primitives "github.com/galaco/bsp/primitives/leaf"
-	"unsafe"
 )
 
 const (
@@ -21,7 +22,7 @@ const (
 
 // Leaf is Lump 10: Leaf
 type Leaf struct {
-	Generic
+	Metadata
 	data []primitives.Leaf
 }
 
@@ -43,7 +44,7 @@ func (lump *Leaf) Unmarshall(raw []byte) (err error) {
 
 	for i < numLeafs {
 		leafBuf := make([]byte, structSize)
-		copy(leafBuf, raw[(structSize * i) : (structSize*i)+structSize])
+		copy(leafBuf, raw[(structSize*i):(structSize*i)+structSize])
 		// Pad the raw data to the correct size of a leaf
 		if lump.Version() > maxBspVersionOfV0Leaf {
 			leafBuf = append(leafBuf, make([]byte, int(unsafe.Sizeof(common.CompressedLightCube{})))...)

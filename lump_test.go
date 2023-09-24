@@ -1,9 +1,10 @@
 package bsp
 
 import (
-	"github.com/galaco/bsp/lumps"
 	"reflect"
 	"testing"
+
+	"github.com/galaco/bsp/lumps"
 )
 
 func TestGetReferenceLumpByIndex(t *testing.T) {
@@ -22,7 +23,7 @@ func TestGetReferenceLumpByIndex(t *testing.T) {
 
 func TestLump_Contents(t *testing.T) {
 	sut := new(Lump)
-	l := new(lumps.Generic)
+	l := new(lumps.RawBytes)
 	l.SetLength(654)
 	sut.SetContents(l)
 	if sut.Contents() != l {
@@ -40,7 +41,7 @@ func TestLump_Length(t *testing.T) {
 
 func TestLump_RawContents(t *testing.T) {
 	sut := new(Lump)
-	data := []byte{0,1,3,4,5,6}
+	data := []byte{0, 1, 3, 4, 5, 6}
 	sut.SetRawContents(data)
 	if len(sut.RawContents()) != len(data) {
 		t.Error("unexpected lump data returned")
@@ -49,7 +50,7 @@ func TestLump_RawContents(t *testing.T) {
 
 func TestLump_SetContents(t *testing.T) {
 	sut := new(Lump)
-	l := new(lumps.Generic)
+	l := new(lumps.RawBytes)
 	l.SetLength(654)
 	sut.SetContents(l)
 	if sut.Contents() != l {
@@ -101,22 +102,22 @@ func getExpectedLump(index int) lumps.ILump {
 		&lumps.BrushSide{},
 		&lumps.Area{},
 		&lumps.AreaPortal{},
-		&lumps.Unimplemented{},
-		&lumps.Unimplemented{},
-		&lumps.Unimplemented{},
-		&lumps.Unimplemented{},
+		&lumps.RawBytes{},
+		&lumps.RawBytes{},
+		&lumps.RawBytes{},
+		&lumps.RawBytes{},
 		&lumps.DispInfo{},
 		&lumps.Face{},
 		&lumps.PhysDisp{},
-		&lumps.Unimplemented{},
+		&lumps.RawBytes{},
 		&lumps.VertNormal{},
 		&lumps.VertNormalIndice{},
-		&lumps.Unimplemented{},
+		&lumps.RawBytes{},
 		&lumps.DispVert{},
 		&lumps.DispLightmapSamplePosition{},
 		&lumps.Game{},
 		&lumps.LeafWaterData{},
-		&lumps.Unimplemented{},
+		&lumps.RawBytes{},
 		&lumps.PrimVert{},
 		&lumps.PrimIndice{},
 		&lumps.Pakfile{},
@@ -128,21 +129,21 @@ func getExpectedLump(index int) lumps.ILump {
 		&lumps.LeafMinDistToWater{},
 		&lumps.FaceMacroTextureInfo{},
 		&lumps.DispTris{},
-		&lumps.Unimplemented{},
-		&lumps.Unimplemented{},
+		&lumps.RawBytes{},
+		&lumps.RawBytes{},
 		&lumps.LeafAmbientIndexHDR{},
 		&lumps.LeafAmbientIndex{},
 		&lumps.Lighting{},
 		&lumps.WorldLightHDR{},
 		&lumps.LeafAmbientLightingHDR{},
 		&lumps.LeafAmbientLighting{},
-		&lumps.Unimplemented{},
+		&lumps.RawBytes{},
 		&lumps.FaceHDR{},
 		&lumps.MapFlags{},
 		&lumps.OverlayFade{},
-		&lumps.Unimplemented{},
-		&lumps.Unimplemented{},
-		&lumps.Unimplemented{}, //disp multiblend
+		&lumps.RawBytes{},
+		&lumps.RawBytes{},
+		&lumps.RawBytes{}, //disp multiblend
 	}
 
 	return lMap[index]

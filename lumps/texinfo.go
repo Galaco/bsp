@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/texinfo"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/texinfo"
 )
 
 // TexInfo is Lump 6: TexInfo
 type TexInfo struct {
-	Generic
+	Metadata
 	data []primitives.TexInfo
 }
 

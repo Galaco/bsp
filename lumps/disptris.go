@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/disptris"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/disptris"
 )
 
 // DispTris is Lump 48: DispTris
 type DispTris struct {
-	Generic
+	Metadata
 	data []primitives.DispTri
 }
 

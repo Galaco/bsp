@@ -7,7 +7,7 @@ import (
 
 // Surfedge is Lump 13: Surfedge
 type Surfedge struct {
-	Generic
+	Metadata
 	data []int32 // MAX_MAP_SURFEDGES = 512000
 }
 

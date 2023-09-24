@@ -9,7 +9,7 @@ import (
 )
 
 func TestBsp_Crc(t *testing.T) {
-	f, err := os.Open("ar_baggage.bsp.gz")
+	f, err := os.Open("testdata/ar_baggage.bsp.gz")
 	if err != nil {
 		t.Error(err)
 	}

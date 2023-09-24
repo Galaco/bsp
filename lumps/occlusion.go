@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/occlusion"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/occlusion"
 )
 
 // Occlusion is Lump 9: Occlusion
 type Occlusion struct {
-	Generic
+	Metadata
 	Count            int32
 	Data             []primitives.OcclusionData // len(slice) = Count
 	PolyDataCount    int32

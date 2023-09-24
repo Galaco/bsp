@@ -7,7 +7,7 @@ import (
 
 // TexDataStringTable is Lump 44: TexDataStringTable
 type TexDataStringTable struct {
-	Generic
+	Metadata
 	data []int32 // MAX_MAP_TEXINFO = 2048
 }
 

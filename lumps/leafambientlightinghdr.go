@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/leafambientlighting"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/leafambientlighting"
 )
 
 // LeafAmbientLightingHDR is Lump 55: LeafAmbientLightingHDR
 type LeafAmbientLightingHDR struct {
-	Generic
+	Metadata
 	data []primitives.LeafAmbientLighting
 }
 

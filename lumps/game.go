@@ -3,16 +3,17 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/game"
 	"strings"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/game"
 )
 
 // Game is Lump 35.
 // @TODO NOTE: This really needs per-game implementations to be completely useful,
 // otherwise we only get staticprop data from it
 type Game struct {
-	Generic
+	Metadata
 	Header              primitives.Header
 	GameLumps           []primitives.GenericGameLump
 	LumpOffset          int32

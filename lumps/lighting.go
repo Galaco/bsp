@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/common"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/common"
 )
 
 // Lighting is Lump 8: Lighting
 type Lighting struct {
-	Generic
+	Metadata
 	data []primitives.ColorRGBExponent32
 }
 

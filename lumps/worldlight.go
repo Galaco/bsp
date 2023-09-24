@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/worldlight"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/worldlight"
 )
 
 // WorldLight is Lump 15: Worldlight
 type WorldLight struct {
-	Generic
+	Metadata
 	data []primitives.WorldLight
 }
 

@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/overlayfade"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/overlayfade"
 )
 
 // OverlayFade is Lump 60: Overlayfades
 type OverlayFade struct {
-	Generic
+	Metadata
 	data []primitives.OverlayFade
 }
 

@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/texdata"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/texdata"
 )
 
 // TexData is Lump 2: TexData
 type TexData struct {
-	Generic
+	Metadata
 	data []primitives.TexData
 }
 

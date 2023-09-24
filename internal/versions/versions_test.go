@@ -1,9 +1,10 @@
 package versions
 
 import (
-	"github.com/galaco/bsp/lumps"
 	"reflect"
 	"testing"
+
+	"github.com/galaco/bsp/lumps"
 )
 
 func TestGetLumpForVersion(t *testing.T) {
@@ -11,7 +12,7 @@ func TestGetLumpForVersion(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if reflect.TypeOf(l) != reflect.TypeOf(&lumps.Unimplemented{}) {
+	if reflect.TypeOf(l) != reflect.TypeOf(&lumps.RawBytes{}) {
 		t.Error("Lump type mismatch.")
 	}
 

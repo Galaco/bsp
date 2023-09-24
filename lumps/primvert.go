@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/primvert"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/primvert"
 )
 
 // PrimVert is Lump 37: PrimVert
 type PrimVert struct {
-	Generic
+	Metadata
 	data []primitives.PrimVert
 }
 

@@ -7,7 +7,7 @@ import (
 
 // PrimIndice is Lump 39: PrimIndice
 type PrimIndice struct {
-	Generic
+	Metadata
 	data []uint16
 }
 

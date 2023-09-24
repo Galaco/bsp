@@ -2,9 +2,10 @@ package bsp
 
 import (
 	"bytes"
-	"github.com/galaco/bsp/lumps"
 	"log"
 	"testing"
+
+	"github.com/galaco/bsp/lumps"
 )
 
 // Test that resultant lump data matches expected.
@@ -51,7 +52,7 @@ func TestBsp_Header(t *testing.T) {
 
 func TestBsp_Lump(t *testing.T) {
 	sut := new(Bsp)
-	l := new(lumps.Generic)
+	l := new(lumps.RawBytes)
 	sut.lumps[0].data = l
 
 	if sut.Lump(0) != l {
@@ -61,7 +62,7 @@ func TestBsp_Lump(t *testing.T) {
 
 func TestBsp_RawLump(t *testing.T) {
 	sut := new(Bsp)
-	l := new(lumps.Generic)
+	l := new(lumps.RawBytes)
 	sut.lumps[0].data = l
 
 	if sut.RawLump(0).data != l {
@@ -71,7 +72,7 @@ func TestBsp_RawLump(t *testing.T) {
 
 func TestBsp_SetLump(t *testing.T) {
 	sut := new(Bsp)
-	ld := new(lumps.Generic)
+	ld := new(lumps.RawBytes)
 	l := new(Lump)
 	l.data = ld
 	sut.SetLump(0, *l)

@@ -3,14 +3,15 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/overlay"
 	"unsafe"
+
+	primitives "github.com/galaco/bsp/primitives/overlay"
 )
 
 // Overlay is Lump 45: Overlay
 // Consists of an array of Overlay structs
 type Overlay struct {
-	Generic
+	Metadata
 	data []primitives.Overlay
 }
 

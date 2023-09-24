@@ -3,13 +3,14 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/go-gl/mathgl/mgl32"
 	"unsafe"
+
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 // Vertex is Lump 3: Vertex
 type Vertex struct {
-	Generic
+	Metadata
 	data []mgl32.Vec3
 }
 

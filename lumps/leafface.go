@@ -7,7 +7,7 @@ import (
 
 // LeafFace is Lump 16: LeafFace
 type LeafFace struct {
-	Generic
+	Metadata
 	data []uint16 // MAX_MAP_LEAFFACES = 65536
 }
 
