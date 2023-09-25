@@ -14,8 +14,8 @@ type Cubemap struct {
 	data []primitives.CubemapSample
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Cubemap) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Cubemap) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -30,14 +30,12 @@ func (lump *Cubemap) Unmarshall(raw []byte) (err error) {
 	return nil
 }
 
-// GetData gets internal format structure data
-func (lump *Cubemap) GetData() []primitives.CubemapSample {
+// Contents returns internal format structure data
+func (lump *Cubemap) Contents() []primitives.CubemapSample {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Cubemap) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *Cubemap) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

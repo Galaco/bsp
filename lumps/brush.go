@@ -14,8 +14,8 @@ type Brush struct {
 	data []primitives.Brush
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Brush) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Brush) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.data = make([]primitives.Brush, length/int(unsafe.Sizeof(primitives.Brush{})))
 	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
@@ -27,14 +27,12 @@ func (lump *Brush) Unmarshall(raw []byte) (err error) {
 	return nil
 }
 
-// GetData gets internal format structure data
-func (lump *Brush) GetData() []primitives.Brush {
+// Contents returns internal format structure data
+func (lump *Brush) Contents() []primitives.Brush {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Brush) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *Brush) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

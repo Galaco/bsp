@@ -25,13 +25,16 @@ func (bsp *Bsp) CRC32() (uint32, error) {
 			continue
 		}
 
-		_, err := crc.Write(bsp.RawLump(l).raw)
+		raw, err := bsp.Lump(l).ToBytes()
 		if err != nil {
+			return 0, err
+		}
+		if _, err := crc.Write(raw); err != nil {
 			return 0, err
 		}
 	}
 
-	// see CRC32_Final
+	// see CRC32_Final.
 	res := crc.Sum32() ^ 0xFFFFFFFF
 
 	return res, nil

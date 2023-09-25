@@ -11,8 +11,8 @@ type PrimIndice struct {
 	data []uint16
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *PrimIndice) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *PrimIndice) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -25,14 +25,12 @@ func (lump *PrimIndice) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *PrimIndice) GetData() []uint16 {
+// Contents returns internal format structure data
+func (lump *PrimIndice) Contents() []uint16 {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *PrimIndice) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *PrimIndice) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

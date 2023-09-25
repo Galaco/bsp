@@ -14,8 +14,8 @@ type Model struct {
 	data []primitives.Model
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Model) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Model) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.data = make([]primitives.Model, length/int(unsafe.Sizeof(primitives.Model{})))
 	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
@@ -27,14 +27,12 @@ func (lump *Model) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *Model) GetData() []primitives.Model {
+// Contents returns internal format structure data
+func (lump *Model) Contents() []primitives.Model {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Model) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *Model) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

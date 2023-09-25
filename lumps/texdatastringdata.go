@@ -6,8 +6,8 @@ type TexDataStringData struct {
 	data string // MAX_MAP_TEXDATA_STRING_DATA = 256000, TEXTURE_NAME_LENGTH = 128
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *TexDataStringData) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *TexDataStringData) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.data = string(raw)
 	lump.Metadata.SetLength(length)
@@ -15,12 +15,12 @@ func (lump *TexDataStringData) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *TexDataStringData) GetData() string {
+// Contents returns internal format structure data
+func (lump *TexDataStringData) Contents() string {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *TexDataStringData) Marshall() ([]byte, error) {
+// ToBytes converts this lump back to raw byte data
+func (lump *TexDataStringData) ToBytes() ([]byte, error) {
 	return []byte(lump.data), nil
 }

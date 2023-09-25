@@ -14,8 +14,8 @@ type Lighting struct {
 	data []primitives.ColorRGBExponent32
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Lighting) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Lighting) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -27,14 +27,12 @@ func (lump *Lighting) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *Lighting) GetData() []primitives.ColorRGBExponent32 {
+// Contents returns internal format structure data
+func (lump *Lighting) Contents() []primitives.ColorRGBExponent32 {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Lighting) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *Lighting) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

@@ -13,8 +13,8 @@ type MapFlags struct {
 	data primitives.MapFlags
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *MapFlags) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *MapFlags) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	if length == 0 {
 		return
@@ -29,14 +29,12 @@ func (lump *MapFlags) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *MapFlags) GetData() *primitives.MapFlags {
+// Contents returns internal format structure data
+func (lump *MapFlags) Contents() *primitives.MapFlags {
 	return &lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *MapFlags) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *MapFlags) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

@@ -14,8 +14,8 @@ type DispTris struct {
 	data []primitives.DispTri
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *DispTris) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *DispTris) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -28,14 +28,12 @@ func (lump *DispTris) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *DispTris) GetData() []primitives.DispTri {
+// Contents returns internal format structure data
+func (lump *DispTris) Contents() []primitives.DispTri {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *DispTris) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *DispTris) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

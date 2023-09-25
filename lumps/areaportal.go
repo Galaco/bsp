@@ -1,10 +1,6 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/areaportal"
 )
 
@@ -14,30 +10,24 @@ type AreaPortal struct {
 	data []primitives.AreaPortal
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *AreaPortal) Unmarshall(raw []byte) (err error) {
-	length := len(raw)
-	lump.Metadata.SetLength(length)
-	if length == 0 {
-		return nil
-	}
-	lump.data = make([]primitives.AreaPortal, length/int(unsafe.Sizeof(primitives.AreaPortal{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+// FromBytes imports this lump from raw byte data
+func (lump *AreaPortal) FromBytes(raw []byte) (err error) {
+	meta, data, err := unmarshallBasicLump[primitives.AreaPortal](raw)
+	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
 
+	lump.data = data
 	return nil
 }
 
-// GetData gets internal format structure data
-func (lump *AreaPortal) GetData() []primitives.AreaPortal {
+// Contents returns internal format structure data
+func (lump *AreaPortal) Contents() []primitives.AreaPortal {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *AreaPortal) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *AreaPortal) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

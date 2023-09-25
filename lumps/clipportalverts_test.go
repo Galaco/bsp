@@ -3,8 +3,9 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/go-gl/mathgl/mgl32"
 	"testing"
+
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 func TestClipPortalVerts_GetData(t *testing.T) {
@@ -18,11 +19,11 @@ func TestClipPortalVerts_GetData(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = sut.Unmarshall(buf.Bytes())
+	err = sut.FromBytes(buf.Bytes())
 	if err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.GetData() {
+	for idx, b := range sut.Contents() {
 		if data[idx] != b {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
@@ -40,7 +41,7 @@ func TestClipPortalVerts_Marshall(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = sut.Unmarshall(buf.Bytes())
+	err = sut.FromBytes(buf.Bytes())
 	if err != nil {
 		t.Error(err)
 	}
@@ -49,7 +50,7 @@ func TestClipPortalVerts_Marshall(t *testing.T) {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
 	}
-	res, err := sut.Marshall()
+	res, err := sut.ToBytes()
 	if err != nil {
 		t.Errorf("unexpected error during marshalling")
 	}
@@ -60,7 +61,7 @@ func TestClipPortalVerts_Marshall(t *testing.T) {
 	}
 }
 
-func TestClipPortalVerts_Unmarshall(t *testing.T) {
+func TestClipPortalVerts_FromBytes(t *testing.T) {
 	sut := ClipPortalVerts{}
 	data := []mgl32.Vec3{
 		{0, 1, 2},
@@ -71,7 +72,7 @@ func TestClipPortalVerts_Unmarshall(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = sut.Unmarshall(buf.Bytes())
+	err = sut.FromBytes(buf.Bytes())
 	if err != nil {
 		t.Error(err)
 	}

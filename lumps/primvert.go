@@ -14,8 +14,8 @@ type PrimVert struct {
 	data []primitives.PrimVert
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *PrimVert) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *PrimVert) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -28,14 +28,12 @@ func (lump *PrimVert) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *PrimVert) GetData() []primitives.PrimVert {
+// Contents returns internal format structure data
+func (lump *PrimVert) Contents() []primitives.PrimVert {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *PrimVert) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *PrimVert) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

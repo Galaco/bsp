@@ -11,8 +11,8 @@ type LeafFace struct {
 	data []uint16 // MAX_MAP_LEAFFACES = 65536
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *LeafFace) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *LeafFace) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.data = make([]uint16, length/2)
 	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
@@ -24,14 +24,12 @@ func (lump *LeafFace) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *LeafFace) GetData() []uint16 {
+// Contents returns internal format structure data
+func (lump *LeafFace) Contents() []uint16 {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *LeafFace) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *LeafFace) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

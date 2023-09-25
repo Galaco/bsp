@@ -14,8 +14,8 @@ type WorldLightHDR struct {
 	data []primitives.WorldLight
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *WorldLightHDR) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *WorldLightHDR) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -26,14 +26,12 @@ func (lump *WorldLightHDR) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *WorldLightHDR) GetData() []primitives.WorldLight {
+// Contents returns internal format structure data
+func (lump *WorldLightHDR) Contents() []primitives.WorldLight {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *WorldLightHDR) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *WorldLightHDR) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

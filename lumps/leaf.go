@@ -26,8 +26,8 @@ type Leaf struct {
 	data []primitives.Leaf
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Leaf) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Leaf) FromBytes(raw []byte) (err error) {
 	// There are 2 version of leaf:
 	// v0 contains a light sample
 	// v1 removes the light sample, and is padded by 2 bytes
@@ -64,13 +64,13 @@ func (lump *Leaf) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *Leaf) GetData() []primitives.Leaf {
+// Contents returns internal format structure data
+func (lump *Leaf) Contents() []primitives.Leaf {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Leaf) Marshall() ([]byte, error) {
+// ToBytes converts this lump back to raw byte data
+func (lump *Leaf) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
 	var err error
 

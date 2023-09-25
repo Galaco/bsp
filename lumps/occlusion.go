@@ -19,8 +19,8 @@ type Occlusion struct {
 	VertexIndices    []int32 //len(slice) = VertexIndexCount
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Occlusion) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Occlusion) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	if length == 0 {
 		return
@@ -69,13 +69,13 @@ func (lump *Occlusion) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *Occlusion) GetData() *Occlusion {
+// Contents returns internal format structure data
+func (lump *Occlusion) Contents() *Occlusion {
 	return lump
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Occlusion) Marshall() ([]byte, error) {
+// ToBytes converts this lump back to raw byte data
+func (lump *Occlusion) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
 	// write data
 	err := binary.Write(&buf, binary.LittleEndian, lump.Count)

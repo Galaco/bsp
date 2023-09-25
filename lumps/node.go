@@ -14,8 +14,8 @@ type Node struct {
 	data []primitives.Node // MAP_MAX_NODES = 65536
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Node) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Node) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.data = make([]primitives.Node, length/int(unsafe.Sizeof(primitives.Node{})))
 	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
@@ -27,14 +27,12 @@ func (lump *Node) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *Node) GetData() []primitives.Node {
+// Contents returns internal format structure data
+func (lump *Node) Contents() []primitives.Node {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Node) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *Node) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

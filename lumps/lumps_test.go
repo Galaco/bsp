@@ -8,10 +8,10 @@ import (
 func TestUnimplemented_GetData(t *testing.T) {
 	sut := RawBytes{}
 	data := []byte{0, 1, 2, 5, 43, 156, 146, 3, 3, 6}
-	if err := sut.Unmarshall(data); err != nil {
+	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.GetData() {
+	for idx, b := range sut.Contents() {
 		if data[idx] != b {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
@@ -21,7 +21,7 @@ func TestUnimplemented_GetData(t *testing.T) {
 func TestUnimplemented_Marshall(t *testing.T) {
 	sut := RawBytes{}
 	data := []byte{0, 1, 2, 5, 43, 156, 146, 3, 3, 6}
-	if err := sut.Unmarshall(data); err != nil {
+	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)
 	}
 	for idx, b := range sut.data {
@@ -29,7 +29,7 @@ func TestUnimplemented_Marshall(t *testing.T) {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
 	}
-	res, err := sut.Marshall()
+	res, err := sut.ToBytes()
 	if err != nil {
 		t.Errorf("unexpected error during marshalling")
 	}
@@ -40,10 +40,10 @@ func TestUnimplemented_Marshall(t *testing.T) {
 	}
 }
 
-func TestUnimplemented_Unmarshall(t *testing.T) {
+func TestUnimplemented_FromBytes(t *testing.T) {
 	sut := RawBytes{}
 	data := []byte{0, 1, 2, 5, 43, 156, 146, 3, 3, 6}
-	if err := sut.Unmarshall(data); err != nil {
+	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)
 	}
 	for idx, b := range sut.data {

@@ -1,22 +1,23 @@
 package lumps
 
 import (
-	primitives "github.com/galaco/bsp/primitives/leaf"
 	"log"
 	"testing"
+
+	primitives "github.com/galaco/bsp/primitives/leaf"
 )
 
 // Assert leaf data when read from bytes is valid
-func TestLeafUnmarshall(t *testing.T) {
+func TestLeafFromBytes(t *testing.T) {
 	lump := Leaf{}
 	lump.SetVersion(20)
-	err := lump.Unmarshall(GetTestDataBytes())
+	err := lump.FromBytes(GetTestDataBytes())
 	if err != nil {
 		t.Error(err)
 	}
 	expected := GetTestLeafData()
 	log.Println(lump)
-	actual := lump.GetData()[0]
+	actual := lump.Contents()[0]
 
 	if actual != expected {
 		log.Println("Expected: ")

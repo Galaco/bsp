@@ -14,8 +14,8 @@ type OverlayFade struct {
 	data []primitives.OverlayFade
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *OverlayFade) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *OverlayFade) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -27,14 +27,12 @@ func (lump *OverlayFade) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *OverlayFade) GetData() []primitives.OverlayFade {
+// Contents returns internal format structure data
+func (lump *OverlayFade) Contents() []primitives.OverlayFade {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *OverlayFade) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *OverlayFade) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

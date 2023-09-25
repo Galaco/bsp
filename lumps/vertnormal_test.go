@@ -3,8 +3,9 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/go-gl/mathgl/mgl32"
 	"testing"
+
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 func TestVertNormal_GetData(t *testing.T) {
@@ -18,10 +19,10 @@ func TestVertNormal_GetData(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := sut.Unmarshall(buf.Bytes()); err != nil {
+	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.GetData() {
+	for idx, b := range sut.Contents() {
 		if data[idx] != b.Pos {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
@@ -39,7 +40,7 @@ func TestVertNormal_Marshall(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := sut.Unmarshall(buf.Bytes()); err != nil {
+	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
 	for idx, b := range sut.data {
@@ -47,7 +48,7 @@ func TestVertNormal_Marshall(t *testing.T) {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
 	}
-	res, err := sut.Marshall()
+	res, err := sut.ToBytes()
 	if err != nil {
 		t.Errorf("unexpected error during marshalling")
 	}
@@ -58,7 +59,7 @@ func TestVertNormal_Marshall(t *testing.T) {
 	}
 }
 
-func TestVertNormal_Unmarshall(t *testing.T) {
+func TestVertNormal_FromBytes(t *testing.T) {
 	sut := VertNormal{}
 	data := []mgl32.Vec3{
 		{0, 1, 2},
@@ -69,7 +70,7 @@ func TestVertNormal_Unmarshall(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := sut.Unmarshall(buf.Bytes()); err != nil {
+	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
 	for idx, b := range sut.data {

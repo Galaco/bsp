@@ -11,8 +11,8 @@ type VertNormalIndice struct {
 	data []uint16
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *VertNormalIndice) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *VertNormalIndice) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -24,14 +24,12 @@ func (lump *VertNormalIndice) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *VertNormalIndice) GetData() []uint16 {
+// Contents returns internal format structure data
+func (lump *VertNormalIndice) Contents() []uint16 {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *VertNormalIndice) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *VertNormalIndice) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

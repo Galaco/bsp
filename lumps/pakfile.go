@@ -3,43 +3,34 @@ package lumps
 import (
 	"archive/zip"
 	"bytes"
-	"encoding/binary"
-	"io/ioutil"
+	"io"
 	"strings"
 )
 
 // Pakfile is Lump 40: Pakfile
 type Pakfile struct {
-	Metadata
 	RawBytes
 	zipReader *zip.Reader
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Pakfile) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Pakfile) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.data = raw
 	lump.Metadata.SetLength(length)
 
-	b := bytes.NewReader(raw)
+	b := bytes.NewReader(lump.data)
 	zipReader, err := zip.NewReader(b, int64(length))
-	if err == nil {
-		lump.zipReader = zipReader
+	if err != nil {
+		return err
 	}
-
-	return err
+	lump.zipReader = zipReader
+	return nil
 }
 
 // GetData GetData gets internal format structure data
-func (lump *Pakfile) GetData() *zip.Reader {
+func (lump *Pakfile) Contents() *zip.Reader {
 	return lump.zipReader
-}
-
-// Marshall Returns the contents of this lump as a []byte
-func (lump *Pakfile) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
 }
 
 // GetFile Get a specific file from the pak
@@ -54,7 +45,7 @@ func (lump *Pakfile) GetFile(filePath string) ([]byte, error) {
 			if err != nil {
 				return nil, err
 			}
-			return ioutil.ReadAll(rc)
+			return io.ReadAll(rc)
 		}
 	}
 	return []byte{}, nil

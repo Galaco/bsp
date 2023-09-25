@@ -14,8 +14,8 @@ type LeafAmbientLightingHDR struct {
 	data []primitives.LeafAmbientLighting
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *LeafAmbientLightingHDR) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *LeafAmbientLightingHDR) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -27,14 +27,12 @@ func (lump *LeafAmbientLightingHDR) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *LeafAmbientLightingHDR) GetData() []primitives.LeafAmbientLighting {
+// Contents returns internal format structure data
+func (lump *LeafAmbientLightingHDR) Contents() []primitives.LeafAmbientLighting {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *LeafAmbientLightingHDR) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *LeafAmbientLightingHDR) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

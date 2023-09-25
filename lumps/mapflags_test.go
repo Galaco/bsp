@@ -3,8 +3,9 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/galaco/bsp/primitives/mapflags"
 	"testing"
+
+	"github.com/galaco/bsp/primitives/mapflags"
 )
 
 func TestMapFlags_GetData(t *testing.T) {
@@ -18,10 +19,10 @@ func TestMapFlags_GetData(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err := sut.Unmarshall(buf.Bytes()); err != nil {
+	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
-	if sut.GetData().LevelFlags != data.LevelFlags {
+	if sut.Contents().LevelFlags != data.LevelFlags {
 		t.Error("mismatched between expected and actual unmarshalled bytes")
 	}
 }
@@ -37,13 +38,13 @@ func TestMapFlags_Marshall(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err := sut.Unmarshall(buf.Bytes()); err != nil {
+	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
 	if sut.data.LevelFlags != data.LevelFlags {
 		t.Error("mismatched between expected and actual unmarshalled bytes")
 	}
-	res, err := sut.Marshall()
+	res, err := sut.ToBytes()
 	if err != nil {
 		t.Error(err)
 	}
@@ -55,7 +56,7 @@ func TestMapFlags_Marshall(t *testing.T) {
 
 }
 
-func TestMapFlags_Unmarshall(t *testing.T) {
+func TestMapFlags_FromBytes(t *testing.T) {
 	sut := MapFlags{}
 	data := mapflags.MapFlags{
 		LevelFlags: 523423,
@@ -66,7 +67,7 @@ func TestMapFlags_Unmarshall(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err := sut.Unmarshall(buf.Bytes()); err != nil {
+	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
 	if sut.data.LevelFlags != data.LevelFlags {

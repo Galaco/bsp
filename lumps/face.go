@@ -14,8 +14,8 @@ type Face struct {
 	data []primitives.Face
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Face) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Face) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.data = make([]primitives.Face, length/int(unsafe.Sizeof(primitives.Face{})))
 	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
@@ -27,14 +27,12 @@ func (lump *Face) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *Face) GetData() []primitives.Face {
+// Contents returns internal format structure data
+func (lump *Face) Contents() []primitives.Face {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Face) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *Face) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

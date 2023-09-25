@@ -1,34 +1,56 @@
 package lumps
 
+import (
+	"bytes"
+	"encoding/binary"
+	"fmt"
+	"unsafe"
+)
+
 // ILump Lump interface.
 // Organise Lump data in a cleaner and more accessible manner
 type ILump interface {
-	// Unmarshall Imports a []byte to a defined lump structure(s).
-	Unmarshall([]byte) error
-
-	// Marshall Exports lump structure back to []byte.
-	Marshall() ([]byte, error)
-
+	// FromBytes imports a []byte to a defined lump structure(s).
+	FromBytes([]byte) error
+	// ToBytes exports lump structure back to []byte.
+	ToBytes() ([]byte, error)
+	// SetVersion sets bsp version of lump.
 	SetVersion(version int32)
 }
 
-type lump interface {
-	Unmarshall(raw []byte) (err error)
-}
-
-func LumpDataToLumpType[T lump](l RawBytes) (*T, error) {
-	var t T
-	if err := t.Unmarshall(l.data); err != nil {
-		return nil, err
+// unmarshallBasicLump is a helper function for lumps that are just a single []T.
+func unmarshallBasicLump[V any](raw []byte) (Metadata, []V, error) {
+	var meta Metadata
+	length := len(raw)
+	meta.SetLength(length)
+	if length == 0 {
+		return meta, nil, fmt.Errorf("lump is empty")
 	}
 
-	return &t, nil
+	var sampleV V
+	v := make([]V, length/int(unsafe.Sizeof(sampleV)))
+	if err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &v); err != nil {
+		return meta, nil, err
+	}
+	meta.SetLength(length)
+
+	return meta, v, nil
+}
+
+func marshallBasicLump(data any) ([]byte, error) {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, binary.LittleEndian, data)
+	return buf.Bytes(), err
 }
 
 // Metadata is a Helper info for a lump
 type Metadata struct {
 	length  int
 	version int32
+}
+
+func (info *Metadata) GetMetadata() *Metadata {
+	return info
 }
 
 // Length Returns lump import length in bytes.
@@ -58,8 +80,8 @@ type RawBytes struct {
 	data []byte
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *RawBytes) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *RawBytes) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.data = raw
 	lump.Metadata.SetLength(length)
@@ -67,13 +89,13 @@ func (lump *RawBytes) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *RawBytes) GetData() []byte {
+// Contents returns internal format structure data
+func (lump *RawBytes) Contents() []byte {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *RawBytes) Marshall() ([]byte, error) {
+// ToBytes converts this lump back to raw byte data
+func (lump *RawBytes) ToBytes() ([]byte, error) {
 	return lump.data, nil
 }
 

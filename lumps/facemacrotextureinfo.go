@@ -14,8 +14,8 @@ type FaceMacroTextureInfo struct {
 	data []primitives.FaceMacroTextureInfo
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *FaceMacroTextureInfo) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *FaceMacroTextureInfo) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -28,14 +28,12 @@ func (lump *FaceMacroTextureInfo) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *FaceMacroTextureInfo) GetData() []primitives.FaceMacroTextureInfo {
+// Contents returns internal format structure data
+func (lump *FaceMacroTextureInfo) Contents() []primitives.FaceMacroTextureInfo {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *FaceMacroTextureInfo) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *FaceMacroTextureInfo) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

@@ -14,8 +14,8 @@ type Planes struct {
 	data []primitives.Plane // MAP_MAX_PLANES = 65536
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Planes) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Planes) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.data = make([]primitives.Plane, length/int(unsafe.Sizeof(primitives.Plane{})))
 	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
@@ -27,14 +27,12 @@ func (lump *Planes) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *Planes) GetData() []primitives.Plane {
+// Contents returns internal format structure data
+func (lump *Planes) Contents() []primitives.Plane {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Planes) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *Planes) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

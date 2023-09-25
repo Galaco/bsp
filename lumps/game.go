@@ -20,8 +20,8 @@ type Game struct {
 	areOffsetsCorrected bool
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Game) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Game) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 
@@ -59,13 +59,13 @@ func (lump *Game) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *Game) GetData() *Game {
+// Contents returns internal format structure data
+func (lump *Game) Contents() *Game {
 	return lump
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Game) Marshall() ([]byte, error) {
+// ToBytes converts this lump back to raw byte data
+func (lump *Game) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount)
 	if err != nil {

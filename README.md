@@ -103,7 +103,7 @@ func main() {
 	f.Close()
     
 	lump := file.Lump(bsp.LumpEntities).(*lumps.Entities)
-	log.Println(lump.GetData())
+	log.Println(lump.Contents())
 }
 ```
 

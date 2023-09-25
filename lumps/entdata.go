@@ -6,8 +6,8 @@ type EntData struct {
 	data string
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *EntData) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *EntData) FromBytes(raw []byte) (err error) {
 	lump.data = string(raw)
 	length := len(raw)
 	lump.Metadata.SetLength(length)
@@ -15,12 +15,12 @@ func (lump *EntData) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *EntData) GetData() string {
+// Contents returns internal format structure data
+func (lump *EntData) Contents() string {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *EntData) Marshall() ([]byte, error) {
+// ToBytes converts this lump back to raw byte data
+func (lump *EntData) ToBytes() ([]byte, error) {
 	return []byte(lump.data), nil
 }

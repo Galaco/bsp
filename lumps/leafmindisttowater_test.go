@@ -14,10 +14,10 @@ func TestLeafMinDistToWater_GetData(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := sut.Unmarshall(buf.Bytes()); err != nil {
+	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.GetData() {
+	for idx, b := range sut.Contents() {
 		if data[idx] != b {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
@@ -32,7 +32,7 @@ func TestLeafMinDistToWater_Marshall(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := sut.Unmarshall(buf.Bytes()); err != nil {
+	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
 	for idx, b := range sut.data {
@@ -40,7 +40,7 @@ func TestLeafMinDistToWater_Marshall(t *testing.T) {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
 	}
-	res, err := sut.Marshall()
+	res, err := sut.ToBytes()
 	if err != nil {
 		t.Errorf("unexpected error during marshalling")
 	}
@@ -51,7 +51,7 @@ func TestLeafMinDistToWater_Marshall(t *testing.T) {
 	}
 }
 
-func TestLeafMinDistToWater_Unmarshall(t *testing.T) {
+func TestLeafMinDistToWater_FromBytes(t *testing.T) {
 	sut := LeafMinDistToWater{}
 	data := []uint16{0, 1, 2, 5, 43, 156, 146, 3, 3, 6}
 	var buf bytes.Buffer
@@ -59,7 +59,7 @@ func TestLeafMinDistToWater_Unmarshall(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := sut.Unmarshall(buf.Bytes()); err != nil {
+	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
 	for idx, b := range sut.data {

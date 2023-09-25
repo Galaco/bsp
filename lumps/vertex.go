@@ -14,8 +14,8 @@ type Vertex struct {
 	data []mgl32.Vec3
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Vertex) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Vertex) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -26,14 +26,12 @@ func (lump *Vertex) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *Vertex) GetData() []mgl32.Vec3 {
+// Contents returns internal format structure data
+func (lump *Vertex) Contents() []mgl32.Vec3 {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Vertex) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *Vertex) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

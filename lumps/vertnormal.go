@@ -14,8 +14,8 @@ type VertNormal struct {
 	data []primitives.VertNormal
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *VertNormal) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *VertNormal) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -27,14 +27,12 @@ func (lump *VertNormal) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *VertNormal) GetData() []primitives.VertNormal {
+// Contents returns internal format structure data
+func (lump *VertNormal) Contents() []primitives.VertNormal {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *VertNormal) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *VertNormal) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data)
 }

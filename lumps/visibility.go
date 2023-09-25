@@ -13,8 +13,8 @@ type Visibility struct {
 	data primitives.Vis
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Visibility) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *Visibility) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.NumClusters)
 	if err != nil {
@@ -36,14 +36,12 @@ func (lump *Visibility) Unmarshall(raw []byte) (err error) {
 	return nil
 }
 
-// GetData gets internal format structure data
-func (lump *Visibility) GetData() *primitives.Vis {
+// Contents returns internal format structure data
+func (lump *Visibility) Contents() *primitives.Vis {
 	return &lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *Visibility) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data.BitVectors)
-	return buf.Bytes(), err
+// ToBytes converts this lump back to raw byte data
+func (lump *Visibility) ToBytes() ([]byte, error) {
+	return marshallBasicLump(lump.data.BitVectors)
 }

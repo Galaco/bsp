@@ -21,63 +21,6 @@ func TestGetReferenceLumpByIndex(t *testing.T) {
 	}
 }
 
-func TestLump_Contents(t *testing.T) {
-	sut := new(Lump)
-	l := new(lumps.RawBytes)
-	l.SetLength(654)
-	sut.SetContents(l)
-	if sut.Contents() != l {
-		t.Error("unexpected lump data returned")
-	}
-}
-
-func TestLump_Length(t *testing.T) {
-	sut := Lump{}
-	sut.length = 32
-	if sut.Length() != 32 {
-		t.Error("incorrect length returned for lump")
-	}
-}
-
-func TestLump_RawContents(t *testing.T) {
-	sut := new(Lump)
-	data := []byte{0, 1, 3, 4, 5, 6}
-	sut.SetRawContents(data)
-	if len(sut.RawContents()) != len(data) {
-		t.Error("unexpected lump data returned")
-	}
-}
-
-func TestLump_SetContents(t *testing.T) {
-	sut := new(Lump)
-	l := new(lumps.RawBytes)
-	l.SetLength(654)
-	sut.SetContents(l)
-	if sut.Contents() != l {
-		t.Error("unexpected lump data returned")
-	}
-}
-
-func TestLump_SetId(t *testing.T) {
-	sut := Lump{}
-	sut.SetId(LumpPakfile)
-
-	if sut.id != LumpPakfile {
-		t.Error("incorrect lump id")
-	}
-}
-
-func TestLump_SetRawContents(t *testing.T) {
-	sut := Lump{}
-	data := []byte{0, 1, 4, 3, 2}
-	sut.SetRawContents(data)
-	for idx, b := range sut.RawContents() {
-		if data[idx] != b {
-			t.Error("raw lump data mismatch")
-		}
-	}
-}
-
 func getExpectedLump(index int) lumps.ILump {
 	lMap := [64]lumps.ILump{
 		&lumps.EntData{},

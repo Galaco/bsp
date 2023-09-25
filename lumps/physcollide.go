@@ -14,8 +14,8 @@ type PhysCollide struct {
 	data []primitives.PhysCollideEntry
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *PhysCollide) Unmarshall(raw []byte) (err error) {
+// FromBytes imports this lump from raw byte data
+func (lump *PhysCollide) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
 	if length == 0 {
@@ -28,13 +28,13 @@ func (lump *PhysCollide) Unmarshall(raw []byte) (err error) {
 	return err
 }
 
-// GetData gets internal format structure data
-func (lump *PhysCollide) GetData() []primitives.PhysCollideEntry {
+// Contents returns internal format structure data
+func (lump *PhysCollide) Contents() []primitives.PhysCollideEntry {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
-func (lump *PhysCollide) Marshall() ([]byte, error) {
+// ToBytes converts this lump back to raw byte data
+func (lump *PhysCollide) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
 	for _, entry := range lump.data {
 		err := binary.Write(&buf, binary.LittleEndian, entry.ModelHeader)
