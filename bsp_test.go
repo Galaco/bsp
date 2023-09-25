@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"compress/gzip"
 	"io"
+	"log"
 	"os"
 	"testing"
 
 	"github.com/galaco/bsp/lumps"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestBsp_Header(t *testing.T) {
@@ -90,6 +92,7 @@ func TestLumpExports(t *testing.T) {
 				expected := binaryData[testBSP.Header().Lumps[lumpIndex].Offset : testBSP.Header().Lumps[lumpIndex].Offset+testBSP.Header().Lumps[lumpIndex].Length]
 				if !bytes.Equal(actual, expected) {
 					t.Errorf("Lump: %d data mismatch", lumpIndex)
+					log.Println(cmp.Diff(expected, actual))
 				}
 
 				lumpIndex += 1

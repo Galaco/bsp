@@ -25,13 +25,16 @@ type DispInfo struct {
 	Contents int32
 	// MapFace
 	MapFace uint16
-	_       [2]byte
+	// Unknown1 are unknown bytes.
+	// @TODO figure these out.
+	Unknown1 [2]byte
 	// LightmapAlphaStart
 	LightmapAlphaStart int32
 	// LightmapSampleStartPosition
 	LightmapSampleStartPosition int32
-	// Ignore contains bytes with unknown purpose and representation. This should be updated as purpose id discovered
-	Ignore [32]uint32
+	// Unknown2 contains bytes with unknown purpose and representation.
+	// @TODO This should be updated as purpose id discovered
+	Unknown2 [32]uint32
 	//EdgeNeighbors [4]DispNeighbor
 	//CornerNeighbors [4]DispCornerNeighbors
 	//AllowedVerts [8]uint32
