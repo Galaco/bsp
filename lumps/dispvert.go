@@ -1,10 +1,6 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/dispvert"
 )
 
@@ -16,16 +12,14 @@ type DispVert struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *DispVert) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.Metadata.SetLength(length)
-	if length == 0 {
-		return
+	meta, data, err := unmarshallBasicLump[primitives.DispVert](raw)
+	lump.Metadata = meta
+	if err != nil {
+		return err
 	}
 
-	lump.data = make([]primitives.DispVert, length/int(unsafe.Sizeof(primitives.DispVert{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-
-	return err
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data

@@ -1,10 +1,5 @@
 package lumps
 
-import (
-	"bytes"
-	"encoding/binary"
-)
-
 // LeafFace is Lump 16: LeafFace
 type LeafFace struct {
 	Metadata
@@ -13,15 +8,14 @@ type LeafFace struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *LeafFace) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]uint16, length/2)
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	meta, data, err := unmarshallBasicLump[uint16](raw)
+	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
 
-	return err
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data

@@ -1,10 +1,6 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/worldlight"
 )
 
@@ -16,14 +12,14 @@ type WorldLight struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *WorldLight) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.Metadata.SetLength(length)
-	if length == 0 {
-		return
+	meta, data, err := unmarshallBasicLump[primitives.WorldLight](raw)
+	lump.Metadata = meta
+	if err != nil {
+		return err
 	}
-	lump.data = make([]primitives.WorldLight, length/int(unsafe.Sizeof(primitives.WorldLight{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	return err
+
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data

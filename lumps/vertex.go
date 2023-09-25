@@ -1,10 +1,6 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -16,14 +12,14 @@ type Vertex struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *Vertex) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.Metadata.SetLength(length)
-	if length == 0 {
-		return
+	meta, data, err := unmarshallBasicLump[mgl32.Vec3](raw)
+	lump.Metadata = meta
+	if err != nil {
+		return err
 	}
-	lump.data = make([]mgl32.Vec3, length/int(unsafe.Sizeof(mgl32.Vec3{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	return err
+
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data

@@ -1,10 +1,6 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/vertnormal"
 )
 
@@ -16,15 +12,14 @@ type VertNormal struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *VertNormal) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.Metadata.SetLength(length)
-	if length == 0 {
-		return
+	meta, data, err := unmarshallBasicLump[primitives.VertNormal](raw)
+	lump.Metadata = meta
+	if err != nil {
+		return err
 	}
 
-	lump.data = make([]primitives.VertNormal, length/int(unsafe.Sizeof(primitives.VertNormal{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	return err
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data

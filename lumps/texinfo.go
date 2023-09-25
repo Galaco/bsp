@@ -1,10 +1,6 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/texinfo"
 )
 
@@ -16,15 +12,14 @@ type TexInfo struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *TexInfo) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]primitives.TexInfo, length/int(unsafe.Sizeof(primitives.TexInfo{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	meta, data, err := unmarshallBasicLump[primitives.TexInfo](raw)
+	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
 
-	return err
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data

@@ -1,10 +1,5 @@
 package lumps
 
-import (
-	"bytes"
-	"encoding/binary"
-)
-
 // VertNormalIndice is Lump 31: VertNormalIndice
 type VertNormalIndice struct {
 	Metadata
@@ -13,15 +8,14 @@ type VertNormalIndice struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *VertNormalIndice) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.Metadata.SetLength(length)
-	if length == 0 {
-		return
+	meta, data, err := unmarshallBasicLump[uint16](raw)
+	lump.Metadata = meta
+	if err != nil {
+		return err
 	}
 
-	lump.data = make([]uint16, length/2)
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	return err
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data

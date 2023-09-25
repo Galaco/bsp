@@ -3,7 +3,6 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"unsafe"
 )
 
@@ -18,13 +17,13 @@ type Lump interface {
 	SetVersion(version int32)
 }
 
-// unmarshallBasicLump is a helper function for lumps that are just a single []T.
+// unmarshallBasicLump is a helper function for unmarshalling []byte to lumps that are just a single []T.
 func unmarshallBasicLump[V any](raw []byte) (Metadata, []V, error) {
 	var meta Metadata
 	length := len(raw)
 	meta.SetLength(length)
 	if length == 0 {
-		return meta, nil, fmt.Errorf("lump is empty")
+		return meta, nil, nil
 	}
 
 	var sampleV V
@@ -37,6 +36,7 @@ func unmarshallBasicLump[V any](raw []byte) (Metadata, []V, error) {
 	return meta, v, nil
 }
 
+// marshallBasicLump is a helper function for marshalling lumps that are just a single []T to []byte.
 func marshallBasicLump(data any) ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, binary.LittleEndian, data)
@@ -47,10 +47,6 @@ func marshallBasicLump(data any) ([]byte, error) {
 type Metadata struct {
 	length  int
 	version int32
-}
-
-func (info *Metadata) GetMetadata() *Metadata {
-	return info
 }
 
 // Length Returns lump import length in bytes.

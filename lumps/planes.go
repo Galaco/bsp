@@ -1,10 +1,6 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/plane"
 )
 
@@ -16,15 +12,14 @@ type Planes struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *Planes) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]primitives.Plane, length/int(unsafe.Sizeof(primitives.Plane{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	meta, data, err := unmarshallBasicLump[primitives.Plane](raw)
+	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
 
-	return err
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data

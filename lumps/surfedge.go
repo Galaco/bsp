@@ -1,10 +1,5 @@
 package lumps
 
-import (
-	"bytes"
-	"encoding/binary"
-)
-
 // Surfedge is Lump 13: Surfedge
 type Surfedge struct {
 	Metadata
@@ -13,15 +8,14 @@ type Surfedge struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *Surfedge) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]int32, length/4)
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	meta, data, err := unmarshallBasicLump[int32](raw)
+	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
 
-	return err
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data

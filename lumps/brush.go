@@ -1,10 +1,6 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/brush"
 )
 
@@ -16,14 +12,13 @@ type Brush struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *Brush) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]primitives.Brush, length/int(unsafe.Sizeof(primitives.Brush{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	meta, data, err := unmarshallBasicLump[primitives.Brush](raw)
+	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
 
+	lump.data = data
 	return nil
 }
 

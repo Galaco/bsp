@@ -1,10 +1,6 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/primitive"
 )
 
@@ -16,16 +12,14 @@ type Primitive struct {
 
 // FromBytes imports this lump from raw byte data
 func (lump *Primitive) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.Metadata.SetLength(length)
-	if length == 0 {
-		return
+	meta, data, err := unmarshallBasicLump[primitives.Primitive](raw)
+	lump.Metadata = meta
+	if err != nil {
+		return err
 	}
 
-	lump.data = make([]primitives.Primitive, length/int(unsafe.Sizeof(primitives.Primitive{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-
-	return err
+	lump.data = data
+	return nil
 }
 
 // Contents returns internal format structure data
