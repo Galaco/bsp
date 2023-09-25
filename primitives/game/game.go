@@ -36,8 +36,6 @@ type LumpDef struct {
 
 // GenericGameLump represents a game lump with unknown/unmappable data
 type GenericGameLump struct {
-	// Length is length in bytes
-	Length int32
-	// Datais byte representation of lump data
+	// Data is byte representation of lump data
 	Data []byte
 }

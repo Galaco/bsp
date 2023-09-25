@@ -41,7 +41,7 @@ func (lump *Game) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	// Correct file offsets
+	// Correct file offsets.
 	if !lump.areOffsetsCorrected {
 		for index := range lump.Header.GameLumps {
 			lump.Header.GameLumps[index].FileOffset -= lump.LumpOffset
@@ -49,10 +49,9 @@ func (lump *Game) FromBytes(raw []byte) (err error) {
 		lump.areOffsetsCorrected = true
 	}
 
-	// Read gamelumps
+	// Read gamelumps.
 	lump.GameLumps = make([]game.GenericGameLump, lumpCount)
 	for i, lumpHeader := range lump.Header.GameLumps {
-		lump.GameLumps[i].Length = lumpHeader.FileLength
 		lump.GameLumps[i].Data = raw[lumpHeader.FileOffset : lumpHeader.FileOffset+lumpHeader.FileLength]
 	}
 
@@ -72,14 +71,13 @@ func (lump *Game) ToBytes() ([]byte, error) {
 		return nil, err
 	}
 	for _, lumpHeader := range lump.Header.GameLumps {
-		if err = binary.Write(&buf, binary.LittleEndian, lumpHeader); err != nil {
+		h := lumpHeader
+		h.FileOffset += lump.LumpOffset
+		if err = binary.Write(&buf, binary.LittleEndian, h); err != nil {
 			return nil, err
 		}
 	}
 	for _, l := range lump.GameLumps {
-		if err = binary.Write(&buf, binary.LittleEndian, l.Length); err != nil {
-			return nil, err
-		}
 		if err = binary.Write(&buf, binary.LittleEndian, l.Data); err != nil {
 			return nil, err
 		}
