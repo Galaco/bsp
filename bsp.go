@@ -38,5 +38,5 @@ func (bsp *Bsp) Lump(index LumpId) lumps.Lump {
 
 // SetLump sets the lump data for a given id.
 func (bsp *Bsp) SetLump(index LumpId, lump lumps.Lump) {
-	bsp.lumps[int(index)] = lump
+	bsp.lumps[index] = lump
 }
