@@ -7,12 +7,12 @@ import (
 // WorldLightHDR is Lump 15: Worldlight
 type WorldLightHDR struct {
 	Metadata
-	data []primitives.WorldLight
+	data []primitives.WorldLightHDR
 }
 
 // FromBytes imports this lump from raw byte data
 func (lump *WorldLightHDR) FromBytes(raw []byte) (err error) {
-	meta, data, err := unmarshallBasicLump[primitives.WorldLight](raw)
+	meta, data, err := unmarshallBasicLump[primitives.WorldLightHDR](raw)
 	lump.Metadata = meta
 	if err != nil {
 		return err
@@ -23,7 +23,7 @@ func (lump *WorldLightHDR) FromBytes(raw []byte) (err error) {
 }
 
 // Contents returns internal format structure data
-func (lump *WorldLightHDR) Contents() []primitives.WorldLight {
+func (lump *WorldLightHDR) Contents() []primitives.WorldLightHDR {
 	return lump.data
 }
 
