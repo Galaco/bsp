@@ -6,7 +6,7 @@ import "github.com/galaco/bsp/lumps"
 // Consists of a 1036byte header and 64 lump blocks.
 type Bsp struct {
 	header Header
-	lumps  [64]lumps.ILump
+	lumps  [64]lumps.Lump
 }
 
 // Header is the Bsp header. Contains format and lump layout data.
@@ -32,11 +32,11 @@ func (bsp *Bsp) Header() *Header {
 }
 
 // Lump gets the lump for a given id.
-func (bsp *Bsp) Lump(index LumpId) lumps.ILump {
+func (bsp *Bsp) Lump(index LumpId) lumps.Lump {
 	return bsp.lumps[index]
 }
 
 // SetLump sets the lump data for a given id.
-func (bsp *Bsp) SetLump(index LumpId, lump lumps.ILump) {
+func (bsp *Bsp) SetLump(index LumpId, lump lumps.Lump) {
 	bsp.lumps[int(index)] = lump
 }

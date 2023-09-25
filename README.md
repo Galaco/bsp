@@ -1,12 +1,11 @@
 [![GoDoc](https://godoc.org/github.com/Galaco/bsp?status.svg)](https://godoc.org/github.com/Galaco/bsp)
 [![Go report card](https://goreportcard.com/badge/github.com/galaco/bsp)](https://goreportcard.com/badge/github.com/galaco/bsp)
 [![GolangCI](https://golangci.com/badges/github.com/galaco/bsp.svg)](https://golangci.com)
-[![Build Status](https://travis-ci.com/Galaco/bsp.svg?branch=master)](https://travis-ci.com/Galaco/bsp)
 [![CircleCI](https://circleci.com/gh/Galaco/bsp/tree/master.svg?style=svg)](https://circleci.com/gh/Galaco/bsp/tree/master)
 [![codecov](https://codecov.io/gh/Galaco/bsp/branch/master/graph/badge.svg)](https://codecov.io/gh/Galaco/bsp)
 
 # Bsp
-Go library for handling Source Engine .bsp map files.
+The most comprehensive library for reading and writing Source Engine .bsp map files.
 
 ### Features:
 * Read support for (most) non-xbox360 BSPs (v20,21). v19 support limited, may work
@@ -72,8 +71,6 @@ The following lumps currently have a full implementation for v20 & v21 BSPs (tes
 60: OverlayFades
 ```
 
-##### This library may reorganise lump order during the first export. This is intentional to handle lump resizing, but will change your checksum if you export without changes.
-
 # Usage
 
 Minimal example of obtaining entdata from a BSP. The following will print the entdata
@@ -90,22 +87,27 @@ import (
 )
 
 func main() {
-	f,_ := os.Open("de_dust2.bsp")
-
-	// Create a new bsp reader
-	reader := bsp.NewReader(f)
-	
-	// Read buffer
-	file,err := reader.Read()
+	f,err := os.Open("de_dust2.bsp")
 	if err != nil {
 		log.Fatal(err)
 	}
-	f.Close()
+	defer f.Close()
+
+	// Create a new bsp reader
+	reader := bsp.NewReader()
+	
+	// Read buffer
+	file,err := reader.Read(f)
+	if err != nil {
+		log.Fatal(err)
+	}
     
 	lump := file.Lump(bsp.LumpEntities).(*lumps.Entities)
 	log.Println(lump.Contents())
 }
 ```
+
+There are more usage examples available in the `examples/` directory.
 
 ## Real World examples
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)

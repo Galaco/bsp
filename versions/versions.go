@@ -5,7 +5,7 @@ import "github.com/galaco/bsp/lumps"
 // GetLumpForVersion returns an empty bsp lump for the specified bsp version and lump id
 // If a version is not 19,20,21 then a generic lump that holds
 // raw bytes only ([]byte) is returned.
-func GetLumpForVersion(bspVersion int, lumpId int) (lumps.ILump, error) {
+func GetLumpForVersion(bspVersion int, lumpId int) (lumps.Lump, error) {
 	switch bspVersion {
 	case 19:
 		return Getv19Lump(lumpId)

@@ -56,6 +56,7 @@ func TestLumpExports(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
+			defer binaryFile.Close()
 			binarygzr, err := gzip.NewReader(binaryFile)
 			if err != nil {
 				t.Error(err)
@@ -69,6 +70,7 @@ func TestLumpExports(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
+			defer testFile.Close()
 			testFilegzr, err := gzip.NewReader(testFile)
 			if err != nil {
 				t.Error(err)

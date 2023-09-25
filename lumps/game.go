@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unsafe"
 
-	primitives "github.com/galaco/bsp/primitives/game"
+	"github.com/galaco/bsp/primitives/game"
 )
 
 // Game is Lump 35.
@@ -14,8 +14,8 @@ import (
 // otherwise we only get staticprop data from it
 type Game struct {
 	Metadata
-	Header              primitives.Header
-	GameLumps           []primitives.GenericGameLump
+	Header              game.Header
+	GameLumps           []game.GenericGameLump
 	LumpOffset          int32
 	areOffsetsCorrected bool
 }
@@ -34,8 +34,8 @@ func (lump *Game) FromBytes(raw []byte) (err error) {
 	lump.Header.SetLumpCount(int32(lumpCount))
 
 	// Read header
-	lump.Header.GameLumps = make([]primitives.LumpDef, lumpCount)
-	headerSize := 4 + (int32(unsafe.Sizeof(primitives.LumpDef{})) * int32(lumpCount))
+	lump.Header.GameLumps = make([]game.LumpDef, lumpCount)
+	headerSize := 4 + (int32(unsafe.Sizeof(game.LumpDef{})) * int32(lumpCount))
 	err = binary.Read(bytes.NewBuffer(raw[4:headerSize]), binary.LittleEndian, &lump.Header.GameLumps)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func (lump *Game) FromBytes(raw []byte) (err error) {
 	}
 
 	// Read gamelumps
-	lump.GameLumps = make([]primitives.GenericGameLump, lumpCount)
+	lump.GameLumps = make([]game.GenericGameLump, lumpCount)
 	for i, lumpHeader := range lump.Header.GameLumps {
 		lump.GameLumps[i].Length = lumpHeader.FileLength
 		lump.GameLumps[i].Data = raw[lumpHeader.FileOffset : lumpHeader.FileOffset+lumpHeader.FileLength]
@@ -96,9 +96,9 @@ func (lump *Game) UpdateInternalOffsets(fileOffset int32) *Game {
 }
 
 // GetStaticPropLump returns the staticprop lump
-func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
+func (lump *Game) GetStaticPropLump() *game.StaticPropLump {
 	for i, gameLump := range lump.Header.GameLumps {
-		if gameLump.Id == primitives.StaticPropLumpId {
+		if gameLump.Id == game.StaticPropLumpId {
 			sprpLump := lump.GameLumps[i]
 
 			offset := 0
@@ -110,7 +110,7 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				return nil
 			}
 			offset += 4
-			dicts := primitives.StaticPropDictLump{
+			dicts := game.StaticPropDictLump{
 				DictEntries: numDicts,
 			}
 			dictNames := make([]string, numDicts)
@@ -132,7 +132,7 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				return nil
 			}
 			offset += 4
-			leaf := primitives.StaticPropLeafLump{
+			leaf := game.StaticPropLeafLump{
 				LeafEntries: numLeafs,
 			}
 			leafs := make([]uint16, numLeafs)
@@ -150,68 +150,68 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				return nil
 			}
 			offset += 4
-			props := make([]primitives.IStaticPropDataLump, numProps)
+			props := make([]game.IStaticPropDataLump, numProps)
 			propLumpSize := 0
 			switch gameLump.Version {
 			case 4:
-				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV4{})) * int(numProps)
-				vprops := make([]primitives.StaticPropV4, numProps)
+				propLumpSize = int(unsafe.Sizeof(game.StaticPropV4{})) * int(numProps)
+				vprops := make([]game.StaticPropV4, numProps)
 				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
 				for idx := range vprops {
-					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
+					props[idx] = game.IStaticPropDataLump(&vprops[idx])
 				}
 			case 5:
-				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV5{})) * int(numProps)
-				vprops := make([]primitives.StaticPropV5, numProps)
+				propLumpSize = int(unsafe.Sizeof(game.StaticPropV5{})) * int(numProps)
+				vprops := make([]game.StaticPropV5, numProps)
 				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
 				for idx := range vprops {
-					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
+					props[idx] = game.IStaticPropDataLump(&vprops[idx])
 				}
 			case 6:
-				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV6{})) * int(numProps)
-				vprops := make([]primitives.StaticPropV6, numProps)
+				propLumpSize = int(unsafe.Sizeof(game.StaticPropV6{})) * int(numProps)
+				vprops := make([]game.StaticPropV6, numProps)
 				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
 				for idx := range vprops {
-					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
+					props[idx] = game.IStaticPropDataLump(&vprops[idx])
 				}
 			case 7:
-				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV7{})) * int(numProps)
-				vprops := make([]primitives.StaticPropV7, numProps)
+				propLumpSize = int(unsafe.Sizeof(game.StaticPropV7{})) * int(numProps)
+				vprops := make([]game.StaticPropV7, numProps)
 				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
 				for idx := range vprops {
-					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
+					props[idx] = game.IStaticPropDataLump(&vprops[idx])
 				}
 			case 8:
-				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV8{})) * int(numProps)
-				vprops := make([]primitives.StaticPropV8, numProps)
+				propLumpSize = int(unsafe.Sizeof(game.StaticPropV8{})) * int(numProps)
+				vprops := make([]game.StaticPropV8, numProps)
 				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
 				for idx := range vprops {
-					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
+					props[idx] = game.IStaticPropDataLump(&vprops[idx])
 				}
 			case 9:
-				propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV9{})) * int(numProps)
-				vprops := make([]primitives.StaticPropV9, numProps)
+				propLumpSize = int(unsafe.Sizeof(game.StaticPropV9{})) * int(numProps)
+				vprops := make([]game.StaticPropV9, numProps)
 				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
 				for idx := range vprops {
-					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
+					props[idx] = game.IStaticPropDataLump(&vprops[idx])
 				}
 			case 10:
 				// This switch is a major hackjob to avoid the need to know what game the bsp is for.
@@ -219,43 +219,43 @@ func (lump *Game) GetStaticPropLump() *primitives.StaticPropLump {
 				// and the MP2013 updated v6 which is REPORTED as v10 as well) we can attempt to infer
 				// which format it actually is.
 				switch {
-				case offset+(int(unsafe.Sizeof(primitives.StaticPropV10{}))*int(numProps)) <= len(sprpLump.Data):
+				case offset+(int(unsafe.Sizeof(game.StaticPropV10{}))*int(numProps)) <= len(sprpLump.Data):
 					// Real v10 format
-					propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV10{})) * int(numProps)
-					vprops := make([]primitives.StaticPropV10, numProps)
+					propLumpSize = int(unsafe.Sizeof(game.StaticPropV10{})) * int(numProps)
+					vprops := make([]game.StaticPropV10, numProps)
 					err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 					if err != nil {
 						return nil
 					}
 					for idx := range vprops {
-						props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
+						props[idx] = game.IStaticPropDataLump(&vprops[idx])
 					}
-				case offset+(int(unsafe.Sizeof(primitives.StaticPropV10MP2013{}))*int(numProps)) <= len(sprpLump.Data):
+				case offset+(int(unsafe.Sizeof(game.StaticPropV10MP2013{}))*int(numProps)) <= len(sprpLump.Data):
 					// Fake v7* 2013MP format.
-					propLumpSize = int(unsafe.Sizeof(primitives.StaticPropV10MP2013{})) * int(numProps)
-					vprops := make([]primitives.StaticPropV10MP2013, numProps)
+					propLumpSize = int(unsafe.Sizeof(game.StaticPropV10MP2013{})) * int(numProps)
+					vprops := make([]game.StaticPropV10MP2013, numProps)
 					err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
 					if err != nil {
 						return nil
 					}
 					for idx := range vprops {
-						props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
+						props[idx] = game.IStaticPropDataLump(&vprops[idx])
 					}
 				default:
 					panic("staticpropdata doesn't correspond to a known v10 format")
 				}
 			case 11:
-				vprops := make([]primitives.StaticPropV11, numProps)
+				vprops := make([]game.StaticPropV11, numProps)
 				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:]), binary.LittleEndian, &vprops)
 				if err != nil {
 					return nil
 				}
 				for idx := range vprops {
-					props[idx] = primitives.IStaticPropDataLump(&vprops[idx])
+					props[idx] = game.IStaticPropDataLump(&vprops[idx])
 				}
 			}
 
-			return &primitives.StaticPropLump{
+			return &game.StaticPropLump{
 				DictLump:  dicts,
 				LeafLump:  leaf,
 				PropLumps: props,

@@ -5,6 +5,6 @@ import (
 )
 
 // Getv21Lump returns the corresponding v21 lump for provided index
-func Getv21Lump(index int) (lumps.ILump, error) {
+func Getv21Lump(index int) (lumps.Lump, error) {
 	return Getv20Lump(index)
 }

@@ -21,8 +21,8 @@ func TestGetReferenceLumpByIndex(t *testing.T) {
 	}
 }
 
-func getExpectedLump(index int) lumps.ILump {
-	lMap := [64]lumps.ILump{
+func getExpectedLump(index int) lumps.Lump {
+	lMap := [64]lumps.Lump{
 		&lumps.EntData{},
 		&lumps.Planes{},
 		&lumps.TexData{},

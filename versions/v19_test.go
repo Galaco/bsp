@@ -1,9 +1,10 @@
 package versions
 
 import (
-	"github.com/galaco/bsp/lumps"
 	"reflect"
 	"testing"
+
+	"github.com/galaco/bsp/lumps"
 )
 
 func TestGetv19Lump(t *testing.T) {

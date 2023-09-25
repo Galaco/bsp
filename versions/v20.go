@@ -7,8 +7,8 @@ import (
 )
 
 // Getv20Lump returns the corresponding v20 lump for provided index
-func Getv20Lump(index int) (lumps.ILump, error) {
-	var ret lumps.ILump
+func Getv20Lump(index int) (lumps.Lump, error) {
+	var ret lumps.Lump
 	var err error
 	switch index {
 	case 0:

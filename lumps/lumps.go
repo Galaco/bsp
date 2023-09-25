@@ -7,9 +7,9 @@ import (
 	"unsafe"
 )
 
-// ILump Lump interface.
+// Lump Lump interface.
 // Organise Lump data in a cleaner and more accessible manner
-type ILump interface {
+type Lump interface {
 	// FromBytes imports a []byte to a defined lump structure(s).
 	FromBytes([]byte) error
 	// ToBytes exports lump structure back to []byte.

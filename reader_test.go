@@ -1,6 +1,7 @@
 package bsp
 
 import (
+	"compress/gzip"
 	"os"
 	"testing"
 
@@ -13,9 +14,14 @@ func TestReadFromStream(t *testing.T) {
 		filePath      string
 		expectedError error
 	}{
+		//{
+		//	name:          "de_dust2",
+		//	filePath:      "testdata/v20/de_dust2.bsp.gz",
+		//	expectedError: nil,
+		//},
 		{
-			name:          "de_dust2",
-			filePath:      "testdata/v20/de_dust2.bsp.gz",
+			name:          "ar_baggage",
+			filePath:      "testdata/v21/ar_baggage.bsp.gz",
 			expectedError: nil,
 		},
 	}
@@ -26,8 +32,13 @@ func TestReadFromStream(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
+			defer f.Close()
+			binarygzr, err := gzip.NewReader(f)
+			if err != nil {
+				t.Error(err)
+			}
 
-			r, err := ReadFromStream(f)
+			r, err := ReadFromStream(binarygzr)
 			if err != nil {
 				t.Error(err)
 			}
