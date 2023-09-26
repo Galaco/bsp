@@ -37,11 +37,12 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 		}
 	}()
 
-	buf := bytes.Buffer{}
-	if _, err := buf.ReadFrom(stream); err != nil {
+	buf := bytes.NewBuffer([]byte{})
+	if _, err := io.Copy(buf, stream); err != nil {
 		return nil, err
 	}
 	reader := bytes.NewReader(buf.Bytes())
+
 	bsp = &Bsp{}
 
 	// Create Header
@@ -80,7 +81,7 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 }
 
 // readHeader Parses header from the bsp file.
-func (r *Reader) readHeader(reader *bytes.Reader) (header Header, err error) {
+func (r *Reader) readHeader(reader io.ReaderAt) (header Header, err error) {
 	headerBytes := make([]byte, unsafe.Sizeof(header))
 
 	sectionReader := io.NewSectionReader(reader, 0, int64(len(headerBytes)))

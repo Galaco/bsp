@@ -9,8 +9,7 @@ import (
 )
 
 // Writer is a Bsp export writer.
-type Writer struct {
-}
+type Writer struct{}
 
 // Write bsp to []byte.
 func (w *Writer) Write(data *Bsp) ([]byte, error) {
@@ -35,10 +34,11 @@ func (w *Writer) Write(data *Bsp) ([]byte, error) {
 
 		// If the lump is empty, we can skip it.
 		if len(marshalledLumps[index]) == 0 {
-			// 0 bytes is a valid lump, but the offset is apparently 0 for this case (likely
-			// to avoid the cost of seeking).
+			// 0 bytes is a valid lump, but all fields are 0 in this case.
 			data.header.Lumps[index].Offset = 0
 			data.header.Lumps[index].Length = 0
+			data.header.Lumps[index].Id = [4]byte{0, 0, 0, 0}
+			data.header.Lumps[index].Version = 0
 			continue
 		}
 
@@ -48,7 +48,9 @@ func (w *Writer) Write(data *Bsp) ([]byte, error) {
 
 		currentOffset += int(data.header.Lumps[index].Length)
 
-		// Finally 4byte align each lump.
+		// Finally 4byte align the data and current offset.
+		// Note that we don't adjust the lump length in the header to reflect this;
+		// it's for padding reasons.
 		marshalledLumps[index] = append(marshalledLumps[index], make([]byte, currentOffset%4)...)
 		currentOffset += currentOffset % 4
 	}
@@ -98,69 +100,4 @@ func resolveLumpExportOrder(header *Header) [64]LumpId {
 // NewWriter Returns a new bsp writer instance.
 func NewWriter() *Writer {
 	return &Writer{}
-}
-
-// DefaultLumpOrdering is Source Engines default export order.
-// Source compile tools write lumps out of order
-// While the ordering doesn't actually matter, it may
-// be useful/more performant to maintain the same order, particularly post-export
-var DefaultLumpOrdering = [64]LumpId{
-	LumpPlanes,
-	LumpLeafs,
-	LumpLeafAmbientLighting,
-	LumpLeafAmbientIndex,
-	LumpLeafAmbientIndexHDR,
-	LumpLeafAmbientLightingHDR,
-	LumpVertexes,
-	LumpNodes,
-	LumpTexInfo,
-	LumpTexData,
-	LumpDispInfo,
-	LumpDispVerts,
-	LumpDispTris,
-	LumpDispLightmapSamplePositions,
-	LumpFaceMacroTextureInfo,
-	LumpPrimitives,
-	LumpPrimVerts,
-	LumpPrimIndices,
-	LumpFaces,
-	LumpFacesHDR,
-	LumpFaceIds,
-	LumpOriginalFaces,
-	LumpBrushes,
-	LumpBrushSides,
-	LumpLeafFaces,
-	LumpLeafBrushes,
-	LumpSurfEdges,
-	LumpEdges,
-	LumpModels,
-	LumpAreas,
-	LumpAreaPortals,
-	LumpLighting,
-	LumpLightingHDR,
-	LumpVisibility,
-	LumpEntities,
-	LumpWorldLights,
-	LumpWorldLightsHDR,
-	LumpLeafWaterData,
-	LumpOcclusion,
-	LumpMapFlags,
-	LumpPortals,
-	LumpClusters,
-	LumpPortalVerts,
-	LumpClusterPortals,
-	LumpClipPortalVerts,
-	LumpCubemaps,
-	LumpTexDataStringData,
-	LumpTexDataStringTable,
-	LumpOverlays,
-	LumpWaterOverlays,
-	LumpOverlayFades,
-	LumpPhysCollide,
-	LumpPhysDisp,
-	LumpVertNormals,
-	LumpVertNormalIndices,
-	LumpLeafMinDistToWater,
-	LumpGame,
-	LumpPakfile,
 }

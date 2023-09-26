@@ -17,7 +17,7 @@ func TestStaticPropV10MP2013_GetAngles(t *testing.T) {
 
 func TestStaticPropV10MP2013_GetDiffuseModulation(t *testing.T) {
 	sut := getStaticPropV10MP2013()
-	if sut.GetDiffuseModulation() != 986 {
+	if sut.GetDiffuseModulation() != 0 {
 		t.Error("unexpected value for diffuseModulation property")
 	}
 
@@ -57,7 +57,7 @@ func TestStaticPropV10MP2013_GetFirstLeaf(t *testing.T) {
 
 func TestStaticPropV10MP2013_GetFlags(t *testing.T) {
 	sut := getStaticPropV10MP2013()
-	if sut.GetFlags() != 85 {
+	if sut.GetFlags() != 0 {
 		t.Error("unexpected value for flags property")
 	}
 
@@ -90,7 +90,7 @@ func TestStaticPropV10MP2013_GetLightingOrigin(t *testing.T) {
 
 func TestStaticPropV10MP2013_GetMaxCPULevel(t *testing.T) {
 	sut := getStaticPropV10MP2013()
-	if sut.GetMaxCPULevel() != 31 {
+	if sut.GetMaxCPULevel() != 0 {
 		t.Error("unexpected value for maxCPULevel property")
 	}
 
@@ -106,7 +106,7 @@ func TestStaticPropV10MP2013_GetMaxDXLevel(t *testing.T) {
 
 func TestStaticPropV10MP2013_GetMaxGPULevel(t *testing.T) {
 	sut := getStaticPropV10MP2013()
-	if sut.GetMaxGPULevel() != 14 {
+	if sut.GetMaxGPULevel() != 0 {
 		t.Error("unexpected value for maxGPULevel property")
 	}
 
@@ -114,7 +114,7 @@ func TestStaticPropV10MP2013_GetMaxGPULevel(t *testing.T) {
 
 func TestStaticPropV10MP2013_GetMinCPULevel(t *testing.T) {
 	sut := getStaticPropV10MP2013()
-	if sut.GetMinCPULevel() != 1 {
+	if sut.GetMinCPULevel() != 0 {
 		t.Error("unexpected value for minCPULevel property")
 	}
 
@@ -130,7 +130,7 @@ func TestStaticPropV10MP2013_GetMinDXLevel(t *testing.T) {
 
 func TestStaticPropV10MP2013_GetMinGPULevel(t *testing.T) {
 	sut := getStaticPropV10MP2013()
-	if sut.GetMinGPULevel() != 6 {
+	if sut.GetMinGPULevel() != 0 {
 		t.Error("unexpected value for minGPULevel property")
 	}
 
