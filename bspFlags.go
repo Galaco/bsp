@@ -1,143 +1,147 @@
 package bsp
 
 const (
-	CONTENTS_EMPTY = 0 // No contents
+	ContentsEmpty = 0 // No contents
 
-	CONTENTS_SOLID        = 0x1 // an eye is never valid in a solid
-	CONTENTS_WINDOW       = 0x2 // translucent, but not watery (glass)
-	CONTENTS_AUX          = 0x4
-	CONTENTS_GRATE        = 0x8 // alpha-tested "grate" textures.  Bullets/sight pass through, but solids don't
-	CONTENTS_SLIME        = 0x10
-	CONTENTS_WATER        = 0x20
-	CONTENTS_BLOCKLOS     = 0x40 // block AI line of sight
-	CONTENTS_OPAQUE       = 0x80 // things that cannot be seen through (may be non-solid though)
-	LAST_VISIBLE_CONTENTS = 0x80
+	ContentsSolid       = 0x1 // an eye is never valid in a solid
+	ContentsWindow      = 0x2 // translucent, but not watery (glass)
+	ContentsAux         = 0x4
+	ContentsGrate       = 0x8 // alpha-tested "grate" textures.  Bullets/sight pass through, but solids don't
+	ContentsSlime       = 0x10
+	ContentsWater       = 0x20
+	ContentsBlockLOS    = 0x40 // block AI line of sight
+	ContentsOpaque      = 0x80 // things that cannot be seen through (may be non-solid though)
+	LastVisibleContents = 0x80
 
-	ALL_VISIBLE_CONTENTS = LAST_VISIBLE_CONTENTS | (LAST_VISIBLE_CONTENTS - 1)
+	AllVisibleContents = LastVisibleContents | (LastVisibleContents - 1)
 
-	CONTENTS_TESTFOGVOLUME = 0x100
-	CONTENTS_UNUSED        = 0x200
+	ContentsTestFogVolume = 0x100
+	ContentsUnused        = 0x200
 
-	// unused
-	// NOTE: If it's visible, grab from the top + update LAST_VISIBLE_CONTENTS
+	// ContentsUnused6 is unused.
+	// NOTE: If it's visible, grab from the top + update LastVisibleContents
 	// if not visible, then grab from the bottom.
-	CONTENTS_UNUSED6 = 0x400
+	ContentsUnused6 = 0x400
 
-	CONTENTS_TEAM1 = 0x800  // per team contents used to differentiate collisions
-	CONTENTS_TEAM2 = 0x1000 // between players and objects on different teams
+	ContentsTeam1 = 0x800  // per team contents used to differentiate collisions
+	ContentsTeam2 = 0x1000 // between players and objects on different teams
 
-	// ignore CONTENTS_OPAQUE on surfaces that have SURF_NODRAW
-	CONTENTS_IGNORE_NODRAW_OPAQUE = 0x2000
+	// ContentsIgnoreNodrawOpaque ignores ContentsOpaque on surfaces that have SurfNodraw.
+	ContentsIgnoreNodrawOpaque = 0x2000
 
-	// hits entities which are MOVETYPE_PUSH (doors, plats, etc.)
-	CONTENTS_MOVEABLE = 0x4000
+	// ContentsMoveable hits entities which are MOVETYPE_PUSH (doors, plats, etc.)
+	ContentsMoveable = 0x4000
 
-	// remaining contents are non-visible, and don't eat brushes
-	CONTENTS_AREAPORTAL = 0x8000
+	// Remaining contents are non-visible, and don't eat brushes.
 
-	CONTENTS_PLAYERCLIP  = 0x10000
-	CONTENTS_MONSTERCLIP = 0x20000
+	ContentsAreaPortal = 0x8000
 
-	// currents can be added to any other contents, and may be mixed
-	CONTENTS_CURRENT_0    = 0x40000
-	CONTENTS_CURRENT_90   = 0x80000
-	CONTENTS_CURRENT_180  = 0x100000
-	CONTENTS_CURRENT_270  = 0x200000
-	CONTENTS_CURRENT_UP   = 0x400000
-	CONTENTS_CURRENT_DOWN = 0x800000
+	ContentsPlayerClip  = 0x10000
+	ContentsMonsterClip = 0x20000
 
-	CONTENTS_ORIGIN = 0x1000000 // removed before bsping an entity
+	// Currents can be added to any other contents, and may be mixed.
 
-	CONTENTS_MONSTER     = 0x2000000 // should never be on a brush, only in game
-	CONTENTS_DEBRIS      = 0x4000000
-	CONTENTS_DETAIL      = 0x8000000  // brushes to be added after vis leafs
-	CONTENTS_TRANSLUCENT = 0x10000000 // auto set if any surface has trans
-	CONTENTS_LADDER      = 0x20000000
-	CONTENTS_HITBOX      = 0x40000000 // use accurate hitboxes on trace
+	ContentsCurrent0    = 0x40000
+	ContentsCurrent90   = 0x80000
+	ContentsCurrent180  = 0x100000
+	ContentsCurrent270  = 0x200000
+	ContentsCurrentUp   = 0x400000
+	ContentsCurrentDown = 0x800000
 
-	// NOTE: These are stored in a short in the engine now.  Don't use more than 16 bits
-	SURF_LIGHT    = 0x0001 // value will hold the light strength
-	SURF_SKY2D    = 0x0002 // don't draw, indicates we should skylight + draw 2d sky but not draw the 3D skybox
-	SURF_SKY      = 0x0004 // don't draw, but add to skybox
-	SURF_WARP     = 0x0008 // turbulent water warp
-	SURF_TRANS    = 0x0010
-	SURF_NOPORTAL = 0x0020 // the surface can not have a portal placed on it
-	SURF_TRIGGER  = 0x0040 // FIXME: This is an xbox hack to work around elimination of trigger surfaces, which breaks occluders
-	SURF_NODRAW   = 0x0080 // don't bother referencing the texture
+	ContentsOrigin = 0x1000000 // removed before bsping an entity
 
-	SURF_HINT = 0x0100 // make a primary bsp splitter
+	ContentsMonster     = 0x2000000 // should never be on a brush, only in game
+	ContentsDebris      = 0x4000000
+	ContentsDetail      = 0x8000000  // brushes to be added after vis leafs
+	ContentsTranslucent = 0x10000000 // auto set if any surface has trans
+	ContentsLadder      = 0x20000000
+	ContentsHitbox      = 0x40000000 // use accurate hitboxes on trace
 
-	SURF_SKIP      = 0x0200 // completely ignore, allowing non-closed brushes
-	SURF_NOLIGHT   = 0x0400 // Don't calculate light
-	SURF_BUMPLIGHT = 0x0800 // calculate three lightmaps for the surface for bumpmapping
-	SURF_NOSHADOWS = 0x1000 // Don't receive shadows
-	SURF_NODECALS  = 0x2000 // Don't receive decals
-	SURF_NOCHOP    = 0x4000 // Don't subdivide patches on this surface
-	SURF_HITBOX    = 0x8000 // surface is part of a hitbox
+	// NOTE: These are stored in a short in the engine now.  Don't use more than 16 bits.
 
-	// -----------------------------------------------------
-	// spatial content masks - used for spatial queries (traceline,etc.)
-	// -----------------------------------------------------
-	MASK_ALL = (0xFFFFFFFF)
+	SurfLight    = 0x0001 // value will hold the light strength
+	SurfSky2D    = 0x0002 // don't draw, indicates we should skylight + draw 2d sky but not draw the 3D skybox
+	SurfSky      = 0x0004 // don't draw, but add to skybox
+	SurfWarp     = 0x0008 // turbulent water warp
+	SurfTrans    = 0x0010
+	SurfNoPortal = 0x0020 // the surface can not have a portal placed on it
+	SurfTrigger  = 0x0040 // FIXME: This is an xbox hack to work around elimination of trigger surfaces, which breaks occluders
+	SurfNodraw   = 0x0080 // don't bother referencing the texture
 
-	// everything that is normally solid
-	MASK_SOLID = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_WINDOW | CONTENTS_MONSTER | CONTENTS_GRATE)
+	SurfHint = 0x0100 // make a primary bsp splitter
 
-	// everything that blocks player movement
-	MASK_PLAYERSOLID = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_PLAYERCLIP | CONTENTS_WINDOW | CONTENTS_MONSTER | CONTENTS_GRATE)
+	SurfSkip      = 0x0200 // completely ignore, allowing non-closed brushes
+	SurfNoLight   = 0x0400 // Don't calculate light
+	SurfBumpLight = 0x0800 // calculate three lightmaps for the surface for bumpmapping
+	SurfNoShadows = 0x1000 // Don't receive shadows
+	SurfNoDecals  = 0x2000 // Don't receive decals
+	SurfNoChop    = 0x4000 // Don't subdivide patches on this surface
+	SurfHitbox    = 0x8000 // surface is part of a hitbox
 
-	// blocks npc movement
-	MASK_NPCSOLID = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTERCLIP | CONTENTS_WINDOW | CONTENTS_MONSTER | CONTENTS_GRATE)
+	// Spacial content masks - used for spacial queries (traceline,etc.).
 
-	// water physics in these contents
-	MASK_WATER = (CONTENTS_WATER | CONTENTS_MOVEABLE | CONTENTS_SLIME)
+	// MaskAll is everything.
+	MaskAll = 0xFFFFFFFF
 
-	// everything that blocks lighting
-	MASK_OPAQUE = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_OPAQUE)
+	// MaskSolid is everything that is normally solid.
+	MaskSolid = ContentsSolid | ContentsMoveable | ContentsWindow | ContentsMonster | ContentsGrate
 
-	// everything that blocks lighting, but with monsters added.
-	MASK_OPAQUE_AND_NPCS = (MASK_OPAQUE | CONTENTS_MONSTER)
+	// MaskPlayerSolid is everything that blocks player movement.
+	MaskPlayerSolid = ContentsSolid | ContentsMoveable | ContentsPlayerClip | ContentsWindow | ContentsMonster | ContentsGrate
 
-	// everything that blocks line of sight for AI
-	MASK_BLOCKLOS = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_BLOCKLOS)
+	// MaskNPCSolid blocks npc movement.
+	MaskNPCSolid = ContentsSolid | ContentsMoveable | ContentsMonsterClip | ContentsWindow | ContentsMonster | ContentsGrate
 
-	// everything that blocks line of sight for AI plus NPCs
-	MASK_BLOCKLOS_AND_NPCS = (MASK_BLOCKLOS | CONTENTS_MONSTER)
+	// MaskWater is water physics in these contents.
+	MaskWater = ContentsWater | ContentsMoveable | ContentsSlime
 
-	// everything that blocks line of sight for players
-	MASK_VISIBLE = (MASK_OPAQUE | CONTENTS_IGNORE_NODRAW_OPAQUE)
+	// MaskOpaque is everything that blocks lighting.
+	MaskOpaque = ContentsSolid | ContentsMoveable | ContentsOpaque
 
-	// everything that blocks line of sight for players, but with monsters added.
-	MASK_VISIBLE_AND_NPCS = (MASK_OPAQUE_AND_NPCS | CONTENTS_IGNORE_NODRAW_OPAQUE)
+	// MaskOpaqueAndNPCs is everything that blocks lighting, but with monsters added.
+	MaskOpaqueAndNPCs = MaskOpaque | ContentsMonster
 
-	// bullets see these as solid
-	MASK_SHOT = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTER | CONTENTS_WINDOW | CONTENTS_DEBRIS | CONTENTS_HITBOX)
+	// MaskBlockLOS is everything that blocks line of sight for AI.
+	MaskBlockLOS = ContentsSolid | ContentsMoveable | ContentsBlockLOS
 
-	// non-raycasted weapons see this as solid (includes grates)
-	MASK_SHOT_HULL = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTER | CONTENTS_WINDOW | CONTENTS_DEBRIS | CONTENTS_GRATE)
+	// MaskBlockLOSAndNPCs is everything that blocks line of sight for AI plus NPCs.
+	MaskBlockLOSAndNPCs = MaskBlockLOS | ContentsMonster
 
-	// hits solids (not grates) and passes through everything else
-	MASK_SHOT_PORTAL = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_WINDOW | CONTENTS_MONSTER)
+	// MaskVisible is everything that blocks line of sight for players.
+	MaskVisible = MaskOpaque | ContentsIgnoreNodrawOpaque
 
-	// everything normally solid, except monsters (world+brush only)
-	MASK_SOLID_BRUSHONLY = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_WINDOW | CONTENTS_GRATE)
+	// MaskVisibleAndNPCs is everything that blocks line of sight for players, but with monsters added.
+	MaskVisibleAndNPCs = MaskOpaqueAndNPCs | ContentsIgnoreNodrawOpaque
 
-	// everything normally solid for player movement, except monsters (world+brush only)
-	MASK_PLAYERSOLID_BRUSHONLY = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_WINDOW | CONTENTS_PLAYERCLIP | CONTENTS_GRATE)
+	// MaskShot is bullets see these as solid.
+	MaskShot = ContentsSolid | ContentsMoveable | ContentsMonster | ContentsWindow | ContentsDebris | ContentsHitbox
 
-	// everything normally solid for npc movement, except monsters (world+brush only)
-	MASK_NPCSOLID_BRUSHONLY = (CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_WINDOW | CONTENTS_MONSTERCLIP | CONTENTS_GRATE)
+	// MaskShotHull is non-raycasted weapons see this as solid (includes grates).
+	MaskShotHull = ContentsSolid | ContentsMoveable | ContentsMonster | ContentsWindow | ContentsDetail | ContentsGrate
 
-	// just the world, used for route rebuilding
-	MASK_NPCWORLDSTATIC = (CONTENTS_SOLID | CONTENTS_WINDOW | CONTENTS_MONSTERCLIP | CONTENTS_GRATE)
+	// MaskShotPortal hits solids (not grates) and passes through everything else.
+	MaskShotPortal = ContentsSolid | ContentsMoveable | ContentsWindow | ContentsMonster
 
-	// These are things that can split areaportals
-	MASK_SPLITAREAPORTAL = (CONTENTS_WATER | CONTENTS_SLIME)
+	// MaskSolidBrushOnly is everything normally solid, except monsters (world+brush only).
+	MaskSolidBrushOnly = ContentsSolid | ContentsMoveable | ContentsWindow | ContentsGrate
 
-	// UNDONE: This is untested, any moving water
-	MASK_CURRENT = (CONTENTS_CURRENT_0 | CONTENTS_CURRENT_90 | CONTENTS_CURRENT_180 | CONTENTS_CURRENT_270 | CONTENTS_CURRENT_UP | CONTENTS_CURRENT_DOWN)
+	// MaskPlayerSolidBrushOnly is everything normally solid for player movement, except monsters (world+brush only).
+	MaskPlayerSolidBrushOnly = ContentsSolid | ContentsMoveable | ContentsWindow | ContentsPlayerClip | ContentsGrate
 
-	// everything that blocks corpse movement
-	// UNDONE: Not used yet / may be deleted
-	MASK_DEADSOLID = (CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_WINDOW | CONTENTS_GRATE)
+	// MaskNPCSolidBrushOnly is everything normally solid for npc movement, except monsters (world+brush only).
+	MaskNPCSolidBrushOnly = ContentsSolid | ContentsMoveable | ContentsWindow | ContentsMonsterClip | ContentsGrate
+
+	// MaskNPCWorldStatic is just the world, used for route rebuilding.
+	MaskNPCWorldStatic = ContentsSolid | ContentsWindow | ContentsMonsterClip | ContentsGrate
+
+	// MaskSplitAreaPortal are things that can split areaportals.
+	MaskSplitAreaPortal = ContentsWater | ContentsSlime
+
+	// MaskCurrent is moving water.
+	// UNDONE: This is untested.
+	MaskCurrent = ContentsCurrent0 | ContentsCurrent90 | ContentsCurrent180 | ContentsCurrent270 | ContentsCurrentUp | ContentsCurrentDown
+
+	// MaskDeadSolid is everything that blocks corpse movement.
+	// UNDONE: Not used yet / may be deleted.
+	MaskDeadSolid = ContentsSolid | ContentsPlayerClip | ContentsWindow | ContentsGrate
 )
