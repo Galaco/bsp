@@ -35,7 +35,7 @@ func TestBsp_Lump(t *testing.T) {
 }
 
 // Test that resultant lump data matches expected.
-func TestLumpExports(t *testing.T) {
+func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 	testCases := []struct {
 		name     string
 		filePath string
@@ -75,7 +75,7 @@ func TestLumpExports(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			testBSP, err := ReadFromStream(testFilegzr)
+			testBSP, err := NewReader().Read(testFilegzr)
 			if err != nil {
 				t.Error(err)
 			}

@@ -19,10 +19,9 @@ func (w *Writer) Write(data *Bsp) ([]byte, error) {
 	marshalledLumps := make([][]byte, 64)
 	var err error
 
-	exportOrder := resolveLumpExportOrder(data.Header())
-	currentOffset := 1032 // Header always 1032bytes
-	for _, index := range exportOrder {
-		// We have to handle lump 35 (GameData differently)
+	currentOffset := 1032 // Header always 1032bytes, so we start immediately afterwards.
+	for _, index := range resolveLumpExportOrder(data.Header()) {
+		// We have to handle lump 35 (GameData differently).
 		// Because valve designed the file format oddly and relatively positioned data contains absolute file offsets.
 		if index == LumpGame {
 			gamelump := data.lumps[index].(*lumps.Game)
@@ -34,10 +33,12 @@ func (w *Writer) Write(data *Bsp) ([]byte, error) {
 			return nil, err
 		}
 
+		// If the lump is empty, we can skip it.
 		if len(marshalledLumps[index]) == 0 {
 			// 0 bytes is a valid lump, but the offset is apparently 0 for this case (likely
 			// to avoid the cost of seeking).
 			data.header.Lumps[index].Offset = 0
+			data.header.Lumps[index].Length = 0
 			continue
 		}
 

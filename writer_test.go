@@ -45,7 +45,7 @@ func TestWriter_Write(t *testing.T) {
 			}
 
 			var buf bytes.Buffer
-			bsp, err := ReadFromStream(io.TeeReader(binarygzr, &buf))
+			bsp, err := NewReader().Read(io.TeeReader(binarygzr, &buf))
 			if err != nil {
 				t.Error(err)
 			}
@@ -55,6 +55,7 @@ func TestWriter_Write(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Write(%s) returned error: %v", tc.filePath, err)
 			}
+
 			expected := buf.Bytes()
 			if !bytes.Equal(expected, actual) {
 				t.Errorf("Write(%s) returned unexpected bytes", tc.filePath)

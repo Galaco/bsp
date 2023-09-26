@@ -38,7 +38,7 @@ func TestReadFromStream(t *testing.T) {
 				t.Error(err)
 			}
 
-			r, err := ReadFromStream(binarygzr)
+			r, err := NewReader().Read(binarygzr)
 			if err != nil {
 				t.Error(err)
 			}
