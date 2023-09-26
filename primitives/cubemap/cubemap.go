@@ -7,9 +7,9 @@ import (
 // CubemapSample
 type CubemapSample struct {
 	// Origin is sample location
-	Origin mgl32.Vec3
+	Origin mgl32.Vec3 `json:"origin"`
 	// Size
-	Size byte
+	Size byte `json:"size"`
 	// AlignmentPadding - probably unused, likely exists for ensure 4byte alignment during read/write.
-	AlignmentPadding [3]byte
+	AlignmentPadding [3]byte `json:"alignmentPadding"`
 }

@@ -7,10 +7,10 @@ import (
 // Brush is Lump 18: Brush
 type Brush struct {
 	Metadata
-	data []primitives.Brush
+	Data []primitives.Brush `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte data.
 func (lump *Brush) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.Brush](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *Brush) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *Brush) Contents() []primitives.Brush {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *Brush) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

@@ -1,41 +1,33 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/leafambientindex"
 )
 
 // LeafAmbientIndexHDR is Lump 51: Leaf Ambient Index HDR
 type LeafAmbientIndexHDR struct {
 	Metadata
-	data []primitives.LeafAmbientIndex
+	Data []primitives.LeafAmbientIndex `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *LeafAmbientIndexHDR) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	if length == 0 {
-		return
-	}
-	lump.data = make([]primitives.LeafAmbientIndex, length/int(unsafe.Sizeof(primitives.LeafAmbientIndex{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	meta, data, err := unmarshallBasicLump[primitives.LeafAmbientIndex](raw)
+	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
 
-	return err
+	lump.Data = data
+	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *LeafAmbientIndexHDR) Contents() []primitives.LeafAmbientIndex {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *LeafAmbientIndexHDR) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

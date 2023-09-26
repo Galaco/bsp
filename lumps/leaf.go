@@ -23,10 +23,10 @@ const (
 // Leaf is Lump 10: Leaf
 type Leaf struct {
 	Metadata
-	data []primitives.Leaf
+	Data []primitives.Leaf `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *Leaf) FromBytes(raw []byte) (err error) {
 	// There are 2 version of leaf:
 	// v0 contains a light sample
@@ -38,19 +38,19 @@ func (lump *Leaf) FromBytes(raw []byte) (err error) {
 	}
 
 	length := len(raw)
-	lump.data = make([]primitives.Leaf, length/structSize)
-	numLeafs := len(lump.data)
+	lump.Data = make([]primitives.Leaf, length/structSize)
+	numLeafs := len(lump.Data)
 	i := 0
 
 	for i < numLeafs {
 		leafBuf := make([]byte, structSize)
 		copy(leafBuf, raw[(structSize*i):(structSize*i)+structSize])
-		// Pad the raw data to the correct size of a leaf
+		// Pad the raw Data to the correct size of a leaf
 		if lump.Version() > maxBspVersionOfV0Leaf {
 			leafBuf = append(leafBuf, make([]byte, int(unsafe.Sizeof(common.CompressedLightCube{})))...)
 		}
 		rawLeaf := bytes.NewBuffer(leafBuf)
-		err = binary.Read(rawLeaf, binary.LittleEndian, &lump.data[i])
+		err = binary.Read(rawLeaf, binary.LittleEndian, &lump.Data[i])
 		if err != nil {
 			return err
 		}
@@ -64,22 +64,22 @@ func (lump *Leaf) FromBytes(raw []byte) (err error) {
 	return err
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *Leaf) Contents() []primitives.Leaf {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *Leaf) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
 	var err error
 
 	switch lump.Version() {
 	case 0:
-		err = binary.Write(&buf, binary.LittleEndian, lump.data)
+		err = binary.Write(&buf, binary.LittleEndian, lump.Data)
 	default:
 		structSize := int(unsafe.Sizeof(primitives.Leaf{})) - int(unsafe.Sizeof(common.CompressedLightCube{}))
-		for _, l := range lump.data {
+		for _, l := range lump.Data {
 			var leafBuf bytes.Buffer
 			if err = binary.Write(&leafBuf, binary.LittleEndian, l); err != nil {
 				return nil, err

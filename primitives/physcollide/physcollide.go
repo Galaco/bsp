@@ -3,29 +3,29 @@ package physcollide
 // PhysCollideEntry
 type PhysCollideEntry struct {
 	// ModelHeader
-	ModelHeader PhysModel
+	ModelHeader PhysModel `json:"modelHeader"`
 	// Solids
-	Solids []Solid
+	Solids []Solid `json:"solids"`
 	// TextBuffer
-	TextBuffer string
+	TextBuffer string `json:"textBuffer"`
 }
 
 // PhysModel
 type PhysModel struct {
 	// ModelIndex
-	ModelIndex int32
+	ModelIndex int32 `json:"modelIndex"`
 	// DataSize
-	DataSize int32
+	DataSize int32 `json:"dataSize"`
 	// KeydataSize
-	KeydataSize int32
+	KeydataSize int32 `json:"keydataSize"`
 	// SolidCount
-	SolidCount int32
+	SolidCount int32 `json:"solidCount"`
 }
 
 // Solid
 type Solid struct {
 	// Size
-	Size int32
+	Size int32 `json:"size"`
 	// CollisionBinary
-	CollisionBinary []int32
+	CollisionBinary []int32 `json:"collisionBinary"`
 }

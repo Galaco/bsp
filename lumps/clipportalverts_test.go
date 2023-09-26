@@ -45,7 +45,7 @@ func TestClipPortalVerts_Marshall(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.data {
+	for idx, b := range sut.Data {
 		if data[idx] != b {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
@@ -76,7 +76,7 @@ func TestClipPortalVerts_FromBytes(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.data {
+	for idx, b := range sut.Data {
 		if data[idx] != b {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}

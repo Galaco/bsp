@@ -11,22 +11,22 @@ import (
 // Occlusion is Lump 9: Occlusion
 type Occlusion struct {
 	Metadata
-	Count            int32
-	Data             []primitives.OcclusionData // len(slice) = Count
-	PolyDataCount    int32
-	PolyData         []primitives.OcclusionPolyData //len(slice) = PolyDataCount
-	VertexIndexCount int32
-	VertexIndices    []int32 //len(slice) = VertexIndexCount
+	Count            int32                          `json:"count"`
+	Data             []primitives.OcclusionData     `json:"data"` // len(slice) = Count
+	PolyDataCount    int32                          `json:"polyDataCount"`
+	PolyData         []primitives.OcclusionPolyData `json:"polyData"` //len(slice) = PolyDataCount
+	VertexIndexCount int32                          `json:"VertexIndexCount"`
+	VertexIndices    []int32                        `json:"VertexIndices"` //len(slice) = VertexIndexCount
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *Occlusion) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	if length == 0 {
 		return
 	}
 	offset := 0
-	// data
+	// Data
 	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Count)
 	if err != nil {
 		return err
@@ -69,15 +69,15 @@ func (lump *Occlusion) FromBytes(raw []byte) (err error) {
 	return err
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *Occlusion) Contents() *Occlusion {
 	return lump
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *Occlusion) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
-	// write data
+	// write Data
 	err := binary.Write(&buf, binary.LittleEndian, lump.Count)
 	if err != nil {
 		return nil, err

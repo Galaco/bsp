@@ -7,10 +7,10 @@ import (
 // DispVert is Lump 33: DispVert
 type DispVert struct {
 	Metadata
-	data []primitives.DispVert
+	Data []primitives.DispVert `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *DispVert) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.DispVert](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *DispVert) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *DispVert) Contents() []primitives.DispVert {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *DispVert) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

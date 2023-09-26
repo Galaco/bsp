@@ -13,13 +13,13 @@ type Pakfile struct {
 	zipReader *zip.Reader
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *Pakfile) FromBytes(raw []byte) (err error) {
 	length := len(raw)
-	lump.data = raw
+	lump.Data = raw
 	lump.Metadata.SetLength(length)
 
-	b := bytes.NewReader(lump.data)
+	b := bytes.NewReader(lump.Data)
 	zipReader, err := zip.NewReader(b, int64(length))
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func (lump *Pakfile) FromBytes(raw []byte) (err error) {
 	return nil
 }
 
-// GetData GetData gets internal format structure data
+// Contents gets internal format structure Data
 func (lump *Pakfile) Contents() *zip.Reader {
 	return lump.zipReader
 }

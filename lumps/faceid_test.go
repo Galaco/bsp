@@ -35,7 +35,7 @@ func TestFaceId_Marshall(t *testing.T) {
 	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.data {
+	for idx, b := range sut.Data {
 		if data[idx] != b.HammerFaceId {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
@@ -62,7 +62,7 @@ func TestFaceId_FromBytes(t *testing.T) {
 	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.data {
+	for idx, b := range sut.Data {
 		if data[idx] != b.HammerFaceId {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}

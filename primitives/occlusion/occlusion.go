@@ -5,18 +5,18 @@ import (
 )
 
 type OcclusionData struct {
-	Flags     int32
-	FirstPoly int32
-	PolyCount int32
-	Mins      mgl32.Vec3
-	Maxs      mgl32.Vec3
-	Area      int32
+	Flags     int32      `json:"flags"`
+	FirstPoly int32      `json:"firstPoly"`
+	PolyCount int32      `json:"polyCount"`
+	Mins      mgl32.Vec3 `json:"mins"`
+	Maxs      mgl32.Vec3 `json:"maxs"`
+	Area      int32      `json:"area"`
 }
 
 type OcclusionPolyData struct {
-	FirstVertexIndex int32
-	VertexCount      int32
-	PlaneNum         int32
+	FirstVertexIndex int32 `json:"firstVertexIndex"`
+	VertexCount      int32 `json:"vertexCount"`
+	PlaneNum         int32 `json:"planeNum"`
 }
 
 //Implementation info

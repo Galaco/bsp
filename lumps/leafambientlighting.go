@@ -7,10 +7,10 @@ import (
 // LeafAmbientLighting is Lump 56: LeafAmbientLighting
 type LeafAmbientLighting struct {
 	Metadata
-	data []primitives.LeafAmbientLighting
+	Data []primitives.LeafAmbientLighting `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *LeafAmbientLighting) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.LeafAmbientLighting](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *LeafAmbientLighting) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *LeafAmbientLighting) Contents() []primitives.LeafAmbientLighting {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *LeafAmbientLighting) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

@@ -7,10 +7,10 @@ import (
 // AreaPortal is Lump 21: Areaportals
 type AreaPortal struct {
 	Metadata
-	data []primitives.AreaPortal
+	Data []primitives.AreaPortal `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte data.
 func (lump *AreaPortal) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.AreaPortal](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *AreaPortal) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *AreaPortal) Contents() []primitives.AreaPortal {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *AreaPortal) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

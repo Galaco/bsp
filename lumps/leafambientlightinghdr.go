@@ -1,38 +1,33 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"unsafe"
-
 	primitives "github.com/galaco/bsp/primitives/leafambientlighting"
 )
 
 // LeafAmbientLightingHDR is Lump 55: LeafAmbientLightingHDR
 type LeafAmbientLightingHDR struct {
 	Metadata
-	data []primitives.LeafAmbientLighting
+	Data []primitives.LeafAmbientLighting `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
-func (lump *LeafAmbientLightingHDR) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.Metadata.SetLength(length)
-	if length == 0 {
-		return
+// FromBytes imports this lump from raw byte Data
+func (lump *LeafAmbientLightingHDR) FromBytes(raw []byte) error {
+	meta, data, err := unmarshallBasicLump[primitives.LeafAmbientLighting](raw)
+	lump.Metadata = meta
+	if err != nil {
+		return err
 	}
-	lump.data = make([]primitives.LeafAmbientLighting, length/int(unsafe.Sizeof(primitives.LeafAmbientLighting{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
 
-	return err
+	lump.Data = data
+	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *LeafAmbientLightingHDR) Contents() []primitives.LeafAmbientLighting {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *LeafAmbientLightingHDR) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

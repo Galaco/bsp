@@ -7,10 +7,10 @@ import (
 // Cubemap is Lump 42: Cubemaps
 type Cubemap struct {
 	Metadata
-	data []primitives.CubemapSample
+	Data []primitives.CubemapSample `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *Cubemap) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.CubemapSample](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *Cubemap) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *Cubemap) Contents() []primitives.CubemapSample {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *Cubemap) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

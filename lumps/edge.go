@@ -8,14 +8,14 @@ import (
 // Edge is Lump 12: Edge
 type Edge struct {
 	Metadata
-	data [][2]uint16 // MAX_MAP_EDGES = 256000
+	Data [][2]uint16 `json:"data"` // MAX_MAP_EDGES = 256000
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *Edge) FromBytes(raw []byte) (err error) {
 	length := len(raw)
-	lump.data = make([][2]uint16, length/4)
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+	lump.Data = make([][2]uint16, length/4)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data)
 	if err != nil {
 		return err
 	}
@@ -24,12 +24,12 @@ func (lump *Edge) FromBytes(raw []byte) (err error) {
 	return err
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *Edge) Contents() [][2]uint16 {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *Edge) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

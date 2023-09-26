@@ -5,38 +5,28 @@ import "github.com/galaco/bsp/lumps"
 // Bsp is the root .bsp filetype container.
 // Consists of a 1036byte header and 64 lump blocks.
 type Bsp struct {
-	header Header
-	lumps  [64]lumps.Lump
+	Header Header         `json:"header"`
+	Lumps  [64]lumps.Lump `json:"lumps"`
 }
 
 // Header is the Bsp header. Contains format and lump layout data.
 // Do not trust lump information between import and export
 type Header struct {
-	Id       int32
-	Version  int32
-	Lumps    [64]HeaderLump
-	Revision int32
+	Id       int32          `json:"id"`
+	Version  int32          `json:"version"`
+	Lumps    [64]HeaderLump `json:"lumps"`
+	Revision int32          `json:"revision"`
 }
 
 // HeaderLump contains layout information for a given lump, stored in the Header.
 type HeaderLump struct {
-	Offset  int32
-	Length  int32
-	Version int32
-	Id      [4]byte
-}
-
-// Header gets the header for a bsp.
-func (bsp *Bsp) Header() *Header {
-	return &bsp.header
-}
-
-// Lump gets the lump for a given id.
-func (bsp *Bsp) Lump(index LumpId) lumps.Lump {
-	return bsp.lumps[index]
-}
-
-// SetLump sets the lump data for a given id.
-func (bsp *Bsp) SetLump(index LumpId, lump lumps.Lump) {
-	bsp.lumps[index] = lump
+	// Offset is the offset into the file (in bytes).
+	Offset int32 `json:"offset"`
+	// Length is the lump length (in bytes).
+	Length int32 `json:"length"`
+	// Version is the lump version.
+	Version int32 `json:"version"`
+	// ID is lump ident code.
+	// If the lump is compressed then treat as an integer that represents the decompressed size.
+	ID [4]byte `json:"id"`
 }

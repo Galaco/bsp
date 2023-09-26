@@ -29,9 +29,9 @@ public:
 // Overlay
 type Overlay struct {
 	// NId
-	NId int32
+	NId int32 `json:"nId"`
 	// NTexInfo
-	NTexInfo int16
+	NTexInfo int16 `json:"nTexInfo"`
 	// AlignmentPadding
-	AlignmentPadding int16
+	AlignmentPadding int16 `json:"alignmentPadding"`
 }

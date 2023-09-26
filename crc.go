@@ -16,7 +16,7 @@ func (bsp *Bsp) CRC32() (uint32, error) {
 	}
 
 	sort.Slice(lumpList, func(i, j int) bool {
-		return bsp.header.Lumps[lumpList[i]].Offset < bsp.header.Lumps[lumpList[j]].Offset
+		return bsp.Header.Lumps[lumpList[i]].Offset < bsp.Header.Lumps[lumpList[j]].Offset
 	})
 
 	for i := 0; i < lumpCount; i++ {
@@ -25,7 +25,7 @@ func (bsp *Bsp) CRC32() (uint32, error) {
 			continue
 		}
 
-		raw, err := bsp.Lump(l).ToBytes()
+		raw, err := bsp.Lumps[l].ToBytes()
 		if err != nil {
 			return 0, err
 		}

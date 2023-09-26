@@ -7,7 +7,7 @@ import (
 )
 
 // Lump Lump interface.
-// Organise Lump data in a cleaner and more accessible manner
+// Organise Lump Data in a cleaner and more accessible manner
 type Lump interface {
 	// FromBytes imports a []byte to a defined lump structure(s).
 	FromBytes([]byte) error
@@ -73,26 +73,26 @@ func (info *Metadata) SetVersion(version int32) {
 // the contents are just raw bytes, left up to the implementer to handle.
 type RawBytes struct {
 	Metadata
-	data []byte
+	Data []byte `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *RawBytes) FromBytes(raw []byte) (err error) {
 	length := len(raw)
-	lump.data = raw
+	lump.Data = raw
 	lump.Metadata.SetLength(length)
 
 	return err
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *RawBytes) Contents() []byte {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *RawBytes) ToBytes() ([]byte, error) {
-	return lump.data, nil
+	return lump.Data, nil
 }
 
 type Unimplemented = RawBytes

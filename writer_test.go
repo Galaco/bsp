@@ -51,7 +51,7 @@ func TestWriter_Write(t *testing.T) {
 			}
 			expectedBytes := expected.Bytes()
 
-			actual, err := NewWriter().Write(bsp)
+			actual, err := NewWriter().toBytes(bsp)
 			if err != nil {
 				t.Fatalf("toBytes(%s) returned error: %v", tc.filePath, err)
 			}

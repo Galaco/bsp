@@ -10,10 +10,10 @@ import (
 // PhysCollide is Lump 20: PhysCollide
 type PhysCollide struct {
 	Metadata
-	data []primitives.PhysCollideEntry
+	Data []primitives.PhysCollideEntry `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *PhysCollide) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.PhysCollideEntry](raw)
 	lump.Metadata = meta
@@ -21,32 +21,31 @@ func (lump *PhysCollide) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *PhysCollide) Contents() []primitives.PhysCollideEntry {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *PhysCollide) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
-	for _, entry := range lump.data {
-		err := binary.Write(&buf, binary.LittleEndian, entry.ModelHeader)
-		if err != nil {
+	for _, entry := range lump.Data {
+		if err := binary.Write(&buf, binary.LittleEndian, entry.ModelHeader); err != nil {
 			return nil, err
 		}
 		for _, solid := range entry.Solids {
-			if err = binary.Write(&buf, binary.LittleEndian, solid.Size); err != nil {
+			if err := binary.Write(&buf, binary.LittleEndian, solid.Size); err != nil {
 				return nil, err
 			}
-			if err = binary.Write(&buf, binary.LittleEndian, solid.CollisionBinary); err != nil {
+			if err := binary.Write(&buf, binary.LittleEndian, solid.CollisionBinary); err != nil {
 				return nil, err
 			}
 		}
-		if err = binary.Write(&buf, binary.LittleEndian, []byte(entry.TextBuffer)); err != nil {
+		if err := binary.Write(&buf, binary.LittleEndian, []byte(entry.TextBuffer)); err != nil {
 			return nil, err
 		}
 	}

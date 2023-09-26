@@ -3,24 +3,24 @@ package lumps
 // TexDataStringData is Lump 43: TexDataStringData
 type TexDataStringData struct {
 	Metadata
-	data string // MAX_MAP_TEXDATA_STRING_DATA = 256000, TEXTURE_NAME_LENGTH = 128
+	Data string `json:"data"` // MAX_MAP_TEXDATA_STRING_DATA = 256000, TEXTURE_NAME_LENGTH = 128
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *TexDataStringData) FromBytes(raw []byte) (err error) {
 	length := len(raw)
-	lump.data = string(raw)
+	lump.Data = string(raw)
 	lump.Metadata.SetLength(length)
 
 	return err
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *TexDataStringData) Contents() string {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *TexDataStringData) ToBytes() ([]byte, error) {
-	return []byte(lump.data), nil
+	return []byte(lump.Data), nil
 }

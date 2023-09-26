@@ -7,10 +7,10 @@ import (
 // FaceId is Lump 11: FaceIds
 type FaceId struct {
 	Metadata
-	data []primitives.FaceId
+	Data []primitives.FaceId `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *FaceId) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.FaceId](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *FaceId) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *FaceId) Contents() []primitives.FaceId {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *FaceId) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

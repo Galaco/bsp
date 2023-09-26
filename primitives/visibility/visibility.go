@@ -13,12 +13,12 @@ const VisPAS = 1
 // Includes both PVS (Potential Visible Set) and PAS (Potential Audible Set)
 type Vis struct {
 	// NumClusters is number of computed cluster
-	NumClusters int32
+	NumClusters int32 `json:"numClusters"`
 	// ByteOffset contains offsets for cluster pvs and pas
 	// Slice length = NumClusters [0]=offset to PVS bit array for cluster
-	ByteOffset [][2]int32
+	ByteOffset [][2]int32 `json:"byteOffset"`
 	// BitVectors are compressed bit vectors, contains run-length compression PVS data
-	BitVectors []byte
+	BitVectors []byte `json:"bitVectors"`
 }
 
 // GetVisibleClusters returns all visible clusters ids for a given cluster

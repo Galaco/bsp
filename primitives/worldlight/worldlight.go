@@ -26,40 +26,40 @@ const (
 // This data may also be stored in entdata
 type WorldLight struct {
 	// Origin is position in the world
-	Origin mgl32.Vec3
+	Origin mgl32.Vec3 `json:"origin"`
 	// Intensity
-	Intensity mgl32.Vec3
+	Intensity mgl32.Vec3 `json:"intensity"`
 	// Normal
-	Normal mgl32.Vec3
+	Normal mgl32.Vec3 `json:"normal"`
 	// Cluster
-	Cluster int32
+	Cluster int32 `json:"cluster"`
 	// Type
-	Type EmitType
+	Type EmitType `json:"type"`
 	// Unknown1
 	// @TODO Think for alignments sake with is uint8. May be 3 bytes padding...
-	Unknown1 [3]byte
+	Unknown1 [3]byte `json:"unknown1"`
 	// Style
-	Style int32
+	Style int32 `json:"style"`
 	// Stopdot
-	Stopdot float32
+	Stopdot float32 `json:"stopdot"`
 	// Stopdot2
-	Stopdot2 float32
+	Stopdot2 float32 `json:"stopdot2"`
 	// Exponent
-	Exponent float32
+	Exponent float32 `json:"exponent"`
 	// Radius
-	Radius float32
+	Radius float32 `json:"radius"`
 	// ConstantAttenuation
-	ConstantAttenuation float32
+	ConstantAttenuation float32 `json:"constantAttenuation"`
 	// LinearAttenuation
-	LinearAttenuation float32
+	LinearAttenuation float32 `json:"linearAttenuation"`
 	// QuadraticAttenuation
-	QuadraticAttenuation float32
+	QuadraticAttenuation float32 `json:"quadraticAttenuation"`
 	// Flags
-	Flags int32
+	Flags int32 `json:"flags"`
 	// TexInfo
-	TexInfo int32
+	TexInfo int32 `json:"texInfo"`
 	// Owner
-	Owner int32
+	Owner int32 `json:"owner"`
 }
 
 // WorldLightHDR is a single light in the world

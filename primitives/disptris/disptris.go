@@ -3,5 +3,5 @@ package disptris
 // DispTri
 type DispTri struct {
 	// Tags
-	Tags uint16
+	Tags uint16 `json:"tags,omitempty"`
 }

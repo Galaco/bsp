@@ -7,10 +7,10 @@ import (
 // ClipPortalVerts is Lump 41: ClipPortalVerts
 type ClipPortalVerts struct {
 	Metadata
-	data []mgl32.Vec3
+	Data []mgl32.Vec3 `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *ClipPortalVerts) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[mgl32.Vec3](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *ClipPortalVerts) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *ClipPortalVerts) Contents() []mgl32.Vec3 {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *ClipPortalVerts) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

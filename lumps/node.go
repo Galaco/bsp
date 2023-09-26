@@ -7,10 +7,10 @@ import (
 // Node is Lump 5: Node
 type Node struct {
 	Metadata
-	data []primitives.Node // MAP_MAX_NODES = 65536
+	Data []primitives.Node `json:"data"` // MAP_MAX_NODES = 65536
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *Node) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.Node](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *Node) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *Node) Contents() []primitives.Node {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *Node) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

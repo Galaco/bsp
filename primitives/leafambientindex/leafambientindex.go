@@ -3,7 +3,7 @@ package leafambientindex
 // LeafAmbientIndex
 type LeafAmbientIndex struct {
 	// AmbientSampleCount
-	AmbientSampleCount uint16
+	AmbientSampleCount uint16 `json:"ambientSampleCount"`
 	// FirstAmbientSample
-	FirstAmbientSample uint16
+	FirstAmbientSample uint16 `json:"firstAmbientSample"`
 }

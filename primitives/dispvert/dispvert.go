@@ -8,9 +8,9 @@ import (
 // required to compute the correct position of the displacement vertex after transformation.
 type DispVert struct {
 	// Vec is direction of vertex from its default computed position
-	Vec mgl32.Vec3
+	Vec mgl32.Vec3 `json:"vec"`
 	// Dist is distance of vertex from its default computed position
-	Dist float32
+	Dist float32 `json:"dist"`
 	// Alpha is the alpha value of this vertex (normally used for blend materials)
-	Alpha float32
+	Alpha float32 `json:"alpha"`
 }

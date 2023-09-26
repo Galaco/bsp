@@ -37,7 +37,7 @@ func TestTexDataStringData_FromBytes(t *testing.T) {
 	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)
 	}
-	if string(sut.data) != string(data) {
+	if string(sut.Data) != string(data) {
 		t.Error("mismatched between expected and actual unmarshalled bytes")
 	}
 }

@@ -7,10 +7,10 @@ import (
 // LeafAmbientIndex is Lump 52: Leaf Ambient Index
 type LeafAmbientIndex struct {
 	Metadata
-	data []primitives.LeafAmbientIndex
+	Data []primitives.LeafAmbientIndex `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *LeafAmbientIndex) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.LeafAmbientIndex](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *LeafAmbientIndex) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *LeafAmbientIndex) Contents() []primitives.LeafAmbientIndex {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *LeafAmbientIndex) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

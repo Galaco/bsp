@@ -43,7 +43,7 @@ func TestPrimVert_Marshall(t *testing.T) {
 	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.data {
+	for idx, b := range sut.Data {
 		if data[idx] != b.Pos {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
@@ -73,7 +73,7 @@ func TestPrimVert_FromBytes(t *testing.T) {
 	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
-	for idx, b := range sut.data {
+	for idx, b := range sut.Data {
 		if data[idx] != b.Pos {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}

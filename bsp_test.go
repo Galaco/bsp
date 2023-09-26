@@ -8,31 +8,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/galaco/bsp/lumps"
 	"github.com/google/go-cmp/cmp"
 )
-
-func TestBsp_Header(t *testing.T) {
-	sut := new(Bsp)
-	header := new(Header)
-	header.Id = 564
-
-	sut.header = *header
-
-	if sut.Header().Id != header.Id {
-		t.Error("unexpected header struct returned")
-	}
-}
-
-func TestBsp_Lump(t *testing.T) {
-	sut := new(Bsp)
-	l := new(lumps.RawBytes)
-	sut.lumps[0] = l
-
-	if sut.Lump(0) != l {
-		t.Error("unexpected lump returned")
-	}
-}
 
 // Test that resultant lump data matches expected.
 func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
@@ -82,15 +59,15 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 
 			// Verify lump lengths.
 			for lumpIndex := 0; lumpIndex < 64; lumpIndex++ {
-				actual, err := testBSP.Lump(LumpId(lumpIndex)).ToBytes()
+				actual, err := testBSP.Lumps[LumpId(lumpIndex)].ToBytes()
 				if err != nil {
 					t.Error(err)
 				}
-				if len(actual) != int(testBSP.Header().Lumps[lumpIndex].Length) {
-					t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(actual), testBSP.header.Lumps[lumpIndex].Length)
+				if len(actual) != int(testBSP.Header.Lumps[lumpIndex].Length) {
+					t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(actual), testBSP.Header.Lumps[lumpIndex].Length)
 				}
 
-				expected := binaryData[testBSP.Header().Lumps[lumpIndex].Offset : testBSP.Header().Lumps[lumpIndex].Offset+testBSP.Header().Lumps[lumpIndex].Length]
+				expected := binaryData[testBSP.Header.Lumps[lumpIndex].Offset : testBSP.Header.Lumps[lumpIndex].Offset+testBSP.Header.Lumps[lumpIndex].Length]
 				if !bytes.Equal(actual, expected) {
 					t.Errorf("Lump: %d data mismatch", lumpIndex)
 					log.Println(cmp.Diff(expected, actual))

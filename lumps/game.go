@@ -11,21 +11,21 @@ import (
 
 // Game is Lump 35.
 // @TODO NOTE: This really needs per-game implementations to be completely useful,
-// otherwise we only get staticprop data from it
+// otherwise we only get staticprop Data from it
 type Game struct {
 	Metadata
-	Header    game.Header
-	GameLumps []game.GenericGameLump
+	Header    game.Header            `json:"data"`
+	GameLumps []game.GenericGameLump `json:"gameLumps"`
 
-	// LumpOffset tracks the offset of the game lump into the whole BSP.
+	// lumpOffset tracks the offset of the game lump into the whole BSP.
 	// Game lump has special rules where it contains offsets into the file, not offsets into the lump,
 	// so we need to know where the lump is in the file to actually use the offsets.
-	LumpOffset int32
+	lumpOffset int32
 	// areOffsetsCorrected is a flag to track if the offsets have been corrected yet.
 	areOffsetsCorrected bool
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *Game) FromBytes(raw []byte) (err error) {
 	length := len(raw)
 	lump.Metadata.SetLength(length)
@@ -51,7 +51,7 @@ func (lump *Game) FromBytes(raw []byte) (err error) {
 	// Correct file offsets.
 	if !lump.areOffsetsCorrected {
 		for index := range lump.Header.GameLumps {
-			lump.Header.GameLumps[index].FileOffset -= lump.LumpOffset
+			lump.Header.GameLumps[index].FileOffset -= lump.lumpOffset
 		}
 		lump.areOffsetsCorrected = true
 	}
@@ -65,12 +65,12 @@ func (lump *Game) FromBytes(raw []byte) (err error) {
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *Game) Contents() *Game {
 	return lump
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *Game) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
 	if err := binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount); err != nil {
@@ -81,7 +81,7 @@ func (lump *Game) ToBytes() ([]byte, error) {
 
 		// Reset the offsets (if modified).
 		if lump.areOffsetsCorrected {
-			h.FileOffset += lump.LumpOffset
+			h.FileOffset += lump.lumpOffset
 		}
 		if err := binary.Write(&buf, binary.LittleEndian, h); err != nil {
 			return nil, err
@@ -98,7 +98,7 @@ func (lump *Game) ToBytes() ([]byte, error) {
 // UpdateInternalOffsets updates the lumps offsets to be relative to the lump, rather
 // than the bsp start.
 func (lump *Game) UpdateInternalOffsets(fileOffset int32) *Game {
-	lump.LumpOffset = fileOffset
+	lump.lumpOffset = fileOffset
 
 	return lump
 }

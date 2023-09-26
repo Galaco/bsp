@@ -7,10 +7,10 @@ import (
 // OverlayFade is Lump 60: Overlayfades
 type OverlayFade struct {
 	Metadata
-	data []primitives.OverlayFade
+	Data []primitives.OverlayFade `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *OverlayFade) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.OverlayFade](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *OverlayFade) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *OverlayFade) Contents() []primitives.OverlayFade {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *OverlayFade) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

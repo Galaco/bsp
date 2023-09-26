@@ -7,7 +7,7 @@ import (
 	primitives "github.com/galaco/bsp/primitives/leaf"
 )
 
-// Assert leaf data when read from bytes is valid
+// Assert leaf Data when read from bytes is valid
 func TestLeafFromBytes(t *testing.T) {
 	lump := Leaf{}
 	lump.SetVersion(20)
@@ -22,7 +22,7 @@ func TestLeafFromBytes(t *testing.T) {
 		log.Println(expected)
 		log.Println("Actual: ")
 		log.Println(actual)
-		t.Errorf("Imported Leaf data mismatch.")
+		t.Errorf("Imported Leaf Data mismatch.")
 	}
 }
 

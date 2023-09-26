@@ -10,23 +10,23 @@ import (
 // Visibility is Lump 4: Visibility
 type Visibility struct {
 	Metadata
-	data primitives.Vis
+	Data primitives.Vis `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *Visibility) FromBytes(raw []byte) (err error) {
 	length := len(raw)
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.NumClusters)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data.NumClusters)
 	if err != nil {
 		return err
 	}
-	lump.data.ByteOffset = make([][2]int32, lump.data.NumClusters)
-	err = binary.Read(bytes.NewBuffer(raw[4:]), binary.LittleEndian, &lump.data.ByteOffset)
+	lump.Data.ByteOffset = make([][2]int32, lump.Data.NumClusters)
+	err = binary.Read(bytes.NewBuffer(raw[4:]), binary.LittleEndian, &lump.Data.ByteOffset)
 	if err != nil {
 		return err
 	}
-	lump.data.BitVectors = make([]byte, length)
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data.BitVectors)
+	lump.Data.BitVectors = make([]byte, length)
+	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data.BitVectors)
 	if err != nil {
 		return err
 	}
@@ -36,12 +36,12 @@ func (lump *Visibility) FromBytes(raw []byte) (err error) {
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *Visibility) Contents() *primitives.Vis {
-	return &lump.data
+	return &lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *Visibility) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data.BitVectors)
+	return marshallBasicLump(lump.Data.BitVectors)
 }

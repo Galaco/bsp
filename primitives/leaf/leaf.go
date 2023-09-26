@@ -11,30 +11,31 @@ const bitmaskLower7 = 0x7F  // 127 (2^7 - 1)
 // faces (or entities) within its bounds
 type Leaf struct {
 	// Contents
-	Contents int32
+	Contents int32 `json:"contents"`
 	// Cluster that this leaf is a part of
-	Cluster int16
+	Cluster int16 `json:"cluster"`
 	// BitField is a C Union of char Name || Area:9 && Flags:7
-	BitField int16
+	BitField int16 `json:"bitField"`
 	// Mins is this leafs bounding volumes minimum
-	Mins [3]int16
+	Mins [3]int16 `json:"mins"`
 	// Maxs  is this leafs bounding volumes maximum
-	Maxs [3]int16
+	Maxs [3]int16 `json:"maxs"`
 	// FirstLeafFace index into LeafFaces lump data
-	FirstLeafFace uint16
+	FirstLeafFace uint16 `json:"firstLeafFace"`
 	// NumLeafFaces is number of LeafFaces in this Leaf
-	NumLeafFaces uint16
+	NumLeafFaces uint16 `json:"numLeafFaces"`
 	// FirstLeafBrush is index into LeafBrushes lump data
-	FirstLeafBrush uint16
+	FirstLeafBrush uint16 `json:"firstLeafBrush"`
 	// NumLeafBrushes is number of LeafBrushes in this Leaf
-	NumLeafBrushes uint16
+	NumLeafBrushes uint16 `json:"numLeafBrushes"`
 	// LeafWaterDataID
-	LeafWaterDataID int16
+	LeafWaterDataID int16 `json:"leafWaterDataID"`
 
 	// LightSample
-	LightSample common.CompressedLightCube
+	LightSample common.CompressedLightCube `json:"lightSample"`
 
-	_ [2]byte
+	// @TODO: Unknown1
+	Unknown1 [2]byte `json:"unknown1"`
 }
 
 // Area returns area (first 9 bits)

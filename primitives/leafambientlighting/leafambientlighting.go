@@ -5,13 +5,13 @@ import primitives "github.com/galaco/bsp/primitives/common"
 // LeafAmbientLighting
 type LeafAmbientLighting struct {
 	// Cube
-	Cube primitives.CompressedLightCube
+	Cube primitives.CompressedLightCube `json:"cube"`
 	// X x
-	X byte
+	X byte `json:"x"`
 	// Y y
-	Y byte
+	Y byte `json:"y"`
 	// Z z
-	Z byte
+	Z byte `json:"z"`
 	// Pad is padding to 4 bytes (any other purpose unknown)
-	Pad byte
+	_ byte
 }

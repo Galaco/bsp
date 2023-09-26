@@ -3,10 +3,10 @@ package lumps
 // VertNormalIndice is Lump 31: VertNormalIndice
 type VertNormalIndice struct {
 	Metadata
-	data []uint16
+	Data []uint16 `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *VertNormalIndice) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[uint16](raw)
 	lump.Metadata = meta
@@ -14,16 +14,16 @@ func (lump *VertNormalIndice) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *VertNormalIndice) Contents() []uint16 {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *VertNormalIndice) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

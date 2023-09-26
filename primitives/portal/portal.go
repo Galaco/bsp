@@ -13,21 +13,21 @@ const MaxPortals = 65536
 // Portal
 type Portal struct {
 	// Id portal id
-	Id int32
+	Id int32 `json:"id"`
 	// Plane
-	Plane plane.Plane
+	Plane plane.Plane `json:"plane"`
 	// OnNode
-	OnNode *node.Node
+	OnNode *node.Node `json:"onNode"`
 	// Nodes
-	Nodes [2]*node.Node
+	Nodes [2]*node.Node `json:"nodes"`
 	// Next
-	Next [2]*Portal
+	Next [2]*Portal `json:"next"`
 	// Winding
-	Winding *common.Winding
+	Winding *common.Winding `json:"winding"`
 	// SideFound
-	SideFound int32 //qboolean = int32
+	SideFound int32 `json:"sideFound"` //qboolean = int32
 	// Side
-	Side *common.Side
+	Side *common.Side `json:"side"`
 	// Face
-	Face [2]*face.Face
+	Face [2]*face.Face `json:"face"`
 }

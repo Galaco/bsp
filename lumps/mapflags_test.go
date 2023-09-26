@@ -41,7 +41,7 @@ func TestMapFlags_Marshall(t *testing.T) {
 	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
-	if sut.data.LevelFlags != data.LevelFlags {
+	if sut.Data.LevelFlags != data.LevelFlags {
 		t.Error("mismatched between expected and actual unmarshalled bytes")
 	}
 	res, err := sut.ToBytes()
@@ -70,7 +70,7 @@ func TestMapFlags_FromBytes(t *testing.T) {
 	if err := sut.FromBytes(buf.Bytes()); err != nil {
 		t.Error(err)
 	}
-	if sut.data.LevelFlags != data.LevelFlags {
+	if sut.Data.LevelFlags != data.LevelFlags {
 		t.Error("mismatched between expected and actual unmarshalled bytes")
 	}
 }

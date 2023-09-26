@@ -7,10 +7,10 @@ import (
 // TexData is Lump 2: TexData
 type TexData struct {
 	Metadata
-	data []primitives.TexData
+	Data []primitives.TexData `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *TexData) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.TexData](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *TexData) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *TexData) Contents() []primitives.TexData {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *TexData) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

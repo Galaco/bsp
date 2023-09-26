@@ -7,10 +7,10 @@ import (
 // VertNormal is Lump 30: VertNormal
 type VertNormal struct {
 	Metadata
-	data []primitives.VertNormal
+	Data []primitives.VertNormal `json:"data"`
 }
 
-// FromBytes imports this lump from raw byte data
+// FromBytes imports this lump from raw byte Data
 func (lump *VertNormal) FromBytes(raw []byte) (err error) {
 	meta, data, err := unmarshallBasicLump[primitives.VertNormal](raw)
 	lump.Metadata = meta
@@ -18,16 +18,16 @@ func (lump *VertNormal) FromBytes(raw []byte) (err error) {
 		return err
 	}
 
-	lump.data = data
+	lump.Data = data
 	return nil
 }
 
-// Contents returns internal format structure data
+// Contents returns internal format structure Data
 func (lump *VertNormal) Contents() []primitives.VertNormal {
-	return lump.data
+	return lump.Data
 }
 
-// ToBytes converts this lump back to raw byte data
+// ToBytes converts this lump back to raw byte Data
 func (lump *VertNormal) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.data)
+	return marshallBasicLump(lump.Data)
 }

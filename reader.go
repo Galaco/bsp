@@ -50,15 +50,15 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 	if err != nil {
 		return nil, err
 	}
-	bsp.header = header
+	bsp.Header = header
 
 	// Create lumps from header data
-	for index := range bsp.header.Lumps {
-		lp, err := r.readLump(reader, &bsp.header.Lumps[index])
+	for index := range bsp.Header.Lumps {
+		lp, err := r.readLump(reader, &bsp.Header.Lumps[index])
 		if err != nil {
 			return nil, err
 		}
-		refLump, err := getReferenceLumpByIndex(index, bsp.header.Version)
+		refLump, err := getReferenceLumpByIndex(index, bsp.Header.Version)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +74,7 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 		if err := refLump.FromBytes(lp); err != nil {
 			return nil, err
 		}
-		bsp.lumps[index] = refLump
+		bsp.Lumps[index] = refLump
 	}
 
 	return bsp, err
