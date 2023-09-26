@@ -40,22 +40,22 @@ type Leaf struct {
 
 // Area returns area (first 9 bits)
 func (b *Leaf) Area() int16 {
-	return int16((b.BitField) & bitmaskLower7)
+	return (b.BitField) & bitmaskLower7
 }
 
 // SetArea sets area (first 9 bits)
 func (b *Leaf) SetArea(area int16) {
 	v := b.BitField
-	b.BitField = int16((v & bitmaskLower9) | (area))
+	b.BitField = (v & bitmaskLower9) | (area)
 }
 
 // Flags returns flags (second 7 bits)
 func (b *Leaf) Flags() int16 {
-	return int16((b.BitField >> 9) & bitmaskLower9)
+	return (b.BitField >> 9) & bitmaskLower9
 }
 
 // SetFlags sets flags (second 7 bits)
 func (b *Leaf) SetFlags(flags int16) {
 	v := b.BitField
-	b.BitField = int16((v & bitmaskLower7) | (int16(flags) << 9))
+	b.BitField = (v & bitmaskLower7) | (flags << 9)
 }

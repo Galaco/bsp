@@ -9,9 +9,7 @@ import (
 )
 
 // Writer is a Bsp export writer.
-type Writer struct {
-	target *Bsp
-}
+type Writer struct{}
 
 // NewWriter Returns a new bsp writer instance.
 func NewWriter() *Writer {

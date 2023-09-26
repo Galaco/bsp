@@ -1,8 +1,9 @@
 package game
 
 import (
-	"github.com/go-gl/mathgl/mgl32"
 	"testing"
+
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 func TestStaticPropV9_GetAngles(t *testing.T) {

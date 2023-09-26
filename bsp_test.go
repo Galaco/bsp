@@ -33,7 +33,11 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			defer binaryFile.Close()
+			defer func(binaryFile *os.File) {
+				if err := binaryFile.Close(); err != nil {
+					t.Error(err)
+				}
+			}(binaryFile)
 			binarygzr, err := gzip.NewReader(binaryFile)
 			if err != nil {
 				t.Error(err)
@@ -47,7 +51,11 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			defer testFile.Close()
+			defer func(testFile *os.File) {
+				if err := testFile.Close(); err != nil {
+					t.Error(err)
+				}
+			}(testFile)
 			testFilegzr, err := gzip.NewReader(testFile)
 			if err != nil {
 				t.Error(err)
@@ -59,7 +67,7 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 
 			// Verify lump lengths.
 			for lumpIndex := 0; lumpIndex < 64; lumpIndex++ {
-				actual, err := testBSP.Lumps[LumpId(lumpIndex)].ToBytes()
+				actual, err := testBSP.Lumps[lumpIndex].ToBytes()
 				if err != nil {
 					t.Error(err)
 				}

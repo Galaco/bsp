@@ -8,7 +8,7 @@ func TestTexDataStringData_GetData(t *testing.T) {
 	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)
 	}
-	if string(sut.Contents()) != string(data) {
+	if sut.Contents() != string(data) {
 		t.Error("mismatched between expected and actual unmarshalled bytes")
 	}
 }
@@ -19,7 +19,7 @@ func TestTexDataStringData_Marshall(t *testing.T) {
 	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)
 	}
-	if string(sut.Contents()) != string(data) {
+	if sut.Contents() != string(data) {
 		t.Error("mismatched between expected and actual unmarshalled bytes")
 	}
 	res, err := sut.ToBytes()
@@ -37,7 +37,7 @@ func TestTexDataStringData_FromBytes(t *testing.T) {
 	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)
 	}
-	if string(sut.Data) != string(data) {
+	if sut.Data != string(data) {
 		t.Error("mismatched between expected and actual unmarshalled bytes")
 	}
 }

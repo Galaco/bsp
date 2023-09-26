@@ -43,7 +43,7 @@ func (vis *Vis) GetPVSForCluster(clusterId int16) []bool {
 	for currentClusterIdx := int32(0); currentClusterIdx < vis.NumClusters; v++ {
 		if int(vis.BitVectors[v]) == 0 {
 			v++
-			currentClusterIdx += (int32(vis.BitVectors[v]) << 3)
+			currentClusterIdx += int32(vis.BitVectors[v]) << 3
 			continue
 		}
 		for i := uint8(0); i < 8 && currentClusterIdx+int32(i) < vis.NumClusters; i++ {

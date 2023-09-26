@@ -32,7 +32,11 @@ func TestReadFromStream(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			defer f.Close()
+			defer func(f *os.File) {
+				if err := f.Close(); err != nil {
+					t.Error(err)
+				}
+			}(f)
 			binarygzr, err := gzip.NewReader(f)
 			if err != nil {
 				t.Error(err)

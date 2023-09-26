@@ -40,10 +40,10 @@ type WorldLight struct {
 	Unknown1 [3]byte `json:"unknown1"`
 	// Style
 	Style int32 `json:"style"`
-	// Stopdot
-	Stopdot float32 `json:"stopdot"`
-	// Stopdot2
-	Stopdot2 float32 `json:"stopdot2"`
+	// StopDot
+	StopDot float32 `json:"stopDot"`
+	// StopDot2
+	StopDot2 float32 `json:"stopDot2"`
 	// Exponent
 	Exponent float32 `json:"exponent"`
 	// Radius
