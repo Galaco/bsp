@@ -11,12 +11,10 @@ import (
 func TestLeafFromBytes(t *testing.T) {
 	lump := Leaf{}
 	lump.SetVersion(20)
-	err := lump.FromBytes(GetTestDataBytes())
-	if err != nil {
+	if err := lump.FromBytes(GetTestDataBytes()); err != nil {
 		t.Error(err)
 	}
 	expected := GetTestLeafData()
-	log.Println(lump)
 	actual := lump.Contents()[0]
 
 	if actual != expected {

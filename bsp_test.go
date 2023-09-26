@@ -81,8 +81,7 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 			}
 
 			// Verify lump lengths.
-			lumpIndex := 0
-			for lumpIndex < 64 {
+			for lumpIndex := 0; lumpIndex < 64; lumpIndex++ {
 				actual, err := testBSP.Lump(LumpId(lumpIndex)).ToBytes()
 				if err != nil {
 					t.Error(err)
@@ -96,8 +95,6 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 					t.Errorf("Lump: %d data mismatch", lumpIndex)
 					log.Println(cmp.Diff(expected, actual))
 				}
-
-				lumpIndex += 1
 			}
 		})
 	}

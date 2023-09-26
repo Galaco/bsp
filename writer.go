@@ -9,7 +9,14 @@ import (
 )
 
 // Writer is a Bsp export writer.
-type Writer struct{}
+type Writer struct {
+	target *Bsp
+}
+
+// NewWriter Returns a new bsp writer instance.
+func NewWriter() *Writer {
+	return &Writer{}
+}
 
 // Write bsp to []byte.
 func (w *Writer) Write(data *Bsp) ([]byte, error) {
@@ -19,7 +26,8 @@ func (w *Writer) Write(data *Bsp) ([]byte, error) {
 	var err error
 
 	currentOffset := 1032 // Header always 1032bytes, so we start immediately afterwards.
-	for _, index := range resolveLumpExportOrder(data.Header()) {
+	order := resolveLumpExportOrder(data.Header())
+	for _, index := range order {
 		// We have to handle lump 35 (GameData differently).
 		// Because valve designed the file format oddly and relatively positioned data contains absolute file offsets.
 		if index == LumpGame {
@@ -95,9 +103,4 @@ func resolveLumpExportOrder(header *Header) [64]LumpId {
 		res[idx] = LumpId(vals[idx].Id)
 	}
 	return res
-}
-
-// NewWriter Returns a new bsp writer instance.
-func NewWriter() *Writer {
-	return &Writer{}
 }

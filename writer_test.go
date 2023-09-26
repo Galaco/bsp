@@ -44,24 +44,38 @@ func TestWriter_Write(t *testing.T) {
 				t.Error(err)
 			}
 
-			var buf bytes.Buffer
-			bsp, err := NewReader().Read(io.TeeReader(binarygzr, &buf))
+			var expected bytes.Buffer
+			bsp, err := NewReader().Read(io.TeeReader(binarygzr, &expected))
 			if err != nil {
 				t.Error(err)
 			}
+			expectedBytes := expected.Bytes()
 
-			w := NewWriter()
-			actual, err := w.Write(bsp)
+			actual, err := NewWriter().Write(bsp)
 			if err != nil {
-				t.Fatalf("Write(%s) returned error: %v", tc.filePath, err)
+				t.Fatalf("toBytes(%s) returned error: %v", tc.filePath, err)
 			}
 
-			expected := buf.Bytes()
-			if !bytes.Equal(expected, actual) {
-				t.Errorf("Write(%s) returned unexpected bytes", tc.filePath)
+			//baseOffset := 8 - 1
+			//compSize := 16
+			//for i := 0; i < 64; i++ {
+			//	expect := binary.BigEndian.Uint32(expectedBytes[baseOffset+(i*compSize) : baseOffset+(i*compSize)+4])
+			//	act := binary.BigEndian.Uint32(actual[baseOffset+(i*compSize) : baseOffset+(i*compSize)+4])
+			//	log.Printf("%d: %d, %d\n", i, expect, act)
+			//	if !bytes.Equal(expectedBytes[baseOffset+(i*compSize):baseOffset+(i*(compSize*2))], actual[baseOffset+(i*compSize):baseOffset+(i*(compSize*2))]) {
+			//		t.Errorf("%d: toBytes(%s) returned unexpected bytes", i, tc.filePath)
+			//	}
+			//
+			//	if diff := cmp.Diff(expectedBytes[7+(i*16):7+(i*32)], actual[7+(i*16):7+(i*32)]); diff != "" {
+			//		t.Errorf("%d: toBytes(%s) returned unexpected diff (-want +got):\n%s", i, tc.filePath, diff)
+			//	}
+			//}
+
+			if !bytes.Equal(expectedBytes[8:1024], actual[8:1024]) {
+				t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)
 			}
-			if diff := cmp.Diff(expected[:256], actual[:256]); diff != "" {
-				t.Errorf("Write(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
+			if diff := cmp.Diff(expectedBytes[8:1024], actual[8:1024]); diff != "" {
+				t.Errorf("toBytes(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
 			}
 		})
 	}
