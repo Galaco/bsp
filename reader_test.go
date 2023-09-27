@@ -14,11 +14,11 @@ func TestReadFromStream(t *testing.T) {
 		filePath      string
 		expectedError error
 	}{
-		//{
-		//	name:          "de_dust2",
-		//	filePath:      "testdata/v20/de_dust2.bsp.gz",
-		//	expectedError: nil,
-		//},
+		{
+			name:          "de_dust2",
+			filePath:      "testdata/v20/de_dust2.bsp.gz",
+			expectedError: nil,
+		},
 		{
 			name:          "ar_baggage",
 			filePath:      "testdata/v21/ar_baggage.bsp.gz",

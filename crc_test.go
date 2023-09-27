@@ -14,11 +14,11 @@ func TestBsp_Crc(t *testing.T) {
 		filePath string
 		expected uint32
 	}{
-		//{
-		//	name:     "de_dust2",
-		//	filePath: "testdata/v20/de_dust2.bsp",
-		//	expected: 0,
-		//},
+		{
+			name:     "de_dust2",
+			filePath: "testdata/v20/de_dust2.bsp.gz",
+			expected: 1947027563,
+		},
 		{
 			name:     "ar_baggage",
 			filePath: "testdata/v21/ar_baggage.bsp.gz",
