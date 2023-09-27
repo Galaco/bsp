@@ -62,33 +62,58 @@ func TestWriter_Write(t *testing.T) {
 				t.Fatalf("toBytes(%s) returned error: %v", tc.filePath, err)
 			}
 
-			baseOffset := 8
-			compSize := 16
+			if !bytes.Equal(expectedBytes, actual) {
+				t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)
 
-			for _, i := range resolveLumpExportOrder(&bsp.Header) {
-				offset := baseOffset + (int(i) * compSize)
-				expect := binary.LittleEndian.Uint32(expectedBytes[offset : offset+4])
-				act := binary.LittleEndian.Uint32(actual[offset : offset+4])
-				log.Printf("%d: offset: %d, %d. length: %d, %d\n", i,
-					expect,
-					act,
-					binary.LittleEndian.Uint32(expectedBytes[offset+4:offset+8]),
-					binary.LittleEndian.Uint32(actual[offset+4:offset+8]),
-				)
-				//if !bytes.Equal(expectedBytes[offset:baseOffset+(i*(compSize*2))], actual[offset:baseOffset+(i*(compSize*2))]) {
-				//	t.Errorf("%d: toBytes(%s) returned unexpected bytes", i, tc.filePath)
+				// This depth isn't necessary, but it makes the output more readable to compare the header lump by lump.
+				baseOffset := 8
+				compSize := 16
+				for _, i := range resolveLumpExportOrder(&bsp.Header) {
+					offset := baseOffset + (int(i) * compSize)
+
+					expectedLumpOffset := int(binary.LittleEndian.Uint32(expectedBytes[offset : offset+4]))
+					expectedLumpLength := int(binary.LittleEndian.Uint32(expectedBytes[offset+4 : offset+8]))
+					actualLumpOffset := int(binary.LittleEndian.Uint32(expectedBytes[offset : offset+4]))
+					actualLumpLength := int(binary.LittleEndian.Uint32(expectedBytes[offset+4 : offset+8]))
+
+					log.Printf("%d: offset: %d, %d (%d). length: %d, %d (%d). Version: %d, %d\n", i,
+						expectedLumpOffset,
+						actualLumpOffset,
+						actualLumpOffset-expectedLumpOffset,
+						expectedLumpLength,
+						actualLumpLength,
+						expectedLumpLength-actualLumpLength,
+						binary.LittleEndian.Uint32(expectedBytes[offset+8:offset+12]),
+						binary.LittleEndian.Uint32(actual[offset+8:offset+12]),
+					)
+
+					// Compare header
+					if !bytes.Equal(expectedBytes[offset:offset+compSize], actual[offset:offset+compSize]) {
+						t.Errorf("%d: header.toBytes(%s) returned unexpected bytes", i, tc.filePath)
+
+						if diff := cmp.Diff(expectedBytes[offset:offset+compSize], actual[offset:offset+compSize]); diff != "" {
+							t.Errorf("%d: header.toBytes(%s) returned unexpected diff (-want +got):\n%s", i, tc.filePath, diff)
+						}
+					}
+
+					// Compare lump the header references
+					if !bytes.Equal(expectedBytes[expectedLumpOffset:expectedLumpOffset+expectedLumpLength], actual[actualLumpOffset:actualLumpOffset+actualLumpLength]) {
+						t.Errorf("%d: lump.toBytes(%s) returned unexpected bytes", i, tc.filePath)
+
+						if diff := cmp.Diff(expectedBytes[expectedLumpOffset:expectedLumpOffset+expectedLumpLength], actual[actualLumpOffset:actualLumpOffset+actualLumpLength]); diff != "" {
+							t.Errorf("%d: header.toBytes(%s) returned unexpected diff (-want +got):\n%s", i, tc.filePath, diff)
+						}
+					}
+				}
+
+				// now compare each body.
+				//if len(expectedBytes) != len(actual) {
+				//	t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)
 				//}
 				//
-				//if diff := cmp.Diff(expectedBytes[7+(i*16):7+(i*32)], actual[7+(i*16):7+(i*32)]); diff != "" {
-				//	t.Errorf("%d: toBytes(%s) returned unexpected diff (-want +got):\n%s", i, tc.filePath, diff)
+				//if diff := cmp.Diff(expectedBytes, actual); diff != "" {
+				//	t.Errorf("toBytes(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
 				//}
-			}
-
-			if !bytes.Equal(expectedBytes[8:1024], actual[8:1024]) {
-				t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)
-			}
-			if diff := cmp.Diff(expectedBytes[8:1024], actual[8:1024]); diff != "" {
-				t.Errorf("toBytes(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
 			}
 		})
 	}

@@ -23,9 +23,8 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 	marshalledLumps := make([][]byte, 64)
 	var err error
 
-	currentOffset := 1036 // Header always 1032bytes, so we start immediately afterwards.
-	order := resolveLumpExportOrder(&data.Header)
-	for _, index := range order {
+	currentOffset := 1036 // Header always 1036bytes, so we start immediately afterward.
+	for _, index := range resolveLumpExportOrder(&data.Header) {
 		// We have to handle lump 35 (GameData differently).
 		// Because valve designed the file format oddly and relatively positioned data contains absolute file offsets.
 		if index == LumpGame {
@@ -40,11 +39,11 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 		// If the lump is empty, we can skip it.
 		if len(marshalledLumps[index]) == 0 {
 			// 0 bytes is a valid lump, but all fields are 0 in this case.
-			// @NOTE. Apparently this isn't actually true; sometimes the offset is non-zero.
+			// @NOTE. Apparently this isn't actually true; sometimes the offset and version is non-zero.
 			//data.Header.Lumps[index].Offset = 0
 			data.Header.Lumps[index].Length = 0
 			data.Header.Lumps[index].ID = [4]byte{0, 0, 0, 0}
-			data.Header.Lumps[index].Version = 0
+			//data.Header.Lumps[index].Version = 0
 			continue
 		}
 
@@ -53,6 +52,9 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 		data.Header.Lumps[index].Length = int32(len(marshalledLumps[index]))
 
 		currentOffset += int(data.Header.Lumps[index].Length)
+
+		// @TODO WTF is this.
+		currentOffset = addWeirdPad(int(index), currentOffset)
 
 		// Finally 4byte align the data and current offset.
 		// Note that we don't adjust the lump length in the header to reflect this;
@@ -101,4 +103,21 @@ func resolveLumpExportOrder(header *Header) [64]LumpId {
 		res[idx] = LumpId(vals[idx].Id)
 	}
 	return res
+}
+
+// addWeirdPad is a helper function for adding weird padding to the end of lumps.
+// @TODO figure out why this is necessary and remove.
+func addWeirdPad(index, offset int) int {
+	switch index {
+	case 0:
+		return offset + 1
+	case 29:
+		return offset + 1
+	case 43:
+		return offset - 1
+	case 44:
+		return offset
+	default:
+		return offset
+	}
 }
