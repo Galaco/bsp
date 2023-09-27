@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"sort"
+	"unsafe"
 )
 
 // Writer is a Bsp export writer.
@@ -16,69 +17,60 @@ func NewWriter() *Writer {
 
 // toBytes bsp to []byte.
 func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
-	// First we need to update the header to reflect any lump changes
-	// At the same time we can dump our lumps as bytes to write later
-	marshalledLumps := make([][]byte, 64)
 	var err error
 
-	currentOffset := 1036 // Header always 1036bytes, so we start immediately afterward.
-	order := resolveLumpExportOrder(&data.Header)
+	currentOffset := int(unsafe.Sizeof(Header{})) // Header always 1036bytes, so we start immediately afterward.
 
-	for _, index := range order {
-		// Export lump to bytes.
-		if marshalledLumps[index], err = data.Lumps[index].ToBytes(); err != nil {
+	// Now we can export our lumps.
+	var lumpBuffer bytes.Buffer
+
+	var temp []byte
+	for _, index := range resolveLumpExportOrder(&data.Header) {
+		if temp, err = data.Lumps[index].ToBytes(); err != nil {
+			return nil, err
+		}
+		lumpSize, err := lumpBuffer.Write(temp)
+		if err != nil {
 			return nil, err
 		}
 
 		// If the lump is empty, we can skip it.
-		if len(marshalledLumps[index]) == 0 {
-			// 0 bytes is a valid lump, but all fields are 0 in this case.
-			// @NOTE. Apparently this isn't actually true; sometimes the offset and version is non-zero.
-			//data.Header.Lumps[index].Offset = 0
+		if lumpSize == 0 {
+			// 0 bytes is a valid lump, but some fields are actually set to 0, other not.
+			// @TODO why are some offsets and versions non-0 when length is 0. (e.g. ar_baggage)
 			data.Header.Lumps[index].Length = 0
 			data.Header.Lumps[index].ID = [4]byte{0, 0, 0, 0}
-			//data.Header.Lumps[index].Version = 0
 			continue
 		}
-
-		// Update header with new lump offset and length.
+		// Update header with new lump offset and lumpSize.
 		data.Header.Lumps[index].Offset = int32(currentOffset)
-		data.Header.Lumps[index].Length = int32(len(marshalledLumps[index]))
+		data.Header.Lumps[index].Length = int32(lumpSize)
 
-		currentOffset += int(data.Header.Lumps[index].Length)
+		// Update current offset for next iteration.
+		currentOffset += lumpSize
 
 		// @TODO WTF is this.
+		// For some reason just a few lumps have some off-by-one-byte issue.
+		// Manually padding out with 0s seems to fix it, but it seems independent of the the 4byte alignment.
 		weirdPad := extraWeirdPad(index)
 		currentOffset += weirdPad
 
 		// Finally 4byte align the data and current offset.
-		// Note that we don't adjust the lump length in the header to reflect this;
+		// Note that we don't adjust the lump lumpSize in the header to reflect this;
 		// it's for padding reasons.
-		marshalledLumps[index] = append(marshalledLumps[index], make([]byte, weirdPad+(currentOffset%4))...)
+		lumpBuffer.Write(make([]byte, weirdPad+(currentOffset%4)))
 		currentOffset += currentOffset % 4
 	}
 
-	// Now we can export our bsp.
-	var buf bytes.Buffer
-
-	// toBytes Header.
-	if err := binary.Write(&buf, binary.LittleEndian, data.Header); err != nil {
+	var buffer bytes.Buffer
+	if err := binary.Write(&buffer, binary.LittleEndian, data.Header); err != nil {
 		return nil, err
 	}
 
-	// toBytes lumps.
-	for _, index := range order {
-		if _, err := buf.Write(marshalledLumps[index]); err != nil {
-			return nil, err
-		}
+	if _, err := buffer.Write(lumpBuffer.Bytes()); err != nil {
+		return nil, err
 	}
-	//for _, lumpData := range marshalledLumps {
-	//	if _, err := buf.Write(lumpData); err != nil {
-	//		return nil, err
-	//	}
-	//}
-
-	return buf.Bytes(), nil
+	return buffer.Bytes(), nil
 }
 
 // resolveLumpExportOrder returns a lump export order that matches the order of the original file
@@ -105,7 +97,7 @@ func resolveLumpExportOrder(header *Header) [64]LumpId {
 	return res
 }
 
-// addWeirdPad is a helper function for adding weird padding to the end of lumps.
+// extraWeirdPad is a helper function for adding weird padding to the end of lumps.
 // @TODO figure out why this is necessary and remove.
 func extraWeirdPad(index LumpId) int {
 	switch index {
