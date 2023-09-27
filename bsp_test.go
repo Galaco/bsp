@@ -60,7 +60,7 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			testBSP, err := NewReader().Read(testFilegzr)
+			testBSP, err := NewReader(LumpResolverByBSPVersion()).Read(testFilegzr)
 			if err != nil {
 				t.Error(err)
 			}

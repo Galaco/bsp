@@ -51,7 +51,7 @@ func TestWriter_Write(t *testing.T) {
 			}
 
 			var expected bytes.Buffer
-			bsp, err := NewReader().Read(io.TeeReader(binarygzr, &expected))
+			bsp, err := NewReader(LumpResolverByBSPVersion()).Read(io.TeeReader(binarygzr, &expected))
 			if err != nil {
 				t.Error(err)
 			}

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/galaco/bsp/lumps"
+	"github.com/galaco/bsp/lump"
 )
 
 func TestReadFromStream(t *testing.T) {
@@ -42,12 +42,12 @@ func TestReadFromStream(t *testing.T) {
 				t.Error(err)
 			}
 
-			r, err := NewReader().Read(binarygzr)
+			r, err := NewReader(LumpResolverByBSPVersion()).Read(binarygzr)
 			if err != nil {
 				t.Error(err)
 			}
 
-			r.Lumps[LumpGame].(*lumps.Game).GetStaticPropLump()
+			r.Lumps[LumpGame].(*lump.Game).GetStaticPropLump()
 		})
 	}
 }

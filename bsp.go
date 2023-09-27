@@ -1,12 +1,10 @@
 package bsp
 
-import "github.com/galaco/bsp/lumps"
-
 // Bsp is the root .bsp filetype container.
 // Consists of a 1036byte header and 64 lump blocks.
 type Bsp struct {
-	Header Header         `json:"header"`
-	Lumps  [64]lumps.Lump `json:"lumps"`
+	Header Header   `json:"header"`
+	Lumps  [64]Lump `json:"lumps"`
 }
 
 // Header is the Bsp header. Contains format and lump layout data.
@@ -29,4 +27,14 @@ type HeaderLump struct {
 	// ID is lump ident code.
 	// If the lump is compressed then treat as an integer that represents the decompressed size.
 	ID [4]byte `json:"id"`
+}
+
+// Lump interface.
+type Lump interface {
+	// FromBytes imports a []byte to a defined lump structure(s).
+	FromBytes([]byte) error
+	// ToBytes exports lump structure back to []byte.
+	ToBytes() ([]byte, error)
+	// SetVersion sets bsp version of lump.
+	SetVersion(version int32)
 }

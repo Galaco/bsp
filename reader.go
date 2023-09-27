@@ -7,16 +7,19 @@ import (
 	"io"
 	"unsafe"
 
-	"github.com/galaco/bsp/lumps"
+	"github.com/galaco/bsp/lump"
 )
 
 // Reader is a Bsp File reader.
 type Reader struct {
+	lumpResolver LumpResolver
 }
 
 // NewReader creates a new Bsp reader.
-func NewReader() *Reader {
-	return &Reader{}
+func NewReader(lumpResolver LumpResolver) *Reader {
+	return &Reader{
+		lumpResolver: lumpResolver,
+	}
 }
 
 // Read reads from an io.Reader into a structured Bsp.
@@ -58,7 +61,7 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 		if err != nil {
 			return nil, err
 		}
-		refLump, err := getReferenceLumpByIndex(index, bsp.Header.Version)
+		refLump, err := r.lumpResolver(index, int(bsp.Header.Version))
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +71,7 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 		// This will correct the offsets to the start of the lump.
 		// @NOTE: Portal2 console uses relative offsets. This game+platform are not supported currently
 		if index == int(LumpGame) {
-			refLump.(*lumps.Game).UpdateInternalOffsets(header.Lumps[index].Offset)
+			refLump.(*lump.Game).UpdateInternalOffsets(header.Lumps[index].Offset)
 		}
 
 		if err := refLump.FromBytes(lp); err != nil {
