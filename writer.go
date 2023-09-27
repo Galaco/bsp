@@ -24,7 +24,9 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 	var err error
 
 	currentOffset := 1036 // Header always 1036bytes, so we start immediately afterward.
-	for _, index := range resolveLumpExportOrder(&data.Header) {
+	order := resolveLumpExportOrder(&data.Header)
+
+	for _, index := range order {
 		// We have to handle lump 35 (GameData differently).
 		// Because valve designed the file format oddly and relatively positioned data contains absolute file offsets.
 		if index == LumpGame {
@@ -54,12 +56,13 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 		currentOffset += int(data.Header.Lumps[index].Length)
 
 		// @TODO WTF is this.
-		currentOffset = addWeirdPad(int(index), currentOffset)
+		weirdPad := extraWeirdPad(index)
+		currentOffset += weirdPad
 
 		// Finally 4byte align the data and current offset.
 		// Note that we don't adjust the lump length in the header to reflect this;
 		// it's for padding reasons.
-		marshalledLumps[index] = append(marshalledLumps[index], make([]byte, currentOffset%4)...)
+		marshalledLumps[index] = append(marshalledLumps[index], make([]byte, weirdPad+(currentOffset%4))...)
 		currentOffset += currentOffset % 4
 	}
 
@@ -72,11 +75,16 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 	}
 
 	// toBytes lumps.
-	for _, lumpData := range marshalledLumps {
-		if err := binary.Write(&buf, binary.LittleEndian, lumpData); err != nil {
+	for _, index := range order {
+		if _, err := buf.Write(marshalledLumps[index]); err != nil {
 			return nil, err
 		}
 	}
+	//for _, lumpData := range marshalledLumps {
+	//	if _, err := buf.Write(lumpData); err != nil {
+	//		return nil, err
+	//	}
+	//}
 
 	return buf.Bytes(), nil
 }
@@ -107,17 +115,17 @@ func resolveLumpExportOrder(header *Header) [64]LumpId {
 
 // addWeirdPad is a helper function for adding weird padding to the end of lumps.
 // @TODO figure out why this is necessary and remove.
-func addWeirdPad(index, offset int) int {
+func extraWeirdPad(index LumpId) int {
 	switch index {
-	case 0:
-		return offset + 1
-	case 29:
-		return offset + 1
-	case 43:
-		return offset - 1
-	case 44:
-		return offset
+	case LumpEntities:
+		return 1
+	case LumpPhysCollide:
+		return 1
+	case LumpTexDataStringData:
+		return -1
+	case LumpTexDataStringTable:
+		return 0
 	default:
-		return offset
+		return 0
 	}
 }

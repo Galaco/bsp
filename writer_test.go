@@ -96,7 +96,7 @@ func TestWriter_Write(t *testing.T) {
 						}
 					}
 
-					// Compare lump the header references
+					// Compare lump the header references.xw
 					if !bytes.Equal(expectedBytes[expectedLumpOffset:expectedLumpOffset+expectedLumpLength], actual[actualLumpOffset:actualLumpOffset+actualLumpLength]) {
 						t.Errorf("%d: lump.toBytes(%s) returned unexpected bytes", i, tc.filePath)
 

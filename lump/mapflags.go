@@ -35,5 +35,6 @@ func (lump *MapFlags) Contents() *primitives.MapFlags {
 
 // ToBytes converts this lump back to raw byte Data
 func (lump *MapFlags) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.Data)
+	a, err := marshallBasicLump(lump.Data)
+	return a, err
 }
