@@ -71,7 +71,7 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 		// This will correct the offsets to the start of the lump.
 		// @NOTE: Portal2 console uses relative offsets. This game+platform are not supported currently
 		if index == int(LumpGame) {
-			refLump.(*lump.Game).UpdateInternalOffsets(header.Lumps[index].Offset)
+			refLump.(*lump.Game).SetAbsoluteFileOffset(int(header.Lumps[index].Offset))
 		}
 
 		if err := refLump.FromBytes(lp); err != nil {

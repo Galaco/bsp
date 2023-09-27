@@ -18,10 +18,11 @@ type Game struct {
 	Header    game2.Header            `json:"data"`
 	GameLumps []game2.GenericGameLump `json:"gameLumps"`
 
-	// offsetOfLumpIntoFile tracks the offset of the game lump into the whole BSP.
+	// absoluteFileOffset tracks the offset of the game lump into the whole BSP.
 	// Game lump has special rules where it contains offsets into the file, not offsets into the lump,
 	// so we need to know where the lump is in the file to actually use the offsets.
-	offsetOfLumpIntoFile int32
+	// This is required for read game lumps which are offset based.
+	absoluteFileOffset int
 }
 
 // FromBytes imports this lump from raw byte Data
@@ -48,19 +49,15 @@ func (lump *Game) FromBytes(raw []byte) (err error) {
 	}
 
 	// Correct file offsets.
-	if lump.offsetOfLumpIntoFile == 0 {
+	if lump.absoluteFileOffset == 0 {
 		return fmt.Errorf("lump offset not set. Cannot correct offsets")
-	}
-
-	// This makes the absolute file offset into a relative offset of this lump.
-	for index := range lump.Header.GameLumps {
-		lump.Header.GameLumps[index].FileOffset -= lump.offsetOfLumpIntoFile
 	}
 
 	// Read gamelumps.
 	lump.GameLumps = make([]game2.GenericGameLump, lumpCount)
 	for i, lumpHeader := range lump.Header.GameLumps {
-		lump.GameLumps[i].Data = raw[lumpHeader.FileOffset : lumpHeader.FileOffset+lumpHeader.FileLength]
+		offset := lump.absoluteToRelativeOffset(int(lumpHeader.FileOffset))
+		lump.GameLumps[i].Data = raw[offset : offset+int(lumpHeader.FileLength)]
 	}
 
 	return nil
@@ -78,11 +75,7 @@ func (lump *Game) ToBytes() ([]byte, error) {
 		return nil, err
 	}
 	for _, lumpHeader := range lump.Header.GameLumps {
-		h := lumpHeader
-
-		// Set the file offset back to the actual file offset, not the relative offset of the game lump.
-		h.FileOffset += lump.offsetOfLumpIntoFile
-		if err := binary.Write(&buf, binary.LittleEndian, h); err != nil {
+		if err := binary.Write(&buf, binary.LittleEndian, lumpHeader); err != nil {
 			return nil, err
 		}
 	}
@@ -94,12 +87,10 @@ func (lump *Game) ToBytes() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// UpdateInternalOffsets updates the lumps offsets to be relative to the lump, rather
+// SetAbsoluteFileOffset updates the lumps offsets to be relative to the lump, rather
 // than the bsp start.
-func (lump *Game) UpdateInternalOffsets(fileOffset int32) *Game {
-	lump.offsetOfLumpIntoFile = fileOffset
-
-	return lump
+func (lump *Game) SetAbsoluteFileOffset(fileOffset int) {
+	lump.absoluteFileOffset = fileOffset
 }
 
 // GetStaticPropLump returns the staticprop lump.
@@ -272,4 +263,9 @@ func (lump *Game) GetStaticPropLump() *game2.StaticPropLump {
 	}
 
 	return nil
+}
+
+// absoluteToRelativeOffset converts an absolute offset into the file into a relative offset into the lump.
+func (lump *Game) absoluteToRelativeOffset(absoluteOffset int) int {
+	return absoluteOffset - lump.absoluteFileOffset
 }
