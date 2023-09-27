@@ -49,17 +49,13 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 		// Update current offset for next iteration.
 		currentOffset += lumpSize
 
-		// @TODO WTF is this.
-		// For some reason just a few lumps have some off-by-one-byte issue.
-		// Manually padding out with 0s seems to fix it, but it seems independent of the the 4byte alignment.
-		weirdPad := extraWeirdPad(index)
-		currentOffset += weirdPad
-
 		// Finally 4byte align the data and current offset.
 		// Note that we don't adjust the lump lumpSize in the header to reflect this;
 		// it's for padding reasons.
-		lumpBuffer.Write(make([]byte, weirdPad+(currentOffset%4)))
-		currentOffset += currentOffset % 4
+		if pad := currentOffset % 4; pad != 0 {
+			lumpBuffer.Write(make([]byte, 4-pad))
+			currentOffset += 4 - pad
+		}
 	}
 
 	var buffer bytes.Buffer
@@ -95,21 +91,4 @@ func resolveLumpExportOrder(header *Header) [64]LumpId {
 		res[idx] = LumpId(vals[idx].Id)
 	}
 	return res
-}
-
-// extraWeirdPad is a helper function for adding weird padding to the end of lumps.
-// @TODO figure out why this is necessary and remove.
-func extraWeirdPad(index LumpId) int {
-	switch index {
-	case LumpEntities:
-		return 1
-	case LumpPhysCollide:
-		return 1
-	case LumpTexDataStringData:
-		return -1
-	case LumpTexDataStringTable:
-		return 0
-	default:
-		return 0
-	}
 }
