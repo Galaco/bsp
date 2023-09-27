@@ -3,7 +3,9 @@ package bsp
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/binary"
 	"io"
+	"log"
 	"os"
 	"testing"
 
@@ -60,20 +62,27 @@ func TestWriter_Write(t *testing.T) {
 				t.Fatalf("toBytes(%s) returned error: %v", tc.filePath, err)
 			}
 
-			//baseOffset := 8 - 1
-			//compSize := 16
-			//for i := 0; i < 64; i++ {
-			//	expect := binary.BigEndian.Uint32(expectedBytes[baseOffset+(i*compSize) : baseOffset+(i*compSize)+4])
-			//	act := binary.BigEndian.Uint32(actual[baseOffset+(i*compSize) : baseOffset+(i*compSize)+4])
-			//	log.Printf("%d: %d, %d\n", i, expect, act)
-			//	if !bytes.Equal(expectedBytes[baseOffset+(i*compSize):baseOffset+(i*(compSize*2))], actual[baseOffset+(i*compSize):baseOffset+(i*(compSize*2))]) {
-			//		t.Errorf("%d: toBytes(%s) returned unexpected bytes", i, tc.filePath)
-			//	}
-			//
-			//	if diff := cmp.Diff(expectedBytes[7+(i*16):7+(i*32)], actual[7+(i*16):7+(i*32)]); diff != "" {
-			//		t.Errorf("%d: toBytes(%s) returned unexpected diff (-want +got):\n%s", i, tc.filePath, diff)
-			//	}
-			//}
+			baseOffset := 8
+			compSize := 16
+
+			for _, i := range resolveLumpExportOrder(&bsp.Header) {
+				offset := baseOffset + (int(i) * compSize)
+				expect := binary.LittleEndian.Uint32(expectedBytes[offset : offset+4])
+				act := binary.LittleEndian.Uint32(actual[offset : offset+4])
+				log.Printf("%d: offset: %d, %d. length: %d, %d\n", i,
+					expect,
+					act,
+					binary.LittleEndian.Uint32(expectedBytes[offset+4:offset+8]),
+					binary.LittleEndian.Uint32(actual[offset+4:offset+8]),
+				)
+				//if !bytes.Equal(expectedBytes[offset:baseOffset+(i*(compSize*2))], actual[offset:baseOffset+(i*(compSize*2))]) {
+				//	t.Errorf("%d: toBytes(%s) returned unexpected bytes", i, tc.filePath)
+				//}
+				//
+				//if diff := cmp.Diff(expectedBytes[7+(i*16):7+(i*32)], actual[7+(i*16):7+(i*32)]); diff != "" {
+				//	t.Errorf("%d: toBytes(%s) returned unexpected diff (-want +got):\n%s", i, tc.filePath, diff)
+				//}
+			}
 
 			if !bytes.Equal(expectedBytes[8:1024], actual[8:1024]) {
 				t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)

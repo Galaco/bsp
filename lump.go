@@ -23,10 +23,9 @@ func getReferenceLumpByIndex(index int, version int32) (lumps.Lump, error) {
 	return l, nil
 }
 
-// DefaultLumpOrdering is Source Engines default export order.
-// Source compile tools write lumps out of order
-// While the ordering doesn't actually matter, it may
-// be useful/more performant to maintain the same order, particularly post-export
+// DefaultLumpOrdering is Source Engines default export order (at least it's an order specified in the original SDK).
+// Source compile tools write lumps out of order, so while the ordering doesn't actually matter, it may be
+// useful/more performant to maintain the same order, particularly post-export.
 var DefaultLumpOrdering = [64]LumpId{
 	LumpPlanes,
 	LumpLeafs,

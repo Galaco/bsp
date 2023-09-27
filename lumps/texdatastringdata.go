@@ -7,12 +7,12 @@ type TexDataStringData struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *TexDataStringData) FromBytes(raw []byte) (err error) {
+func (lump *TexDataStringData) FromBytes(raw []byte) error {
 	length := len(raw)
 	lump.Data = string(raw)
 	lump.Metadata.SetLength(length)
 
-	return err
+	return nil
 }
 
 // Contents returns internal format structure Data
