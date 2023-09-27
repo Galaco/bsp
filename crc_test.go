@@ -37,7 +37,7 @@ func TestBsp_Crc(t *testing.T) {
 				t.Error(err)
 			}
 
-			bspF, err := bsp.NewReader(bsp.LumpResolverByBSPVersion()).Read(gzR)
+			bspF, err := bsp.NewReader().Read(gzR)
 			if err != nil {
 				t.Error(err)
 			}

@@ -9,29 +9,27 @@ import (
 // LumpResolverByBSPVersion returns an empty bsp lump for the specified bsp version and lump id
 // If a version is not 19,20,21 then a generic lump that holds
 // raw bytes only ([]byte) is returned.
-func LumpResolverByBSPVersion() LumpResolver {
-	return func(id, version int) (l Lump, err error) {
-		if id < 0 || id > 63 {
-			return nil, fmt.Errorf("invalid lump id: %d provided", id)
-		}
-
-		switch version {
-		case 19:
-			// @TODO: Implement v21.
-			l, err = getv20Lump(id)
-		case 20:
-			l, err = getv20Lump(id)
-		case 21:
-			// @TODO: Implement v21.
-			l, err = getv20Lump(id)
-		default:
-			l, err = &lump.RawBytes{}, nil
-		}
-
-		l.SetVersion(int32(version))
-
-		return l, nil
+func LumpResolverByBSPVersion(id, version int) (l Lump, err error) {
+	if id < 0 || id > 63 {
+		return nil, fmt.Errorf("invalid lump id: %d provided", id)
 	}
+
+	switch version {
+	case 19:
+		// @TODO: Implement v21.
+		l, err = getv20Lump(id)
+	case 20:
+		l, err = getv20Lump(id)
+	case 21:
+		// @TODO: Implement v21.
+		l, err = getv20Lump(id)
+	default:
+		l, err = &lump.RawBytes{}, nil
+	}
+
+	l.SetVersion(int32(version))
+
+	return l, nil
 }
 
 // Getv20Lump returns the corresponding v20 lump for provided index.

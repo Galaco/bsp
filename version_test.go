@@ -42,7 +42,7 @@ func TestGetLumpForVersion(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			l, err := LumpResolverByBSPVersion()(tc.id, tc.version)
+			l, err := LumpResolverByBSPVersion(tc.id, tc.version)
 			if err != nil {
 				t.Error(err)
 			}

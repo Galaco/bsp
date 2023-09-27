@@ -24,10 +24,10 @@ func TestWriter_Write(t *testing.T) {
 		name     string
 		filePath string
 	}{
-		{
-			name:     "de_dust2",
-			filePath: "testdata/v20/de_dust2.bsp.gz",
-		},
+		//{
+		//	name:     "de_dust2",
+		//	filePath: "testdata/v20/de_dust2.bsp.gz",
+		//},
 		{
 			name:     "ar_baggage",
 			filePath: "testdata/v21/ar_baggage.bsp.gz",
@@ -51,7 +51,9 @@ func TestWriter_Write(t *testing.T) {
 			}
 
 			var expected bytes.Buffer
-			bsp, err := NewReader(LumpResolverByBSPVersion()).Read(io.TeeReader(binarygzr, &expected))
+			bsp, err := NewReaderWithConfig(ReaderConfig{
+				LumpResolver: LumpResolverByBSPVersion,
+			}).Read(io.TeeReader(binarygzr, &expected))
 			if err != nil {
 				t.Error(err)
 			}

@@ -3,43 +3,43 @@ package bsp
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"io"
 	"unsafe"
 
 	"github.com/galaco/bsp/lump"
 )
 
-// Reader is a Bsp File reader.
-type Reader struct {
-	lumpResolver LumpResolver
+type ReaderConfig struct {
+	LumpResolver LumpResolver
 }
 
-// NewReader creates a new Bsp reader.
-func NewReader(lumpResolver LumpResolver) *Reader {
+func DefaultReaderConfig() ReaderConfig {
+	return ReaderConfig{
+		LumpResolver: LumpResolverByBSPVersion,
+	}
+}
+
+// Reader is a Bsp File reader.
+type Reader struct {
+	config ReaderConfig
+}
+
+// NewReader creates a new Bsp reader with default config.
+func NewReader() *Reader {
 	return &Reader{
-		lumpResolver: lumpResolver,
+		config: DefaultReaderConfig(),
+	}
+}
+
+// NewReaderWithConfig creates a new Bsp reader.
+func NewReaderWithConfig(config ReaderConfig) *Reader {
+	return &Reader{
+		config: config,
 	}
 }
 
 // Read reads from an io.Reader into a structured Bsp.
 func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
-	// Safeguard against panics.
-	// @TODO this needs to be removed and the library made safe.
-	defer func() {
-		if r := recover(); r != nil {
-			bsp = nil
-			switch x := r.(type) {
-			case string:
-				err = errors.New(x)
-			case error:
-				err = x
-			default:
-				err = errors.New("unknown panic")
-			}
-		}
-	}()
-
 	buf := bytes.NewBuffer([]byte{})
 	if _, err := io.Copy(buf, stream); err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 		if err != nil {
 			return nil, err
 		}
-		refLump, err := r.lumpResolver(index, int(bsp.Header.Version))
+		refLump, err := r.config.LumpResolver(index, int(bsp.Header.Version))
 		if err != nil {
 			return nil, err
 		}
@@ -103,13 +103,13 @@ func (r *Reader) readHeader(reader io.ReaderAt) (header Header, err error) {
 // Expects a byte reader containing the lump data, as well as the
 // header and lump identifier (id).
 func (r *Reader) readLump(reader *bytes.Reader, headerLump *HeaderLump) ([]byte, error) {
-	// Limit lump data to declared size.
-	raw := make([]byte, headerLump.Length)
-
 	// Skip reading for empty lump.
 	if headerLump.Length == 0 {
-		return raw, nil
+		return nil, nil
 	}
+
+	// Limit lump data to declared size.
+	raw := make([]byte, headerLump.Length)
 
 	if _, err := io.NewSectionReader(reader, int64(headerLump.Offset), int64(headerLump.Length)).Read(raw); err != nil {
 		return nil, err

@@ -42,7 +42,9 @@ func TestReadFromStream(t *testing.T) {
 				t.Error(err)
 			}
 
-			r, err := NewReader(LumpResolverByBSPVersion()).Read(binarygzr)
+			r, err := NewReaderWithConfig(ReaderConfig{
+				LumpResolver: LumpResolverByBSPVersion,
+			}).Read(binarygzr)
 			if err != nil {
 				t.Error(err)
 			}
