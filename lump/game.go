@@ -3,6 +3,7 @@ package lump
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"strings"
 	"unsafe"
 
@@ -17,12 +18,10 @@ type Game struct {
 	Header    game2.Header            `json:"data"`
 	GameLumps []game2.GenericGameLump `json:"gameLumps"`
 
-	// lumpOffset tracks the offset of the game lump into the whole BSP.
+	// offsetOfLumpIntoFile tracks the offset of the game lump into the whole BSP.
 	// Game lump has special rules where it contains offsets into the file, not offsets into the lump,
 	// so we need to know where the lump is in the file to actually use the offsets.
-	lumpOffset int32
-	// areOffsetsCorrected is a flag to track if the offsets have been corrected yet.
-	areOffsetsCorrected bool
+	offsetOfLumpIntoFile int32
 }
 
 // FromBytes imports this lump from raw byte Data
@@ -49,11 +48,13 @@ func (lump *Game) FromBytes(raw []byte) (err error) {
 	}
 
 	// Correct file offsets.
-	if !lump.areOffsetsCorrected {
-		for index := range lump.Header.GameLumps {
-			lump.Header.GameLumps[index].FileOffset -= lump.lumpOffset
-		}
-		lump.areOffsetsCorrected = true
+	if lump.offsetOfLumpIntoFile == 0 {
+		return fmt.Errorf("lump offset not set. Cannot correct offsets")
+	}
+
+	// This makes the absolute file offset into a relative offset of this lump.
+	for index := range lump.Header.GameLumps {
+		lump.Header.GameLumps[index].FileOffset -= lump.offsetOfLumpIntoFile
 	}
 
 	// Read gamelumps.
@@ -79,10 +80,8 @@ func (lump *Game) ToBytes() ([]byte, error) {
 	for _, lumpHeader := range lump.Header.GameLumps {
 		h := lumpHeader
 
-		// Reset the offsets (if modified).
-		if lump.areOffsetsCorrected {
-			h.FileOffset += lump.lumpOffset
-		}
+		// Set the file offset back to the actual file offset, not the relative offset of the game lump.
+		h.FileOffset += lump.offsetOfLumpIntoFile
 		if err := binary.Write(&buf, binary.LittleEndian, h); err != nil {
 			return nil, err
 		}
@@ -98,7 +97,7 @@ func (lump *Game) ToBytes() ([]byte, error) {
 // UpdateInternalOffsets updates the lumps offsets to be relative to the lump, rather
 // than the bsp start.
 func (lump *Game) UpdateInternalOffsets(fileOffset int32) *Game {
-	lump.lumpOffset = fileOffset
+	lump.offsetOfLumpIntoFile = fileOffset
 
 	return lump
 }
@@ -106,6 +105,7 @@ func (lump *Game) UpdateInternalOffsets(fileOffset int32) *Game {
 // GetStaticPropLump returns the staticprop lump.
 func (lump *Game) GetStaticPropLump() *game2.StaticPropLump {
 	for i, gameLump := range lump.Header.GameLumps {
+
 		if gameLump.Id == game2.StaticPropLumpId {
 			sprpLump := lump.GameLumps[i]
 

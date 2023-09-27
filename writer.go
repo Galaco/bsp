@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"sort"
-
-	"github.com/galaco/bsp/lump"
 )
 
 // Writer is a Bsp export writer.
@@ -27,12 +25,6 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 	order := resolveLumpExportOrder(&data.Header)
 
 	for _, index := range order {
-		// We have to handle lump 35 (GameData differently).
-		// Because valve designed the file format oddly and relatively positioned data contains absolute file offsets.
-		if index == LumpGame {
-			data.Lumps[index] = data.Lumps[index].(*lump.Game).UpdateInternalOffsets(int32(currentOffset) - data.Header.Lumps[index].Offset)
-		}
-
 		// Export lump to bytes.
 		if marshalledLumps[index], err = data.Lumps[index].ToBytes(); err != nil {
 			return nil, err

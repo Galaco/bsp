@@ -65,7 +65,8 @@ func TestWriter_Write(t *testing.T) {
 			if !bytes.Equal(expectedBytes, actual) {
 				t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)
 
-				// This depth isn't necessary, but it makes the output more readable to compare the header lump by lump.
+				// It's rather painful to easily debug this kind of output,
+				// below are some helpers for diffing header and lump data.
 				baseOffset := 8
 				compSize := 16
 				for _, i := range resolveLumpExportOrder(&bsp.Header) {
@@ -96,7 +97,7 @@ func TestWriter_Write(t *testing.T) {
 						}
 					}
 
-					// Compare lump the header references.xw
+					// Compare lump the header references.
 					if !bytes.Equal(expectedBytes[expectedLumpOffset:expectedLumpOffset+expectedLumpLength], actual[actualLumpOffset:actualLumpOffset+actualLumpLength]) {
 						t.Errorf("%d: lump.toBytes(%s) returned unexpected bytes", i, tc.filePath)
 
@@ -107,13 +108,13 @@ func TestWriter_Write(t *testing.T) {
 				}
 
 				// now compare each body.
-				//if len(expectedBytes) != len(actual) {
-				//	t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)
-				//}
-				//
-				//if diff := cmp.Diff(expectedBytes, actual); diff != "" {
-				//	t.Errorf("toBytes(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
-				//}
+				if len(expectedBytes) != len(actual) {
+					t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)
+				}
+
+				if diff := cmp.Diff(expectedBytes, actual); diff != "" {
+					t.Errorf("toBytes(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
+				}
 			}
 		})
 	}
