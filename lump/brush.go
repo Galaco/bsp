@@ -11,13 +11,12 @@ type Brush struct {
 }
 
 // FromBytes imports this lump from raw byte data.
-func (lump *Brush) FromBytes(raw []byte) (err error) {
+func (lump *Brush) FromBytes(raw []byte) error {
 	meta, data, err := unmarshallBasicLump[primitives.Brush](raw)
-	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-
+	lump.Metadata = meta
 	lump.Data = data
 	return nil
 }

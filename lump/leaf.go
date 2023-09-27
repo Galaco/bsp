@@ -27,7 +27,7 @@ type Leaf struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *Leaf) FromBytes(raw []byte) (err error) {
+func (lump *Leaf) FromBytes(raw []byte) error {
 	// There are 2 version of leaf:
 	// v0 contains a light sample
 	// v1 removes the light sample, and is padded by 2 bytes
@@ -37,8 +37,7 @@ func (lump *Leaf) FromBytes(raw []byte) (err error) {
 		structSize -= int(unsafe.Sizeof(common.CompressedLightCube{}))
 	}
 
-	length := len(raw)
-	lump.Data = make([]primitives.Leaf, length/structSize)
+	lump.Data = make([]primitives.Leaf, len(raw)/structSize)
 	numLeafs := len(lump.Data)
 	i := 0
 
@@ -50,8 +49,7 @@ func (lump *Leaf) FromBytes(raw []byte) (err error) {
 			leafBuf = append(leafBuf, make([]byte, int(unsafe.Sizeof(common.CompressedLightCube{})))...)
 		}
 		rawLeaf := bytes.NewBuffer(leafBuf)
-		err = binary.Read(rawLeaf, binary.LittleEndian, &lump.Data[i])
-		if err != nil {
+		if err := binary.Read(rawLeaf, binary.LittleEndian, &lump.Data[i]); err != nil {
 			return err
 		}
 		i++
@@ -59,9 +57,8 @@ func (lump *Leaf) FromBytes(raw []byte) (err error) {
 			return fmt.Errorf("leaf count overflows maximum allowed size of %d", MaxMapLeafs)
 		}
 	}
-	lump.SetLength(length)
 
-	return err
+	return nil
 }
 
 // Contents returns internal format structure Data
@@ -72,21 +69,25 @@ func (lump *Leaf) Contents() []primitives.Leaf {
 // ToBytes converts this lump back to raw byte Data
 func (lump *Leaf) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
-	var err error
 
 	switch lump.Version() {
 	case 0:
-		err = binary.Write(&buf, binary.LittleEndian, lump.Data)
+		if err := binary.Write(&buf, binary.LittleEndian, lump.Data); err != nil {
+			return nil, err
+		}
 	default:
 		structSize := int(unsafe.Sizeof(primitives.Leaf{})) - int(unsafe.Sizeof(common.CompressedLightCube{}))
+		// @TODO optimize this.
 		for _, l := range lump.Data {
 			var leafBuf bytes.Buffer
-			if err = binary.Write(&leafBuf, binary.LittleEndian, l); err != nil {
+			if err := binary.Write(&leafBuf, binary.LittleEndian, l); err != nil {
 				return nil, err
 			}
-			err = binary.Write(&buf, binary.LittleEndian, leafBuf.Bytes()[0:structSize])
+			if err := binary.Write(&buf, binary.LittleEndian, leafBuf.Bytes()[0:structSize]); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	return buf.Bytes(), err
+	return buf.Bytes(), nil
 }

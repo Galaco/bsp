@@ -66,7 +66,7 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 			}
 
 			// Verify lump lengths.
-			for lumpIndex := 0; lumpIndex < 64; lumpIndex++ {
+			for lumpIndex := range testBSP.Header.Lumps {
 				actual, err := testBSP.Lumps[lumpIndex].ToBytes()
 				if err != nil {
 					t.Error(err)

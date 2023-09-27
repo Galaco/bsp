@@ -1,7 +1,6 @@
 package lump
 
 import (
-	"log"
 	"testing"
 )
 
@@ -50,23 +49,6 @@ func TestUnimplemented_FromBytes(t *testing.T) {
 		if data[idx] != b {
 			t.Error("mismatched between expected and actual unmarshalled bytes")
 		}
-	}
-}
-
-func TestMetadata_Length(t *testing.T) {
-	sut := Metadata{}
-	sut.SetLength(32)
-	if sut.Length() != 32 {
-		t.Errorf("wrong length returned fron Length")
-	}
-}
-
-func TestMetadata_SetLength(t *testing.T) {
-	sut := Metadata{}
-	sut.SetLength(32)
-	if sut.Length() != 32 {
-		log.Println(sut.length)
-		t.Errorf("wrong length returned fron Length")
 	}
 }
 

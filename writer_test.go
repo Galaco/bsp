@@ -24,10 +24,10 @@ func TestWriter_Write(t *testing.T) {
 		name     string
 		filePath string
 	}{
-		//{
-		//	name:     "de_dust2",
-		//	filePath: "testdata/v20/de_dust2.bsp.gz",
-		//},
+		{
+			name:     "de_dust2",
+			filePath: "testdata/v20/de_dust2.bsp.gz",
+		},
 		{
 			name:     "ar_baggage",
 			filePath: "testdata/v21/ar_baggage.bsp.gz",
@@ -112,9 +112,9 @@ func TestWriter_Write(t *testing.T) {
 					t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)
 				}
 
-				if diff := cmp.Diff(expectedBytes, actual); diff != "" {
-					t.Errorf("toBytes(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
-				}
+				//if diff := cmp.Diff(expectedBytes, actual); diff != "" {
+				//	t.Errorf("toBytes(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
+				//}
 			}
 		})
 	}

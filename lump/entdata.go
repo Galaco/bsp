@@ -7,12 +7,10 @@ type EntData struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *EntData) FromBytes(raw []byte) (err error) {
+func (lump *EntData) FromBytes(raw []byte) error {
 	lump.Data = string(raw)
-	length := len(raw)
-	lump.Metadata.SetLength(length)
 
-	return err
+	return nil
 }
 
 // Contents returns internal format structure Data

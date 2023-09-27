@@ -14,17 +14,13 @@ type Pakfile struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *Pakfile) FromBytes(raw []byte) (err error) {
-	length := len(raw)
+func (lump *Pakfile) FromBytes(raw []byte) error {
 	lump.Data = raw
-	lump.Metadata.SetLength(length)
-
-	b := bytes.NewReader(lump.Data)
-	zipReader, err := zip.NewReader(b, int64(length))
-	if err != nil {
+	var err error
+	if lump.zipReader, err = zip.NewReader(bytes.NewReader(lump.Data), int64(len(raw))); err != nil {
 		return err
 	}
-	lump.zipReader = zipReader
+
 	return nil
 }
 

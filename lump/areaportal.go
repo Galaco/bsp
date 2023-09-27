@@ -11,13 +11,12 @@ type AreaPortal struct {
 }
 
 // FromBytes imports this lump from raw byte data.
-func (lump *AreaPortal) FromBytes(raw []byte) (err error) {
+func (lump *AreaPortal) FromBytes(raw []byte) error {
 	meta, data, err := unmarshallBasicLump[primitives.AreaPortal](raw)
-	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-
+	lump.Metadata = meta
 	lump.Data = data
 	return nil
 }

@@ -12,16 +12,13 @@ type Edge struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *Edge) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	lump.Data = make([][2]uint16, length/4)
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data)
-	if err != nil {
+func (lump *Edge) FromBytes(raw []byte) error {
+	lump.Data = make([][2]uint16, len(raw)/4)
+	if err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data); err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
 
-	return err
+	return nil
 }
 
 // Contents returns internal format structure Data

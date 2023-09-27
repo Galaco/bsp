@@ -11,13 +11,12 @@ type WorldLightHDR struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *WorldLightHDR) FromBytes(raw []byte) (err error) {
+func (lump *WorldLightHDR) FromBytes(raw []byte) error {
 	meta, data, err := unmarshallBasicLump[primitives.WorldLightHDR](raw)
-	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-
+	lump.Metadata = meta
 	lump.Data = data
 	return nil
 }

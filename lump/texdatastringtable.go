@@ -7,13 +7,12 @@ type TexDataStringTable struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *TexDataStringTable) FromBytes(raw []byte) (err error) {
+func (lump *TexDataStringTable) FromBytes(raw []byte) error {
 	meta, data, err := unmarshallBasicLump[int32](raw)
-	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-
+	lump.Metadata = meta
 	lump.Data = data
 	return nil
 }

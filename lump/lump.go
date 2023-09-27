@@ -9,18 +9,15 @@ import (
 // unmarshallBasicLump is a helper function for unmarshalling []byte to lumps that are just a single []T.
 func unmarshallBasicLump[V any](raw []byte) (Metadata, []V, error) {
 	var meta Metadata
-	length := len(raw)
-	meta.SetLength(length)
-	if length == 0 {
+	if len(raw) == 0 {
 		return meta, nil, nil
 	}
 
 	var sampleV V
-	v := make([]V, length/int(unsafe.Sizeof(sampleV)))
+	v := make([]V, len(raw)/int(unsafe.Sizeof(sampleV)))
 	if err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &v); err != nil {
 		return meta, nil, err
 	}
-	meta.SetLength(length)
 
 	return meta, v, nil
 }
@@ -36,16 +33,6 @@ func marshallBasicLump(data any) ([]byte, error) {
 type Metadata struct {
 	length  int
 	version int32
-}
-
-// Length Returns lump import length in bytes.
-func (info *Metadata) Length() int {
-	return info.length
-}
-
-// SetLength sets lump import length in bytes
-func (info *Metadata) SetLength(length int) {
-	info.length = length
 }
 
 // Version Returns lump import version in bytes.
@@ -66,12 +53,10 @@ type RawBytes struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *RawBytes) FromBytes(raw []byte) (err error) {
-	length := len(raw)
+func (lump *RawBytes) FromBytes(raw []byte) error {
 	lump.Data = raw
-	lump.Metadata.SetLength(length)
 
-	return err
+	return nil
 }
 
 // Contents returns internal format structure Data

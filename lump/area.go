@@ -11,13 +11,13 @@ type Area struct {
 }
 
 // FromBytes imports this lump from raw byte data.
-func (lump *Area) FromBytes(raw []byte) (err error) {
+func (lump *Area) FromBytes(raw []byte) error {
 	meta, data, err := unmarshallBasicLump[primitives.Area](raw)
-	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
 
+	lump.Metadata = meta
 	lump.Data = data
 	return nil
 }

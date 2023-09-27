@@ -14,25 +14,18 @@ type Visibility struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *Visibility) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data.NumClusters)
-	if err != nil {
+func (lump *Visibility) FromBytes(raw []byte) error {
+	if err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data.NumClusters); err != nil {
 		return err
 	}
 	lump.Data.ByteOffset = make([][2]int32, lump.Data.NumClusters)
-	err = binary.Read(bytes.NewBuffer(raw[4:]), binary.LittleEndian, &lump.Data.ByteOffset)
-	if err != nil {
+	if err := binary.Read(bytes.NewBuffer(raw[4:]), binary.LittleEndian, &lump.Data.ByteOffset); err != nil {
 		return err
 	}
-	lump.Data.BitVectors = make([]byte, length)
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data.BitVectors)
-	if err != nil {
+	lump.Data.BitVectors = make([]byte, len(raw))
+	if err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data.BitVectors); err != nil {
 		return err
 	}
-
-	lump.Metadata.SetLength(length)
-
 	return nil
 }
 

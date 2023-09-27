@@ -7,13 +7,13 @@ type LeafBrush struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *LeafBrush) FromBytes(raw []byte) (err error) {
+func (lump *LeafBrush) FromBytes(raw []byte) error {
 	meta, data, err := unmarshallBasicLump[uint16](raw)
-	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
 
+	lump.Metadata = meta
 	lump.Data = data
 	return nil
 }

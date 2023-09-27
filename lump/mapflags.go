@@ -15,17 +15,11 @@ type MapFlags struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *MapFlags) FromBytes(raw []byte) error {
-	length := len(raw)
-	if length == 0 {
+	if len(raw) == 0 {
 		return nil
 	}
 
-	if err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data); err != nil {
-		return err
-	}
-	lump.Metadata.SetLength(length)
-
-	return nil
+	return binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data)
 }
 
 // Contents returns internal format structure Data

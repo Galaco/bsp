@@ -11,13 +11,12 @@ type Cubemap struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *Cubemap) FromBytes(raw []byte) (err error) {
+func (lump *Cubemap) FromBytes(raw []byte) error {
 	meta, data, err := unmarshallBasicLump[primitives.CubemapSample](raw)
-	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-
+	lump.Metadata = meta
 	lump.Data = data
 	return nil
 }

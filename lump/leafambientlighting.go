@@ -11,13 +11,12 @@ type LeafAmbientLighting struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *LeafAmbientLighting) FromBytes(raw []byte) (err error) {
+func (lump *LeafAmbientLighting) FromBytes(raw []byte) error {
 	meta, data, err := unmarshallBasicLump[primitives.LeafAmbientLighting](raw)
-	lump.Metadata = meta
 	if err != nil {
 		return err
 	}
-
+	lump.Metadata = meta
 	lump.Data = data
 	return nil
 }

@@ -20,53 +20,44 @@ type Occlusion struct {
 }
 
 // FromBytes imports this lump from raw byte Data
-func (lump *Occlusion) FromBytes(raw []byte) (err error) {
-	length := len(raw)
-	if length == 0 {
-		return
+func (lump *Occlusion) FromBytes(raw []byte) error {
+	if len(raw) == 0 {
+		return nil
 	}
 	offset := 0
 	// Data
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Count)
-	if err != nil {
+	if err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Count); err != nil {
 		return err
 	}
 	offset += 4
 	lump.Data = make([]primitives.OcclusionData, lump.Count)
-	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.Data)
-	if err != nil {
+	if err := binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.Data); err != nil {
 		return err
 	}
 	offset += int(unsafe.Sizeof(primitives.OcclusionData{})) * int(lump.Count)
 
 	// polydata
-	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.PolyDataCount)
-	if err != nil {
+	if err := binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.PolyDataCount); err != nil {
 		return err
 	}
 	offset += 4
 	lump.PolyData = make([]primitives.OcclusionPolyData, lump.PolyDataCount)
-	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.PolyData)
-	if err != nil {
+	if err := binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.PolyData); err != nil {
 		return err
 	}
 	offset += int(unsafe.Sizeof(primitives.OcclusionPolyData{})) * int(lump.PolyDataCount)
 
 	// vertexdata
-	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.VertexIndexCount)
-	if err != nil {
+	if err := binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.VertexIndexCount); err != nil {
 		return err
 	}
 	offset += 4
 	lump.VertexIndices = make([]int32, lump.VertexIndexCount)
-	err = binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.VertexIndices)
-	if err != nil {
+	if err := binary.Read(bytes.NewBuffer(raw[offset:]), binary.LittleEndian, &lump.VertexIndices); err != nil {
 		return err
 	}
 
-	lump.Metadata.SetLength(length)
-
-	return err
+	return nil
 }
 
 // Contents returns internal format structure Data
@@ -77,33 +68,35 @@ func (lump *Occlusion) Contents() *Occlusion {
 // ToBytes converts this lump back to raw byte Data
 func (lump *Occlusion) ToBytes() ([]byte, error) {
 	var buf bytes.Buffer
+
 	// write Data
-	err := binary.Write(&buf, binary.LittleEndian, lump.Count)
-	if err != nil {
+	if err := binary.Write(&buf, binary.LittleEndian, lump.Count); err != nil {
 		return nil, err
 	}
 	for _, data := range lump.Data {
-		if err = binary.Write(&buf, binary.LittleEndian, data); err != nil {
+		if err := binary.Write(&buf, binary.LittleEndian, data); err != nil {
 			return nil, err
 		}
 	}
 
 	// write polydata
-	if err = binary.Write(&buf, binary.LittleEndian, lump.PolyDataCount); err != nil {
+	if err := binary.Write(&buf, binary.LittleEndian, lump.PolyDataCount); err != nil {
 		return nil, err
 	}
 	for _, data := range lump.PolyData {
-		if err = binary.Write(&buf, binary.LittleEndian, data); err != nil {
+		if err := binary.Write(&buf, binary.LittleEndian, data); err != nil {
 			return nil, err
 		}
 	}
 
 	// write indices
-	err = binary.Write(&buf, binary.LittleEndian, lump.VertexIndexCount)
+	if err := binary.Write(&buf, binary.LittleEndian, lump.VertexIndexCount); err != nil {
+		return nil, err
+	}
 	for _, data := range lump.VertexIndices {
-		if err = binary.Write(&buf, binary.LittleEndian, data); err != nil {
+		if err := binary.Write(&buf, binary.LittleEndian, data); err != nil {
 			return nil, err
 		}
 	}
-	return buf.Bytes(), err
+	return buf.Bytes(), nil
 }
