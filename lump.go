@@ -1,7 +1,7 @@
 package bsp
 
 // LumpResolver Return an instance of a Lump for a given offset.
-type LumpResolver func(id int, header Header) (Lump, error)
+type LumpResolver func(id LumpId, header Header) (Lump, error)
 
 // DefaultLumpOrdering is Source Engines default export order (at least it's an order specified in the original SDK).
 // Source compile tools write lumps out of order, so while the ordering doesn't actually matter, it may be

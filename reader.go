@@ -61,7 +61,7 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 		if err != nil {
 			return nil, err
 		}
-		refLump, err := r.config.LumpResolver(index, bsp.Header)
+		refLump, err := r.config.LumpResolver(LumpId(index), bsp.Header)
 		if err != nil {
 			return nil, err
 		}

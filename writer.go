@@ -15,6 +15,10 @@ func NewWriter() *Writer {
 	return &Writer{}
 }
 
+func (w *Writer) Write(bsp *Bsp) ([]byte, error) {
+	return w.toBytes(bsp)
+}
+
 // toBytes bsp to []byte.
 func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 	var err error

@@ -71,6 +71,12 @@ The following lumps currently have a full implementation for v20 & v21 BSPs (tes
 60: OverlayFades
 ```
 
+Lumps not listed here are parsed and available as `[]byte` format.
+
+Note: Some lumps in some BSP versions have data with unidentified purpose. These fields are available as byte arrays. 
+Please submit an issue or a PR if you can help fill in any of these fields.
+
+
 # Usage
 
 Minimal example of obtaining entdata from a BSP. The following will print the entdata
@@ -109,6 +115,20 @@ func main() {
 
 There are more usage examples available in the `examples/` directory.
 
+## Exporting BSPs
+
+This library supports writing BSPs. It aims to preserve identical binaries where possible, but this is not guaranteed
+due to wide-ranging difference in format across games (and even within the same game!). 
+For example:
+* Counterstrike: Source
+  * de_dust2 Lump 59 (MapFlags) has 0 flags set, a the 4byte lump is written. Format is BSP v20.
+  * de_nuke Lump 59 (MapFlags) has 0 flags set, but the lump is not written. Format is BSP v20.
+
+There are plenty of other scenarios where this can occur, and in a way that we cannot guess with certainty what the 
+expected behaviour should be. By default, this library assumes that structures that contain > 0 bytes are written, 
+but this behaviour can be overridden (see examples).
+
+
 ## Real World examples
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)
 * Insert game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
@@ -116,4 +136,4 @@ There are more usage examples available in the `examples/` directory.
 
 
 # Contributing
-All contributions welcome. Known unsupported games/maps are especially useful.
+All contributions welcome, in particular any maps that are found to be incompatible.

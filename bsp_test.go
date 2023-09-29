@@ -31,7 +31,7 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			binaryFile, err := os.Open(tc.filePath)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			defer func(binaryFile *os.File) {
 				if err := binaryFile.Close(); err != nil {
@@ -40,16 +40,16 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 			}(binaryFile)
 			binarygzr, err := gzip.NewReader(binaryFile)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			binaryData, err := io.ReadAll(binarygzr)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 
 			testFile, err := os.Open(tc.filePath)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			defer func(testFile *os.File) {
 				if err := testFile.Close(); err != nil {
@@ -58,13 +58,13 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 			}(testFile)
 			testFilegzr, err := gzip.NewReader(testFile)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			testBSP, err := NewReaderWithConfig(ReaderConfig{
 				LumpResolver: LumpResolverByBSPVersion,
 			}).Read(testFilegzr)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 
 			// Verify lump lengths.
