@@ -12,11 +12,11 @@ type Primitive struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *Primitive) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[primitives.Primitive](raw)
+	data, err := unmarshallBasicLump[primitives.Primitive](raw)
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
 	return nil
 }

@@ -24,10 +24,10 @@ func TestWriter_Write(t *testing.T) {
 		name     string
 		filePath string
 	}{
-		//{
-		//	name:     "de_dust2",
-		//	filePath: "testdata/v20/de_dust2.bsp.gz",
-		//},
+		{
+			name:     "de_dust2",
+			filePath: "testdata/v20/de_dust2.bsp.gz",
+		},
 		{
 			name:     "ar_baggage",
 			filePath: "testdata/v21/ar_baggage.bsp.gz",
@@ -38,7 +38,7 @@ func TestWriter_Write(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			f, err := os.Open(tc.filePath)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			defer func(f *os.File) {
 				if err := f.Close(); err != nil {
@@ -55,7 +55,7 @@ func TestWriter_Write(t *testing.T) {
 				LumpResolver: LumpResolverByBSPVersion,
 			}).Read(io.TeeReader(binarygzr, &expected))
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			expectedBytes := expected.Bytes()
 
@@ -104,7 +104,7 @@ func TestWriter_Write(t *testing.T) {
 						t.Errorf("%d: lump.toBytes(%s) returned unexpected bytes", i, tc.filePath)
 
 						if diff := cmp.Diff(expectedBytes[expectedLumpOffset:expectedLumpOffset+expectedLumpLength], actual[actualLumpOffset:actualLumpOffset+actualLumpLength]); diff != "" {
-							t.Errorf("%d: header.toBytes(%s) returned unexpected diff (-want +got):\n%s", i, tc.filePath, diff)
+							t.Fatalf("%d: lump.toBytes(%s) returned unexpected diff (-want +got):\n%s", i, tc.filePath, diff)
 						}
 					}
 				}

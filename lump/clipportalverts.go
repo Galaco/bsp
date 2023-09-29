@@ -12,11 +12,11 @@ type ClipPortalVerts struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *ClipPortalVerts) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[mgl32.Vec3](raw)
+	data, err := unmarshallBasicLump[mgl32.Vec3](raw)
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
 	return nil
 }

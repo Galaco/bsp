@@ -8,11 +8,11 @@ type Surfedge struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *Surfedge) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[int32](raw)
+	data, err := unmarshallBasicLump[int32](raw)
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
 	return nil
 }

@@ -12,11 +12,11 @@ type OverlayFade struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *OverlayFade) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[primitives.OverlayFade](raw)
+	data, err := unmarshallBasicLump[primitives.OverlayFade](raw)
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
 	return nil
 }

@@ -8,11 +8,11 @@ type LeafMinDistToWater struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *LeafMinDistToWater) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[uint16](raw)
+	data, err := unmarshallBasicLump[uint16](raw)
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
 	return nil
 }

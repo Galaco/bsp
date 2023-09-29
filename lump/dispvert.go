@@ -12,11 +12,11 @@ type DispVert struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *DispVert) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[primitives.DispVert](raw)
+	data, err := unmarshallBasicLump[primitives.DispVert](raw)
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
 	return nil
 }

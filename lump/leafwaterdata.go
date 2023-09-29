@@ -12,12 +12,11 @@ type LeafWaterData struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *LeafWaterData) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[primitives.LeafWaterData](raw)
+	data, err := unmarshallBasicLump[primitives.LeafWaterData](raw)
 	if err != nil {
 		return err
 	}
 
-	lump.Metadata = meta
 	lump.Data = data
 	return nil
 }

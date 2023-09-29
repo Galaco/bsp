@@ -66,40 +66,42 @@ type WorldLight struct {
 // This data may also be stored in entdata
 type WorldLightHDR struct {
 	// Origin is position in the world
-	Origin mgl32.Vec3
+	Origin mgl32.Vec3 `json:"origin" bsp:"all"`
 	// Intensity
-	Intensity mgl32.Vec3
+	Intensity mgl32.Vec3 `json:"intensity" bsp:"all"`
 	// Normal
-	Normal mgl32.Vec3
+	Normal mgl32.Vec3 `json:"normal" bsp:"all"`
 	// Cluster
-	Cluster int32
+	Cluster int32 `json:"cluster" bsp:"all"`
 	// Type
-	Type EmitType
+	Type EmitType `json:"type" bsp:"all"`
 	// Unknown1
 	// @TODO Think for alignments sake with is uint8. May be 3 bytes padding...
-	Unknown1 [3]byte
+	Unknown1 [3]byte `json:"unknown1" bsp:"all"`
 	// Style
-	Style int32
-	// Stopdot
-	Stopdot float32
-	// Stopdot2
-	Stopdot2 float32
+	Style int32 `json:"style" bsp:"all"`
+	// StopDot
+	StopDot float32 `json:"stopDot" bsp:"all"`
+	// StopDot2
+	StopDot2 float32 `json:"stopDot2" bsp:"all"`
 	// Exponent
-	Exponent float32
+	Exponent float32 `json:"exponent" bsp:"all"`
 	// Radius
-	Radius float32
+	Radius float32 `json:"radius" bsp:"all"`
 	// ConstantAttenuation
-	ConstantAttenuation float32
+	ConstantAttenuation float32 `json:"constantAttenuation" bsp:"all"`
 	// LinearAttenuation
-	LinearAttenuation float32
+	LinearAttenuation float32 `json:"linearAttenuation" bsp:"all"`
 	// QuadraticAttenuation
-	QuadraticAttenuation float32
+	QuadraticAttenuation float32 `json:"quadraticAttenuation" bsp:"all"`
 	// Flags
-	Flags int32
+	Flags int32 `json:"flags" bsp:"all"`
 	// TexInfo
-	TexInfo int32
+	TexInfo int32 `json:"texInfo" bsp:"all"`
 	// Owner
-	Owner int32
-	// Unknown2
-	Unknown2 [12]byte
+	Owner int32 `json:"owner" bsp:"all"`
+	// @TODO We don't know what this is.
+	Unknown2 [12]byte `json:"unknown2" bsp:"v21"`
+	// @TODO We don't know what this is, but v20 has it and v21 does not.
+	//Unknown3 [8]byte `json:"unknown3" bsp:"v20"`
 }

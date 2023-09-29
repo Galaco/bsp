@@ -1,6 +1,8 @@
 package lump
 
 import (
+	"fmt"
+
 	primitives "github.com/galaco/bsp/lump/primitive/worldlight"
 )
 
@@ -12,12 +14,13 @@ type WorldLightHDR struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *WorldLightHDR) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[primitives.WorldLightHDR](raw)
+	data, err := unmarshallTaggedLump[primitives.WorldLightHDR](raw, fmt.Sprintf("v%d", lump.Version()))
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
+
 	return nil
 }
 
@@ -28,5 +31,5 @@ func (lump *WorldLightHDR) Contents() []primitives.WorldLightHDR {
 
 // ToBytes converts this lump back to raw byte Data
 func (lump *WorldLightHDR) ToBytes() ([]byte, error) {
-	return marshallBasicLump(lump.Data)
+	return marshallTaggedLump[primitives.WorldLightHDR](lump.Data, fmt.Sprintf("v%d", lump.Version()))
 }

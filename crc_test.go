@@ -17,7 +17,7 @@ func TestBsp_Crc(t *testing.T) {
 		{
 			name:     "de_dust2",
 			filePath: "testdata/v20/de_dust2.bsp.gz",
-			expected: 1947027563,
+			expected: 3380635791,
 		},
 		{
 			name:     "ar_baggage",

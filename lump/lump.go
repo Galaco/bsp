@@ -3,23 +3,25 @@ package lump
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
+	"reflect"
+	"strings"
 	"unsafe"
 )
 
 // unmarshallBasicLump is a helper function for unmarshalling []byte to lumps that are just a single []T.
-func unmarshallBasicLump[V any](raw []byte) (Metadata, []V, error) {
-	var meta Metadata
+func unmarshallBasicLump[V any](raw []byte) ([]V, error) {
 	if len(raw) == 0 {
-		return meta, nil, nil
+		return nil, nil
 	}
 
 	var sampleV V
 	v := make([]V, len(raw)/int(unsafe.Sizeof(sampleV)))
 	if err := binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &v); err != nil {
-		return meta, nil, err
+		return nil, err
 	}
 
-	return meta, v, nil
+	return v, nil
 }
 
 // marshallBasicLump is a helper function for marshalling lumps that are just a single []T to []byte.
@@ -70,3 +72,71 @@ func (lump *RawBytes) ToBytes() ([]byte, error) {
 }
 
 type Unimplemented = RawBytes
+
+// unmarshallTaggedLump is a helper function for unmarshalling []byte to lumps that are just a single []T.
+// It uses the "bsp" tag on struct fields to determine which fields to read.
+func unmarshallTaggedLump[V any](raw []byte, version string) ([]V, error) {
+	if len(raw) == 0 {
+		return nil, nil
+	}
+
+	var sampleV V
+
+	// Figure out the length of our struct for our version.
+	var binarylenV int
+	for _, field := range reflect.VisibleFields(reflect.TypeOf(sampleV)) {
+		// Fields that are in this version should contribute to the length.
+		if t := field.Tag.Get("bsp"); t == "all" || t == version {
+			binarylenV += int(field.Type.Size())
+		}
+	}
+	if len(raw)%binarylenV != 0 {
+		// length doesn't match exactly a multiple of our calculated struct size.
+		return nil, fmt.Errorf("lump length %d is not a multiple of %d", len(raw), binarylenV)
+	}
+
+	// Calculate the padding size to properly read the struct.
+	padSize := int(unsafe.Sizeof(sampleV)) - binarylenV
+
+	v := make([]V, len(raw)/binarylenV)
+	for i := range v {
+		//buf := bytes.NewBuffer(raw[(binarylenV * i) : (binarylenV*i)+binarylenV])
+		b2 := append([]byte{}, raw[(binarylenV*i):(binarylenV*i)+binarylenV]...)
+		buf := bytes.NewBuffer(append(b2, []byte(strings.Repeat("\x45", padSize))...))
+		if err := binary.Read(buf, binary.LittleEndian, &v[i]); err != nil {
+			return nil, err
+		}
+	}
+
+	return v, nil
+}
+
+// marshallTaggedLump is a helper function for marshalling lumps that are just a single []T to []byte.
+// It uses the "bsp" tag on struct fields to determine which fields to write.
+func marshallTaggedLump[V any](data []V, version string) ([]byte, error) {
+	if len(data) == 0 {
+		return []byte{}, nil
+	}
+
+	var buf bytes.Buffer
+	visibleFields := reflect.VisibleFields(reflect.TypeOf(data[0]))
+	for _, v := range data {
+		for _, field := range visibleFields {
+			rv := reflect.Indirect(reflect.ValueOf(&v))
+			// Fields that are in this version should contribute to the length.
+			if t := field.Tag.Get("bsp"); t == "all" || t == version {
+				switch rv.FieldByName(field.Name).Kind() {
+				//case reflect.Slice:
+				//	if err := binary.Write(&buf, binary.LittleEndian, rv.FieldByName(field.Name).Elem()); err != nil {
+				//		return nil, err
+				//	}
+				default:
+					if err := binary.Write(&buf, binary.LittleEndian, rv.FieldByName(field.Name).Interface()); err != nil {
+						return nil, err
+					}
+				}
+			}
+		}
+	}
+	return buf.Bytes(), nil
+}

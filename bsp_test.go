@@ -17,10 +17,10 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 		name     string
 		filePath string
 	}{
-		//{
-		//	name:     "de_dust2",
-		//	filePath: "testdata/v20/de_dust2.bsp.gz",
-		//},
+		{
+			name:     "de_dust2",
+			filePath: "testdata/v20/de_dust2.bsp.gz",
+		},
 		{
 			name:     "ar_baggage",
 			filePath: "testdata/v21/ar_baggage.bsp.gz",

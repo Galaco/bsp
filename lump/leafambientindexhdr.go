@@ -12,11 +12,11 @@ type LeafAmbientIndexHDR struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *LeafAmbientIndexHDR) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[primitives.LeafAmbientIndex](raw)
+	data, err := unmarshallBasicLump[primitives.LeafAmbientIndex](raw)
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
 	return nil
 }

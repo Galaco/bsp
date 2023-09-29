@@ -12,11 +12,11 @@ type Face struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *Face) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[primitives.Face](raw)
+	data, err := unmarshallBasicLump[primitives.Face](raw)
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
 	return nil
 }

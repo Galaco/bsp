@@ -12,11 +12,11 @@ type VertNormal struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *VertNormal) FromBytes(raw []byte) error {
-	meta, data, err := unmarshallBasicLump[primitives.VertNormal](raw)
+	data, err := unmarshallBasicLump[primitives.VertNormal](raw)
 	if err != nil {
 		return err
 	}
-	lump.Metadata = meta
+
 	lump.Data = data
 	return nil
 }
