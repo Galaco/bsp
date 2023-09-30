@@ -141,7 +141,8 @@ const (
 	LumpLeafAmbientLightingHDR = LumpId(55)
 	// LumpLeafAmbientLighting
 	LumpLeafAmbientLighting = LumpId(56)
-	// LumpXZipPakfile is deprecated, and xbox specific
+	// LumpXZipPakfile is xbox specific.
+	// Deprecated: Valve says it's deprecated.
 	LumpXZipPakfile = LumpId(57)
 	// LumpFacesHDR
 	LumpFacesHDR = LumpId(58)

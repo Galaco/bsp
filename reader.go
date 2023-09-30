@@ -10,10 +10,17 @@ import (
 	"github.com/galaco/bsp/lump"
 )
 
+// LumpResolver Return an instance of a Lump for a given offset.
+type LumpResolver func(id LumpId, header Header) (Lump, error)
+
+// ReaderConfig offers configurable parameters for reading BSP.
 type ReaderConfig struct {
+	// LumpResolver is used to produce a new instance of whatever lump is presented by a given BSP version.
+	// If you have unsupported lumps, then overwrite this parameter with a custom implementation.
 	LumpResolver LumpResolver
 }
 
+// DefaultReaderConfig returns the default config for a reader.
 func DefaultReaderConfig() ReaderConfig {
 	return ReaderConfig{
 		LumpResolver: LumpResolverByBSPVersion,
@@ -40,23 +47,23 @@ func NewReaderWithConfig(config ReaderConfig) *Reader {
 }
 
 // Read reads from an io.Reader into a structured Bsp.
-func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
+func (r *Reader) Read(stream io.Reader) (*Bsp, error) {
 	buf := bytes.NewBuffer([]byte{})
 	if _, err := io.Copy(buf, stream); err != nil {
 		return nil, err
 	}
 	reader := bytes.NewReader(buf.Bytes())
 
-	bsp = &Bsp{}
+	bsp := &Bsp{}
 
-	// Create Header
+	// Create Header.
 	header, err := r.readHeader(reader)
 	if err != nil {
 		return nil, err
 	}
 	bsp.Header = header
 
-	// Create lumps from header data
+	// Create lumps from header data.
 	for index := range bsp.Header.Lumps {
 		lp, err := r.readLump(reader, &bsp.Header.Lumps[index])
 		if err != nil {
@@ -67,10 +74,10 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 			return nil, err
 		}
 
-		// There are specific rules for the game lump that requires some extra information
-		// Game lump lumps have offset data relative to file start, not lump start
+		// There are specific rules for the game lump that requires some extra information.
+		// Game lump lumps have offset data relative to file start, not lump start.
 		// This will correct the offsets to the start of the lump.
-		// @NOTE: Portal2 console uses relative offsets. This game+platform are not supported currently
+		// @TODO: Portal2 console uses relative offsets. This game+platform are not supported currently.
 		if index == int(LumpGame) {
 			if _, ok := refLump.(lump.GameGeneric); !ok {
 				return nil, fmt.Errorf("game lump does not implement GameGeneric interface")
@@ -84,7 +91,7 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 		bsp.Lumps[index] = refLump
 	}
 
-	return bsp, err
+	return bsp, nil
 }
 
 // readHeader Parses header from the bsp file.

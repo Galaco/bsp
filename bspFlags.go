@@ -65,7 +65,7 @@ const (
 	SurfWarp     = 0x0008 // turbulent water warp
 	SurfTrans    = 0x0010
 	SurfNoPortal = 0x0020 // the surface can not have a portal placed on it
-	SurfTrigger  = 0x0040 // FIXME: This is an xbox hack to work around elimination of trigger surfaces, which breaks occluders
+	SurfTrigger  = 0x0040 // Valve FIXME: This is an xbox hack to work around elimination of trigger surfaces, which breaks occluders
 	SurfNodraw   = 0x0080 // don't bother referencing the texture
 
 	SurfHint = 0x0100 // make a primary bsp splitter

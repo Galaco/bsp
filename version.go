@@ -17,12 +17,12 @@ func LumpResolverByBSPVersion(id LumpId, header Header) (l Lump, err error) {
 	switch header.Version {
 	case 19:
 		// @TODO: Implement v21.
-		l, err = getv20Lump(id)
+		l, err = getV20Lump(id)
 	case 20:
-		l, err = getv20Lump(id)
+		l, err = getV20Lump(id)
 	case 21:
 		// @TODO: Implement v21.
-		l, err = getv20Lump(id)
+		l, err = getV20Lump(id)
 	default:
 		l, err = &lump.RawBytes{}, nil
 	}
@@ -32,8 +32,8 @@ func LumpResolverByBSPVersion(id LumpId, header Header) (l Lump, err error) {
 	return l, nil
 }
 
-// Getv20Lump returns the corresponding v20 lump for provided index.
-func getv20Lump(index LumpId) (Lump, error) {
+// getV20Lump returns the corresponding v20 lump for provided index.
+func getV20Lump(index LumpId) (Lump, error) {
 	switch index {
 	case 0:
 		return &lump.EntData{}, nil
@@ -94,13 +94,15 @@ func getv20Lump(index LumpId) (Lump, error) {
 	case 28:
 		return &lump.PhysDisp{}, nil
 	case 29:
-		return &lump.RawBytes{}, nil //physcollide - IN PROGRESS
+		return &lump.RawBytes{}, nil //physcollide.
 	case 30:
 		return &lump.VertNormal{}, nil
 	case 31:
 		return &lump.VertNormalIndice{}, nil
 	case 32:
-		return &lump.RawBytes{}, nil //disp lightmap alphas - IS STRIPPED ANYWAY?
+		// @TODO: This appears to be stripped by VRAD.
+		// Find samples to test.
+		return &lump.RawBytes{}, nil //disp lightmap alphas
 	case 33:
 		return &lump.DispVert{}, nil
 	case 34:
@@ -110,7 +112,7 @@ func getv20Lump(index LumpId) (Lump, error) {
 	case 36:
 		return &lump.LeafWaterData{}, nil
 	case 37:
-		return &lump.RawBytes{}, nil //primitives FIXME - Appears to be 4bytes unaccounted for at end of lump?
+		return &lump.RawBytes{}, nil //primitives @TODO - Appears to be 4bytes unaccounted for at end of lump?
 	case 38:
 		return &lump.PrimVert{}, nil
 	case 39:

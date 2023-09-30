@@ -86,23 +86,23 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 // resolveLumpExportOrder returns a lump export order that matches the order of the original file
 // based on lump offsets.
 func resolveLumpExportOrder(header *Header) [64]LumpId {
-	vals := make([]struct {
+	temp := make([]struct {
 		Offset int32
 		Id     int
 	}, 64)
 	for idx, l := range header.Lumps {
-		vals[idx].Offset = l.Offset
-		vals[idx].Id = idx
+		temp[idx].Offset = l.Offset
+		temp[idx].Id = idx
 	}
 
-	sort.Slice(vals, func(i, j int) bool {
-		return vals[i].Offset < vals[j].Offset
+	sort.Slice(temp, func(i, j int) bool {
+		return temp[i].Offset < temp[j].Offset
 	})
 
 	res := [64]LumpId{}
 
-	for idx := range vals {
-		res[idx] = LumpId(vals[idx].Id)
+	for idx := range temp {
+		res[idx] = LumpId(temp[idx].Id)
 	}
 	return res
 }
