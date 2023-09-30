@@ -3,6 +3,7 @@ package bsp
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"unsafe"
 
@@ -71,7 +72,10 @@ func (r *Reader) Read(stream io.Reader) (bsp *Bsp, err error) {
 		// This will correct the offsets to the start of the lump.
 		// @NOTE: Portal2 console uses relative offsets. This game+platform are not supported currently
 		if index == int(LumpGame) {
-			refLump.(*lump.Game).SetAbsoluteFileOffset(int(header.Lumps[index].Offset))
+			if _, ok := refLump.(lump.GameGeneric); !ok {
+				return nil, fmt.Errorf("game lump does not implement GameGeneric interface")
+			}
+			refLump.(lump.GameGeneric).SetAbsoluteFileOffset(int(header.Lumps[index].Offset))
 		}
 
 		if err := refLump.FromBytes(lp); err != nil {

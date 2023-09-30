@@ -10,7 +10,7 @@ import (
 // MapFlags is Lump 59: MapFlags
 type MapFlags struct {
 	Metadata
-	Data primitives.MapFlags `json:"data"`
+	Data *primitives.MapFlags `json:"data"`
 }
 
 // FromBytes imports this lump from raw byte Data
@@ -19,15 +19,20 @@ func (lump *MapFlags) FromBytes(raw []byte) error {
 		return nil
 	}
 
-	return binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.Data)
+	lump.Data = &primitives.MapFlags{}
+
+	return binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, lump.Data)
 }
 
 // Contents returns internal format structure Data
 func (lump *MapFlags) Contents() *primitives.MapFlags {
-	return &lump.Data
+	return lump.Data
 }
 
 // ToBytes converts this lump back to raw byte Data
 func (lump *MapFlags) ToBytes() ([]byte, error) {
+	if lump.Data == nil {
+		return nil, nil
+	}
 	return marshallBasicLump(lump.Data)
 }

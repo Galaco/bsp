@@ -16,39 +16,39 @@ func TestGetLumpForVersion(t *testing.T) {
 	}{
 		{
 			name:    "unknown version",
-			id:      1,
+			id:      4,
 			version: 987,
 			t:       reflect.TypeOf(&lump.RawBytes{}),
 		},
 		{
 			name:    "v19",
-			id:      19,
-			version: 4,
+			id:      4,
+			version: 19,
 			t:       reflect.TypeOf(&lump.Visibility{}),
 		},
 		{
 			name:    "v20",
-			id:      20,
-			version: 4,
+			id:      4,
+			version: 20,
 			t:       reflect.TypeOf(&lump.Visibility{}),
 		},
 		{
 			name:    "v21",
-			id:      21,
-			version: 4,
+			id:      4,
+			version: 21,
 			t:       reflect.TypeOf(&lump.Visibility{}),
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			l, err := LumpResolverByBSPVersion(tc.id, Header{
+			l, err := LumpResolverByBSPVersion(LumpId(tc.id), Header{
 				Version: int32(tc.version),
 			})
 			if err != nil {
 				t.Error(err)
 			}
-			if reflect.TypeOf(l) != reflect.TypeOf(&lump.RawBytes{}) {
+			if reflect.TypeOf(l) != tc.t {
 				t.Error("Lump type mismatch.")
 			}
 		})

@@ -10,6 +10,10 @@ import (
 	primitive "github.com/galaco/bsp/lump/primitive/game"
 )
 
+type GameGeneric interface {
+	SetAbsoluteFileOffset(fileOffset int)
+}
+
 // Game is Lump 35.
 // @TODO NOTE: This really needs per-game implementations to be completely useful,
 // otherwise we only get staticprop Data from it
@@ -67,6 +71,21 @@ func (lump *Game) Contents() *Game {
 
 // ToBytes converts this lump back to raw byte Data
 func (lump *Game) ToBytes() ([]byte, error) {
+	// Lazy way to calculate header size early.
+	lumpDataOffsetBaseOffset := lump.absoluteFileOffset + 4 + (int(unsafe.Sizeof(primitive.LumpDef{})) * int(lump.Header.LumpCount))
+
+	var bodyBuf bytes.Buffer
+	var old int
+	for i, l := range lump.GameLumps {
+		old = bodyBuf.Len()
+		lump.Header.GameLumps[i].FileOffset = int32(lumpDataOffsetBaseOffset + (bodyBuf.Len()))
+		if err := binary.Write(&bodyBuf, binary.LittleEndian, l.Data); err != nil {
+			return nil, err
+		}
+		lump.Header.GameLumps[i].FileLength = int32(bodyBuf.Len() - old)
+		//lump.Header.GameLumps[i].FileOffset = int32(lumpDataOffsetBaseOffset + (bodyBuf.Len() - old))
+	}
+
 	var buf bytes.Buffer
 	if err := binary.Write(&buf, binary.LittleEndian, lump.Header.LumpCount); err != nil {
 		return nil, err
@@ -76,11 +95,8 @@ func (lump *Game) ToBytes() ([]byte, error) {
 			return nil, err
 		}
 	}
-	for _, l := range lump.GameLumps {
-		if err := binary.Write(&buf, binary.LittleEndian, l.Data); err != nil {
-			return nil, err
-		}
-	}
+	buf.Write(bodyBuf.Bytes())
+
 	return buf.Bytes(), nil
 }
 

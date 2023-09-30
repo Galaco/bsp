@@ -108,8 +108,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lump := file.Lump(bsp.LumpEntities).(*lumps.Entities)
-	log.Println(lump.Contents())
+	entdata := file.Lumps[bsp.LumpEntities].(*lump.EntData)
+	log.Println(entdata.Contents())
 }
 ```
 
@@ -127,6 +127,17 @@ For example:
 There are plenty of other scenarios where this can occur, and in a way that we cannot guess with certainty what the 
 expected behaviour should be. By default, this library assumes that structures that contain > 0 bytes are written, 
 but this behaviour can be overridden (see examples).
+
+## Overriding lumps.
+
+Lumps can be overridden by using the `NewReaderWithOptions` function, and passing a custom `LumpResolver`. A `LumpResolver` is
+responsible for return a new instance of whatever lump implementation you wish to use for a particular Lump index and BSP version.
+See examples for more details.
+
+### Lump 35: Game Lump
+
+The game lump has special rules, because of the unusual use of absolute file offsets. If you wish to override the game lump with
+your own implementation, then you must implement the `lump.GameGeneric` interface on your custom lump definition.
 
 
 ## Real World examples

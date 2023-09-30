@@ -3,6 +3,8 @@ package bsp
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
+	"github.com/galaco/bsp/lump"
 	"sort"
 	"unsafe"
 )
@@ -23,13 +25,21 @@ func (w *Writer) Write(bsp *Bsp) ([]byte, error) {
 func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 	var err error
 
-	currentOffset := int(unsafe.Sizeof(Header{})) // Header always 1036bytes, so we start immediately afterward.
+	bytesWritten := int(unsafe.Sizeof(Header{})) // Header always 1036bytes, so we start immediately afterward.
 
 	// Now we can export our lumps.
 	var lumpBuffer bytes.Buffer
 
 	var temp []byte
 	for _, index := range resolveLumpExportOrder(&data.Header) {
+		// Update our game data offsets.
+		if index == LumpGame {
+			if _, ok := data.Lumps[index].(lump.GameGeneric); !ok {
+				return nil, fmt.Errorf("game lump does not implement GameGeneric interface")
+			}
+			data.Lumps[index].(lump.GameGeneric).SetAbsoluteFileOffset(bytesWritten)
+		}
+
 		if temp, err = data.Lumps[index].ToBytes(); err != nil {
 			return nil, err
 		}
@@ -47,18 +57,18 @@ func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
 			continue
 		}
 		// Update header with new lump offset and lumpSize.
-		data.Header.Lumps[index].Offset = int32(currentOffset)
+		data.Header.Lumps[index].Offset = int32(bytesWritten)
 		data.Header.Lumps[index].Length = int32(lumpSize)
 
 		// Update current offset for next iteration.
-		currentOffset += lumpSize
+		bytesWritten += lumpSize
 
 		// Finally 4byte align the data and current offset.
 		// Note that we don't adjust the lump lumpSize in the header to reflect this;
 		// it's for padding reasons.
-		if pad := currentOffset % 4; pad != 0 {
+		if pad := bytesWritten % 4; pad != 0 {
 			lumpBuffer.Write(make([]byte, 4-pad))
-			currentOffset += 4 - pad
+			bytesWritten += 4 - pad
 		}
 	}
 

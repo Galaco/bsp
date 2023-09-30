@@ -25,6 +25,18 @@ func TestWriter_Write(t *testing.T) {
 		filePath string
 	}{
 		{
+			name:     "cs_assault",
+			filePath: "testdata/v20/cs_assault.bsp.gz",
+		},
+		{
+			name:     "de_nuke",
+			filePath: "testdata/v20/de_nuke.bsp.gz",
+		},
+		{
+			name:     "de_tides",
+			filePath: "testdata/v20/de_tides.bsp.gz",
+		},
+		{
 			name:     "de_dust2",
 			filePath: "testdata/v20/de_dust2.bsp.gz",
 		},
@@ -59,7 +71,7 @@ func TestWriter_Write(t *testing.T) {
 			}
 			expectedBytes := expected.Bytes()
 
-			actual, err := NewWriter().toBytes(bsp)
+			actual, err := NewWriter().Write(bsp)
 			if err != nil {
 				t.Fatalf("toBytes(%s) returned error: %v", tc.filePath, err)
 			}
