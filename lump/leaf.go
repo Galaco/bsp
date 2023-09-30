@@ -1,12 +1,7 @@
 package lump
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
-	"unsafe"
-
-	"github.com/galaco/bsp/lump/primitive/common"
 	primitives "github.com/galaco/bsp/lump/primitive/leaf"
 )
 
@@ -28,35 +23,12 @@ type Leaf struct {
 
 // FromBytes imports this lump from raw byte Data
 func (lump *Leaf) FromBytes(raw []byte) error {
-	// There are 2 version of leaf:
-	// v0 contains a light sample
-	// v1 removes the light sample, and is padded by 2 bytes
-	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
-	if lump.Version() > maxBspVersionOfV0Leaf {
-		// Correct size of v1+ leafs
-		structSize -= int(unsafe.Sizeof(common.CompressedLightCube{}))
+	data, err := unmarshallTaggedLump[primitives.Leaf](raw, fmt.Sprintf("v%d", lump.Version()))
+	if err != nil {
+		return err
 	}
 
-	lump.Data = make([]primitives.Leaf, len(raw)/structSize)
-	numLeafs := len(lump.Data)
-	i := 0
-
-	for i < numLeafs {
-		leafBuf := make([]byte, structSize)
-		copy(leafBuf, raw[(structSize*i):(structSize*i)+structSize])
-		// Pad the raw Data to the correct size of a leaf
-		if lump.Version() > maxBspVersionOfV0Leaf {
-			leafBuf = append(leafBuf, make([]byte, int(unsafe.Sizeof(common.CompressedLightCube{})))...)
-		}
-		rawLeaf := bytes.NewBuffer(leafBuf)
-		if err := binary.Read(rawLeaf, binary.LittleEndian, &lump.Data[i]); err != nil {
-			return err
-		}
-		i++
-		if i > MaxMapLeafs {
-			return fmt.Errorf("leaf count overflows maximum allowed size of %d", MaxMapLeafs)
-		}
-	}
+	lump.Data = data
 
 	return nil
 }
@@ -68,26 +40,5 @@ func (lump *Leaf) Contents() []primitives.Leaf {
 
 // ToBytes converts this lump back to raw byte Data
 func (lump *Leaf) ToBytes() ([]byte, error) {
-	var buf bytes.Buffer
-
-	switch lump.Version() {
-	case 0:
-		if err := binary.Write(&buf, binary.LittleEndian, lump.Data); err != nil {
-			return nil, err
-		}
-	default:
-		structSize := int(unsafe.Sizeof(primitives.Leaf{})) - int(unsafe.Sizeof(common.CompressedLightCube{}))
-		// @TODO optimize this.
-		for _, l := range lump.Data {
-			var leafBuf bytes.Buffer
-			if err := binary.Write(&leafBuf, binary.LittleEndian, l); err != nil {
-				return nil, err
-			}
-			if err := binary.Write(&buf, binary.LittleEndian, leafBuf.Bytes()[0:structSize]); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return buf.Bytes(), nil
+	return marshallTaggedLump[primitives.Leaf](lump.Data, fmt.Sprintf("v%d", lump.Version()))
 }

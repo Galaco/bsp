@@ -66,42 +66,40 @@ type WorldLight struct {
 // This data may also be stored in entdata
 type WorldLightHDR struct {
 	// Origin is position in the world
-	Origin mgl32.Vec3 `json:"origin" bsp:"all"`
+	Origin mgl32.Vec3 `json:"origin"`
 	// Intensity
-	Intensity mgl32.Vec3 `json:"intensity" bsp:"all"`
+	Intensity mgl32.Vec3 `json:"intensity"`
 	// Normal
-	Normal mgl32.Vec3 `json:"normal" bsp:"all"`
+	Normal mgl32.Vec3 `json:"normal"`
 	// Cluster
-	Cluster int32 `json:"cluster" bsp:"all"`
+	Cluster int32 `json:"cluster"`
 	// Type
-	Type EmitType `json:"type" bsp:"all"`
+	Type EmitType `json:"type"`
 	// Unknown1
 	// @TODO Think for alignments sake with is uint8. May be 3 bytes padding...
-	Unknown1 [3]byte `json:"unknown1" bsp:"all"`
+	Unknown1 [3]byte `json:"unknown1"`
 	// Style
-	Style int32 `json:"style" bsp:"all"`
+	Style int32 `json:"style"`
 	// StopDot
-	StopDot float32 `json:"stopDot" bsp:"all"`
+	StopDot float32 `json:"stopDot"`
 	// StopDot2
-	StopDot2 float32 `json:"stopDot2" bsp:"all"`
+	StopDot2 float32 `json:"stopDot2"`
 	// Exponent
-	Exponent float32 `json:"exponent" bsp:"all"`
+	Exponent float32 `json:"exponent"`
 	// Radius
-	Radius float32 `json:"radius" bsp:"all"`
+	Radius float32 `json:"radius"`
 	// ConstantAttenuation
-	ConstantAttenuation float32 `json:"constantAttenuation" bsp:"all"`
+	ConstantAttenuation float32 `json:"constantAttenuation"`
 	// LinearAttenuation
-	LinearAttenuation float32 `json:"linearAttenuation" bsp:"all"`
+	LinearAttenuation float32 `json:"linearAttenuation"`
 	// QuadraticAttenuation
-	QuadraticAttenuation float32 `json:"quadraticAttenuation" bsp:"all"`
+	QuadraticAttenuation float32 `json:"quadraticAttenuation"`
 	// Flags
-	Flags int32 `json:"flags" bsp:"all"`
+	Flags int32 `json:"flags"`
 	// TexInfo
-	TexInfo int32 `json:"texInfo" bsp:"all"`
+	TexInfo int32 `json:"texInfo"`
 	// Owner
-	Owner int32 `json:"owner" bsp:"all"`
+	Owner int32 `json:"owner"`
 	// @TODO We don't know what this is.
 	Unknown2 [12]byte `json:"unknown2" bsp:"v21"`
-	// @TODO We don't know what this is, but v20 has it and v21 does not.
-	//Unknown3 [8]byte `json:"unknown3" bsp:"v20"`
 }

@@ -32,7 +32,7 @@ type Leaf struct {
 	LeafWaterDataID int16 `json:"leafWaterDataID"`
 
 	// LightSample
-	LightSample common.CompressedLightCube `json:"lightSample"`
+	LightSample common.CompressedLightCube `json:"lightSample" bsp:"v19"`
 
 	// @TODO: Unknown1
 	Unknown1 [2]byte `json:"unknown1"`

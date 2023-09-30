@@ -86,7 +86,7 @@ func unmarshallTaggedLump[V any](raw []byte, version string) ([]V, error) {
 	var binarylenV int
 	for _, field := range reflect.VisibleFields(reflect.TypeOf(sampleV)) {
 		// Fields that are in this version should contribute to the length.
-		if t := field.Tag.Get("bsp"); t == "all" || t == version {
+		if t := field.Tag.Get("bsp"); t == "" || t == version {
 			binarylenV += int(field.Type.Size())
 		}
 	}
@@ -100,9 +100,8 @@ func unmarshallTaggedLump[V any](raw []byte, version string) ([]V, error) {
 
 	v := make([]V, len(raw)/binarylenV)
 	for i := range v {
-		//buf := bytes.NewBuffer(raw[(binarylenV * i) : (binarylenV*i)+binarylenV])
 		b2 := append([]byte{}, raw[(binarylenV*i):(binarylenV*i)+binarylenV]...)
-		buf := bytes.NewBuffer(append(b2, []byte(strings.Repeat("\x45", padSize))...))
+		buf := bytes.NewBuffer(append(b2, []byte(strings.Repeat("\x00", padSize))...))
 		if err := binary.Read(buf, binary.LittleEndian, &v[i]); err != nil {
 			return nil, err
 		}
@@ -124,7 +123,7 @@ func marshallTaggedLump[V any](data []V, version string) ([]byte, error) {
 		for _, field := range visibleFields {
 			rv := reflect.Indirect(reflect.ValueOf(&v))
 			// Fields that are in this version should contribute to the length.
-			if t := field.Tag.Get("bsp"); t == "all" || t == version {
+			if t := field.Tag.Get("bsp"); t == "" || t == version {
 				switch rv.FieldByName(field.Name).Kind() {
 				//case reflect.Slice:
 				//	if err := binary.Write(&buf, binary.LittleEndian, rv.FieldByName(field.Name).Elem()); err != nil {
