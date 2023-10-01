@@ -15,5 +15,5 @@ type LeafAmbientLighting struct {
 	// Z z
 	Z byte `json:"z"`
 	// Pad is padding to 4 bytes (any other purpose unknown).
-	Unknown1 byte
+	Pad byte
 }

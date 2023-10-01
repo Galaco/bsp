@@ -88,8 +88,8 @@ func TestWriter_Write(t *testing.T) {
 
 					expectedLumpOffset := int(binary.LittleEndian.Uint32(expectedBytes[offset : offset+4]))
 					expectedLumpLength := int(binary.LittleEndian.Uint32(expectedBytes[offset+4 : offset+8]))
-					actualLumpOffset := int(binary.LittleEndian.Uint32(expectedBytes[offset : offset+4]))
-					actualLumpLength := int(binary.LittleEndian.Uint32(expectedBytes[offset+4 : offset+8]))
+					actualLumpOffset := int(binary.LittleEndian.Uint32(actual[offset : offset+4]))
+					actualLumpLength := int(binary.LittleEndian.Uint32(actual[offset+4 : offset+8]))
 
 					log.Printf("%d: offset: %d, %d (%d). length: %d, %d (%d). Version: %d, %d\n", i,
 						expectedLumpOffset,
@@ -126,9 +126,9 @@ func TestWriter_Write(t *testing.T) {
 					t.Errorf("toBytes(%s) returned unexpected bytes", tc.filePath)
 				}
 
-				//if diff := cmp.Diff(expectedBytes, actual); diff != "" {
-				//	t.Errorf("toBytes(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
-				//}
+				if diff := cmp.Diff(expectedBytes, actual); diff != "" {
+					t.Errorf("toBytes(%s) returned unexpected diff (-want +got):\n%s", tc.filePath, diff)
+				}
 			}
 		})
 	}

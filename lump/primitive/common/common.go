@@ -107,7 +107,4 @@ type MapDispInfo struct {
 }
 
 // CompressedLightCube
-type CompressedLightCube struct {
-	// Color
-	Color [6]ColorRGBExponent32 `json:"color"`
-}
+type CompressedLightCube = [6]ColorRGBExponent32
