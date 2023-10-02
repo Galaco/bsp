@@ -104,6 +104,7 @@ type MapDispInfo struct {
 	// #ifdef VSVMFIO
 	// Elevation float32
 	// OffsetNormals []Vector
+	// #endif
 }
 
 // CompressedLightCube

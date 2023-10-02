@@ -26,5 +26,10 @@ func main() {
 	}
 
 	entdata := file.Lumps[bsp.LumpEntities].(*lump.EntData)
+	l := entdata.Contents()
+	if err != nil {
+		panic(err)
+	}
+	_ = l
 	log.Println(entdata.Contents())
 }

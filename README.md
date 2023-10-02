@@ -86,30 +86,30 @@ lump (entdata is a single json-like string) of a specified .bsp to console.
 package main
 
 import (
-	"github.com/galaco/bsp"
-	"github.com/galaco/bsp/lump"
-	"log"
-	"os"
+  "github.com/galaco/bsp"
+  "github.com/galaco/bsp/lump"
+  "log"
+  "os"
 )
 
 func main() {
-	f, err := os.Open("de_dust2.bsp")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
+  f, err := os.Open("de_dust2.bsp")
+  if err != nil {
+    log.Fatal(err)
+  }
+  defer f.Close()
 
-	// Create a new bsp reader
-	reader := bsp.NewReader()
+  // Create a new bsp reader
+  reader := bsp.NewReader()
 
-	// Read buffer
-	file, err := reader.Read(f)
-	if err != nil {
-		log.Fatal(err)
-	}
+  // Read buffer
+  file, err := reader.Read(f)
+  if err != nil {
+    log.Fatal(err)
+  }
 
-	entdata := file.Lumps[bsp.LumpEntities].(*lump.EntData)
-	log.Println(entdata.Contents())
+  entdata := (file.Lumps[bsp.LumpEntities]).(*lump.Entdata)
+  log.Println(entdata.Contents())
 }
 ```
 
