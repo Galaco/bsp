@@ -18,7 +18,7 @@ func TestGetLumpForVersion(t *testing.T) {
 			name:    "unknown version",
 			id:      4,
 			version: 987,
-			t:       reflect.TypeOf(&lump.RawBytes{}),
+			t:       reflect.TypeOf(&lump.Unimplemented{}),
 		},
 		{
 			name:    "v19",

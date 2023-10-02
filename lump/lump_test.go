@@ -5,7 +5,7 @@ import (
 )
 
 func TestUnimplemented_GetData(t *testing.T) {
-	sut := RawBytes{}
+	sut := Unimplemented{}
 	data := []byte{0, 1, 2, 5, 43, 156, 146, 3, 3, 6}
 	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)
@@ -18,7 +18,7 @@ func TestUnimplemented_GetData(t *testing.T) {
 }
 
 func TestUnimplemented_Marshall(t *testing.T) {
-	sut := RawBytes{}
+	sut := Unimplemented{}
 	data := []byte{0, 1, 2, 5, 43, 156, 146, 3, 3, 6}
 	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)
@@ -40,7 +40,7 @@ func TestUnimplemented_Marshall(t *testing.T) {
 }
 
 func TestUnimplemented_FromBytes(t *testing.T) {
-	sut := RawBytes{}
+	sut := Unimplemented{}
 	data := []byte{0, 1, 2, 5, 43, 156, 146, 3, 3, 6}
 	if err := sut.FromBytes(data); err != nil {
 		t.Error(err)

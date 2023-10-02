@@ -24,7 +24,7 @@ func LumpResolverByBSPVersion(id LumpId, header Header) (l Lump, err error) {
 		// @TODO: Implement v21.
 		l, err = getV20Lump(id)
 	default:
-		l, err = &lump.RawBytes{}, nil
+		l, err = &lump.Unimplemented{}, nil
 	}
 
 	l.SetVersion(header.Version)
@@ -80,13 +80,13 @@ func getV20Lump(index LumpId) (Lump, error) {
 	case 21:
 		return &lump.AreaPortal{}, nil
 	case 22:
-		return &lump.RawBytes{}, nil //portals | unused0 | propcollision
+		return &lump.Unimplemented{}, nil //portals | unused0 | propcollision
 	case 23:
-		return &lump.RawBytes{}, nil //clusters | unused1 | prophulls
+		return &lump.Unimplemented{}, nil //clusters | unused1 | prophulls
 	case 24:
-		return &lump.RawBytes{}, nil //portalverts | unused2 | prophullverts
+		return &lump.Unimplemented{}, nil //portalverts | unused2 | prophullverts
 	case 25:
-		return &lump.RawBytes{}, nil //clusterportals | unused3 | proptris
+		return &lump.Unimplemented{}, nil //clusterportals | unused3 | proptris
 	case 26:
 		return &lump.DispInfo{}, nil
 	case 27:
@@ -94,7 +94,7 @@ func getV20Lump(index LumpId) (Lump, error) {
 	case 28:
 		return &lump.PhysDisp{}, nil
 	case 29:
-		return &lump.RawBytes{}, nil //physcollide.
+		return &lump.Unimplemented{}, nil //physcollide.
 	case 30:
 		return &lump.VertNormal{}, nil
 	case 31:
@@ -102,7 +102,7 @@ func getV20Lump(index LumpId) (Lump, error) {
 	case 32:
 		// @TODO: This appears to be stripped by VRAD.
 		// Find samples to test.
-		return &lump.RawBytes{}, nil //disp lightmap alphas
+		return &lump.Unimplemented{}, nil //disp lightmap alphas
 	case 33:
 		return &lump.DispVert{}, nil
 	case 34:
@@ -112,7 +112,7 @@ func getV20Lump(index LumpId) (Lump, error) {
 	case 36:
 		return &lump.LeafWaterData{}, nil
 	case 37:
-		return &lump.RawBytes{}, nil //primitives @TODO - Appears to be 4bytes unaccounted for at end of lump?
+		return &lump.Unimplemented{}, nil //primitives @TODO - Appears to be 4bytes unaccounted for at end of lump?
 	case 38:
 		return &lump.PrimVert{}, nil
 	case 39:
@@ -136,9 +136,9 @@ func getV20Lump(index LumpId) (Lump, error) {
 	case 48:
 		return &lump.DispTris{}, nil
 	case 49:
-		return &lump.RawBytes{}, nil //physcollidesurface | prop blob
+		return &lump.Unimplemented{}, nil //physcollidesurface | prop blob
 	case 50:
-		return &lump.RawBytes{}, nil //wateroverlays
+		return &lump.Unimplemented{}, nil //wateroverlays
 	case 51:
 		return &lump.LeafAmbientIndexHDR{}, nil
 	case 52:
@@ -152,7 +152,7 @@ func getV20Lump(index LumpId) (Lump, error) {
 	case 56:
 		return &lump.LeafAmbientLighting{}, nil //leaf ambient lighting
 	case 57:
-		return &lump.RawBytes{}, nil //xzippakfile
+		return &lump.Unimplemented{}, nil //xzippakfile
 	case 58:
 		return &lump.FaceHDR{}, nil
 	case 59:
@@ -160,11 +160,11 @@ func getV20Lump(index LumpId) (Lump, error) {
 	case 60:
 		return &lump.OverlayFade{}, nil
 	case 61:
-		return &lump.RawBytes{}, nil //overlay system levels
+		return &lump.Unimplemented{}, nil //overlay system levels
 	case 62:
-		return &lump.RawBytes{}, nil //physlevel
+		return &lump.Unimplemented{}, nil //physlevel
 	case 63:
-		return &lump.RawBytes{}, nil //disp multiblend
+		return &lump.Unimplemented{}, nil //disp multiblend
 	default:
 		return nil, fmt.Errorf("invalid lump id")
 	}
