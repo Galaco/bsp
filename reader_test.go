@@ -1,30 +1,55 @@
 package bsp
 
 import (
-	"github.com/galaco/bsp/lumps"
+	"compress/gzip"
 	"os"
 	"testing"
+
+	"github.com/galaco/bsp/lump"
 )
 
-func TestReadFromFile(t *testing.T) {
-	t.Skip()
-	_, err := ReadFromFile("maps/v20/de_dust2.bsp")
-	if err != nil {
-		t.Error(err)
-	}
-}
-
 func TestReadFromStream(t *testing.T) {
-	t.Skip()
-	f, err := os.Open("maps/v20/de_dust2.bsp")
-	if err != nil {
-		t.Error(err)
+	testCases := []struct {
+		name          string
+		filePath      string
+		expectedError error
+	}{
+		{
+			name:          "de_dust2",
+			filePath:      "testdata/v20/de_dust2.bsp.gz",
+			expectedError: nil,
+		},
+		{
+			name:          "ar_baggage",
+			filePath:      "testdata/v21/ar_baggage.bsp.gz",
+			expectedError: nil,
+		},
 	}
 
-	r, err := ReadFromStream(f)
-	if err != nil {
-		t.Error(err)
-	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			f, err := os.Open(tc.filePath)
+			if err != nil {
+				t.Error(err)
+			}
+			defer func(f *os.File) {
+				if err := f.Close(); err != nil {
+					t.Error(err)
+				}
+			}(f)
+			binarygzr, err := gzip.NewReader(f)
+			if err != nil {
+				t.Error(err)
+			}
 
-	r.Lump(LumpGame).(*lumps.Game).GetStaticPropLump()
+			r, err := NewReaderWithConfig(ReaderConfig{
+				LumpResolver: LumpResolverByBSPVersion,
+			}).Read(binarygzr)
+			if err != nil {
+				t.Error(err)
+			}
+
+			r.Lumps[LumpGame].(*lump.Game).GetStaticPropLump()
+		})
+	}
 }

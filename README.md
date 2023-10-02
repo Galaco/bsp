@@ -1,12 +1,11 @@
 [![GoDoc](https://godoc.org/github.com/Galaco/bsp?status.svg)](https://godoc.org/github.com/Galaco/bsp)
 [![Go report card](https://goreportcard.com/badge/github.com/galaco/bsp)](https://goreportcard.com/badge/github.com/galaco/bsp)
 [![GolangCI](https://golangci.com/badges/github.com/galaco/bsp.svg)](https://golangci.com)
-[![Build Status](https://travis-ci.com/Galaco/bsp.svg?branch=master)](https://travis-ci.com/Galaco/bsp)
 [![CircleCI](https://circleci.com/gh/Galaco/bsp/tree/master.svg?style=svg)](https://circleci.com/gh/Galaco/bsp/tree/master)
 [![codecov](https://codecov.io/gh/Galaco/bsp/branch/master/graph/badge.svg)](https://codecov.io/gh/Galaco/bsp)
 
 # Bsp
-Go library for handling Source Engine .bsp map files.
+The most comprehensive library for reading and writing Source Engine .bsp map files.
 
 ### Features:
 * Read support for (most) non-xbox360 BSPs (v20,21). v19 support limited, may work
@@ -72,7 +71,11 @@ The following lumps currently have a full implementation for v20 & v21 BSPs (tes
 60: OverlayFades
 ```
 
-##### This library may reorganise lump order during the first export. This is intentional to handle lump resizing, but will change your checksum if you export without changes.
+Lumps not listed here are parsed and available as `[]byte` format.
+
+Note: Some lumps in some BSP versions have data with unidentified purpose. These fields are available as byte arrays. 
+Please submit an issue or a PR if you can help fill in any of these fields.
+
 
 # Usage
 
@@ -83,29 +86,59 @@ lump (entdata is a single json-like string) of a specified .bsp to console.
 package main
 
 import (
-	"github.com/galaco/bsp"
-	"github.com/galaco/bsp/lumps"
-	"log"
-	"os"
+  "github.com/galaco/bsp"
+  "github.com/galaco/bsp/lump"
+  "log"
+  "os"
 )
 
 func main() {
-	f,_ := os.Open("de_dust2.bsp")
+  f, err := os.Open("de_dust2.bsp")
+  if err != nil {
+    log.Fatal(err)
+  }
+  defer f.Close()
 
-	// Create a new bsp reader
-	reader := bsp.NewReader(f)
-	
-	// Read buffer
-	file,err := reader.Read()
-	if err != nil {
-		log.Fatal(err)
-	}
-	f.Close()
-    
-	lump := file.Lump(bsp.LumpEntities).(*lumps.Entities)
-	log.Println(lump.GetData())
+  // Create a new bsp reader
+  reader := bsp.NewReader()
+
+  // Read buffer
+  file, err := reader.Read(f)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  entdata := (file.Lumps[bsp.LumpEntities]).(*lump.Entdata)
+  log.Println(entdata.Contents())
 }
 ```
+
+There are more usage examples available in the `examples/` directory.
+
+## Exporting BSPs
+
+This library supports writing BSPs. It aims to preserve identical binaries where possible, but this is not guaranteed
+due to wide-ranging difference in format across games (and even within the same game!). 
+For example:
+* Counterstrike: Source
+  * de_dust2 Lump 59 (MapFlags) has 0 flags set, a the 4byte lump is written. Format is BSP v20.
+  * de_nuke Lump 59 (MapFlags) has 0 flags set, but the lump is not written. Format is BSP v20.
+
+There are plenty of other scenarios where this can occur, and in a way that we cannot guess with certainty what the 
+expected behaviour should be. By default, this library assumes that structures that contain > 0 bytes are written, 
+but this behaviour can be overridden (see examples).
+
+## Overriding lumps.
+
+Lumps can be overridden by using the `NewReaderWithOptions` function, and passing a custom `LumpResolver`. A `LumpResolver` is
+responsible for return a new instance of whatever lump implementation you wish to use for a particular Lump index and BSP version.
+See examples for more details.
+
+### Lump 35: Game Lump
+
+The game lump has special rules, because of the unusual use of absolute file offsets. If you wish to override the game lump with
+your own implementation, then you must implement the `lump.GameGeneric` interface on your custom lump definition.
+
 
 ## Real World examples
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)
@@ -114,4 +147,4 @@ func main() {
 
 
 # Contributing
-All contributions welcome. Known unsupported games/maps are especially useful.
+All contributions welcome, in particular any maps that are found to be incompatible.

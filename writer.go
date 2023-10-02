@@ -3,151 +3,106 @@ package bsp
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/galaco/bsp/lumps"
+	"fmt"
+	"github.com/galaco/bsp/lump"
+	"sort"
+	"unsafe"
 )
 
 // Writer is a Bsp export writer.
-type Writer struct {
-	data Bsp
+type Writer struct{}
+
+// NewWriter Returns a new bsp writer instance.
+func NewWriter() *Writer {
+	return &Writer{}
 }
 
-// GetBsp Gets bsp file to write.
-func (w *Writer) GetBsp() Bsp {
-	return w.data
+func (w *Writer) Write(bsp *Bsp) ([]byte, error) {
+	return w.toBytes(bsp)
 }
 
-// SetBsp Sets bsp file to write.
-func (w *Writer) SetBsp(file Bsp) {
-	w.data = file
-}
+// toBytes bsp to []byte.
+func (w *Writer) toBytes(data *Bsp) ([]byte, error) {
+	var err error
 
-// Write bsp to []byte.
-func (w *Writer) Write() ([]byte, error) {
-	// First we need to update the header to reflect any lump changes
-	// At the same time we can dump our lumps as bytes to write later
-	lumpBytes := make([][]byte, 64)
-	currentOffset := 1036 // Header always 1036bytes
+	bytesWritten := int(unsafe.Sizeof(Header{})) // Header always 1036bytes, so we start immediately afterward.
 
-	for _, index := range getDefaultLumpOrdering() {
-		// We have to handle lump 35 (GameData differently)
-		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
+	// Now we can export our lumps.
+	var lumpBuffer bytes.Buffer
+
+	var temp []byte
+	for _, index := range resolveLumpExportOrder(&data.Header) {
+		// Update our game data offsets.
 		if index == LumpGame {
-			gamelump := w.data.lumps[int(index)].Contents().(*lumps.Game)
-			w.data.lumps[int(index)].SetContents(
-				gamelump.UpdateInternalOffsets(int32(currentOffset) - w.data.header.Lumps[int(index)].Offset))
+			if _, ok := data.Lumps[index].(lump.GameGeneric); !ok {
+				return nil, fmt.Errorf("game lump does not implement GameGeneric interface")
+			}
+			data.Lumps[index].(lump.GameGeneric).SetAbsoluteFileOffset(bytesWritten)
 		}
-		exportBytes, err := w.WriteLump(index)
+
+		if temp, err = data.Lumps[index].ToBytes(); err != nil {
+			return nil, err
+		}
+		lumpSize, err := lumpBuffer.Write(temp)
 		if err != nil {
 			return nil, err
 		}
-		lumpBytes[int(index)] = exportBytes
 
-		lumpSize := len(lumpBytes[int(index)])
+		// If the lump is empty, we can skip it.
+		if lumpSize == 0 {
+			// 0 bytes is a valid lump, but some fields are actually set to 0, other not.
+			// @TODO why are some offsets and versions non-0 when length is 0. (e.g. ar_baggage)
+			data.Header.Lumps[index].Length = 0
+			data.Header.Lumps[index].ID = [4]byte{0, 0, 0, 0}
+			continue
+		}
+		// Update header with new lump offset and lumpSize.
+		data.Header.Lumps[index].Offset = int32(bytesWritten)
+		data.Header.Lumps[index].Length = int32(lumpSize)
 
-		w.data.header.Lumps[int(index)].Length = int32(lumpSize)
-		w.data.header.Lumps[int(index)].Offset = int32(currentOffset)
+		// Update current offset for next iteration.
+		bytesWritten += lumpSize
 
-		currentOffset += lumpSize
-
-		// Finally 4byte align each lump.
-		lumpBytes[int(index)] = append(lumpBytes[int(index)], make([]byte, currentOffset%4)...)
-		currentOffset += currentOffset % 4
-	}
-
-	// Now we can export our bsp
-	var buf bytes.Buffer
-
-	//Write Header
-	err := binary.Write(&buf, binary.LittleEndian, w.data.header)
-	if err != nil {
-		return nil, err
-	}
-
-	//Write lumps
-	for _, lumpData := range lumpBytes {
-		if err = binary.Write(&buf, binary.LittleEndian, lumpData); err != nil {
-			return nil, err
+		// Finally 4byte align the data and current offset.
+		// Note that we don't adjust the lump lumpSize in the header to reflect this;
+		// it's for padding reasons.
+		if pad := bytesWritten % 4; pad != 0 {
+			lumpBuffer.Write(make([]byte, 4-pad))
+			bytesWritten += 4 - pad
 		}
 	}
 
-	return buf.Bytes(), nil
-}
-
-// WriteLump Exports a single lump to []byte.
-func (w *Writer) WriteLump(index LumpId) ([]byte, error) {
-	lump := w.data.Lump(index)
-	return lump.Marshall()
-}
-
-// NewWriter Returns a new bsp writer instance.
-func NewWriter() Writer {
-	w := Writer{}
-	return w
-}
-
-// getDefaultLumpOrdering gets Source Engines default export order.
-// Source compile tools write lumps out of order
-// While the ordering doesn't actually matter, it may
-// be useful/more performant to maintain the same order, particularly post-export
-func getDefaultLumpOrdering() [64]LumpId {
-	return [64]LumpId{
-		LumpPlanes,
-		LumpLeafs,
-		LumpLeafAmbientLighting,
-		LumpLeafAmbientIndex,
-		LumpLeafAmbientIndexHDR,
-		LumpLeafAmbientLightingHDR,
-		LumpVertexes,
-		LumpNodes,
-		LumpTexInfo,
-		LumpTexData,
-		LumpDispInfo,
-		LumpDispVerts,
-		LumpDispTris,
-		LumpDispLightmapSamplePositions,
-		LumpFaceMacroTextureInfo,
-		LumpPrimitives,
-		LumpPrimVerts,
-		LumpPrimIndices,
-		LumpFaces,
-		LumpFacesHDR,
-		LumpFaceIds,
-		LumpOriginalFaces,
-		LumpBrushes,
-		LumpBrushSides,
-		LumpLeafFaces,
-		LumpLeafBrushes,
-		LumpSurfEdges,
-		LumpEdges,
-		LumpModels,
-		LumpAreas,
-		LumpAreaPortals,
-		LumpLighting,
-		LumpLightingHDR,
-		LumpVisibility,
-		LumpEntities,
-		LumpWorldLights,
-		LumpWorldLightsHDR,
-		LumpLeafWaterData,
-		LumpOcclusion,
-		LumpMapFlags,
-		LumpPortals,
-		LumpClusters,
-		LumpPortalVerts,
-		LumpClusterPortals,
-		LumpClipPortalVerts,
-		LumpCubemaps,
-		LumpTexDataStringData,
-		LumpTexDataStringTable,
-		LumpOverlays,
-		LumpWaterOverlays,
-		LumpOverlayFades,
-		LumpPhysCollide,
-		LumpPhysDisp,
-		LumpVertNormals,
-		LumpVertNormalIndices,
-		LumpLeafMinDistToWater,
-		LumpGame,
-		LumpPakfile,
+	var buffer bytes.Buffer
+	if err := binary.Write(&buffer, binary.LittleEndian, data.Header); err != nil {
+		return nil, err
 	}
+
+	if _, err := buffer.Write(lumpBuffer.Bytes()); err != nil {
+		return nil, err
+	}
+	return buffer.Bytes(), nil
+}
+
+// resolveLumpExportOrder returns a lump export order that matches the order of the original file
+// based on lump offsets.
+func resolveLumpExportOrder(header *Header) [64]LumpId {
+	temp := make([]struct {
+		Offset int32
+		Id     int
+	}, 64)
+	for idx, l := range header.Lumps {
+		temp[idx].Offset = l.Offset
+		temp[idx].Id = idx
+	}
+
+	sort.Slice(temp, func(i, j int) bool {
+		return temp[i].Offset < temp[j].Offset
+	})
+
+	res := [64]LumpId{}
+
+	for idx := range temp {
+		res[idx] = LumpId(temp[idx].Id)
+	}
+	return res
 }

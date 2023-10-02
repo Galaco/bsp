@@ -2,81 +2,87 @@ package bsp
 
 import (
 	"bytes"
-	"github.com/galaco/bsp/lumps"
+	"compress/gzip"
+	"io"
 	"log"
+	"os"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 // Test that resultant lump data matches expected.
-func TestLumpExports(t *testing.T) {
-	t.Skip()
-	file, err := ReadFromFile("maps/v20/de_dust2.bsp")
-	if err != nil {
-		t.Error(err)
+func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
+	testCases := []struct {
+		name     string
+		filePath string
+	}{
+		{
+			name:     "de_dust2",
+			filePath: "testdata/v20/de_dust2.bsp.gz",
+		},
+		{
+			name:     "ar_baggage",
+			filePath: "testdata/v21/ar_baggage.bsp.gz",
+		},
 	}
 
-	// Verify lump lengths
-	lumpIndex := 0
-	for lumpIndex < 64 {
-		lump := file.Lump(LumpId(lumpIndex))
-		rawLump := file.RawLump(LumpId(lumpIndex))
-		lumpBytes, err := lump.Marshall()
-		if err != nil {
-			t.Error(err)
-		}
-		if len(lumpBytes) != int(file.Header().Lumps[lumpIndex].Length) {
-			t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(lumpBytes), file.header.Lumps[lumpIndex].Length)
-		} else {
-			log.Printf("Index: %d, Expected: %d, Actual: %d\n", lumpIndex, len(rawLump.RawContents()), len(lumpBytes))
-			if !bytes.Equal(lumpBytes, rawLump.RawContents()) {
-				t.Errorf("Lump: %d data mismatch", lumpIndex)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			binaryFile, err := os.Open(tc.filePath)
+			if err != nil {
+				t.Fatal(err)
 			}
-		}
+			defer func(binaryFile *os.File) {
+				if err := binaryFile.Close(); err != nil {
+					t.Error(err)
+				}
+			}(binaryFile)
+			binarygzr, err := gzip.NewReader(binaryFile)
+			if err != nil {
+				t.Fatal(err)
+			}
+			binaryData, err := io.ReadAll(binarygzr)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		lumpIndex += 1
-	}
-}
+			testFile, err := os.Open(tc.filePath)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func(testFile *os.File) {
+				if err := testFile.Close(); err != nil {
+					t.Error(err)
+				}
+			}(testFile)
+			testFilegzr, err := gzip.NewReader(testFile)
+			if err != nil {
+				t.Fatal(err)
+			}
+			testBSP, err := NewReaderWithConfig(ReaderConfig{
+				LumpResolver: LumpResolverByBSPVersion,
+			}).Read(testFilegzr)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-func TestBsp_Header(t *testing.T) {
-	sut := new(Bsp)
-	header := new(Header)
-	header.Id = 564
+			// Verify lump lengths.
+			for lumpIndex := range testBSP.Header.Lumps {
+				actual, err := testBSP.Lumps[lumpIndex].ToBytes()
+				if err != nil {
+					t.Error(err)
+				}
+				if len(actual) != int(testBSP.Header.Lumps[lumpIndex].Length) {
+					t.Errorf("Lump: %d length mismatch. Got: %dbytes, expected: %dbytes", lumpIndex, len(actual), testBSP.Header.Lumps[lumpIndex].Length)
+				}
 
-	sut.header = *header
-
-	if sut.Header().Id != header.Id {
-		t.Error("unexpected header struct returned")
-	}
-}
-
-func TestBsp_Lump(t *testing.T) {
-	sut := new(Bsp)
-	l := new(lumps.Generic)
-	sut.lumps[0].data = l
-
-	if sut.Lump(0) != l {
-		t.Error("unexpected lump returned")
-	}
-}
-
-func TestBsp_RawLump(t *testing.T) {
-	sut := new(Bsp)
-	l := new(lumps.Generic)
-	sut.lumps[0].data = l
-
-	if sut.RawLump(0).data != l {
-		t.Error("unexpected lump returned")
-	}
-}
-
-func TestBsp_SetLump(t *testing.T) {
-	sut := new(Bsp)
-	ld := new(lumps.Generic)
-	l := new(Lump)
-	l.data = ld
-	sut.SetLump(0, *l)
-
-	if sut.RawLump(0).data != ld {
-		t.Error("unexpected lump returned")
+				expected := binaryData[testBSP.Header.Lumps[lumpIndex].Offset : testBSP.Header.Lumps[lumpIndex].Offset+testBSP.Header.Lumps[lumpIndex].Length]
+				if !bytes.Equal(actual, expected) {
+					t.Errorf("Lump: %d data mismatch", lumpIndex)
+					log.Println(cmp.Diff(expected, actual))
+				}
+			}
+		})
 	}
 }
