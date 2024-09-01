@@ -20,6 +20,11 @@ func TestReadFromStream(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			name:          "ze_bioshock_v8",
+			filePath:      "testdata/v20/ze_bioshock_v8.bsp.gz",
+			expectedError: nil,
+		},
+		{
 			name:          "ar_baggage",
 			filePath:      "testdata/v21/ar_baggage.bsp.gz",
 			expectedError: nil,

@@ -33,6 +33,10 @@ func TestWriter_Write(t *testing.T) {
 			filePath: "testdata/v20/de_nuke.bsp.gz",
 		},
 		{
+			name:     "cs_italy",
+			filePath: "testdata/v20/cs_italy.bsp.gz",
+		},
+		{
 			name:     "de_tides",
 			filePath: "testdata/v20/de_tides.bsp.gz",
 		},

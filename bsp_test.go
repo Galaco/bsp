@@ -22,6 +22,14 @@ func Test_ExportedLumpBytesAreCorrect(t *testing.T) {
 			filePath: "testdata/v20/de_dust2.bsp.gz",
 		},
 		{
+			name:     "cs_italy",
+			filePath: "testdata/v20/cs_italy.bsp.gz",
+		},
+		{
+			name:     "ze_bioshock_v8",
+			filePath: "testdata/v20/ze_bioshock_v8.bsp.gz",
+		},
+		{
 			name:     "ar_baggage",
 			filePath: "testdata/v21/ar_baggage.bsp.gz",
 		},

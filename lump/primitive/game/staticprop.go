@@ -34,8 +34,66 @@ type StaticPropLeafLump struct {
 	Leaf []uint16 // Slice length must equal leafEntries. Validation to be added
 }
 
+type StaticProp struct {
+	// GetOrigin Origin of object in world
+	Origin mgl32.Vec3
+	// GetAngles Rotation of object in world
+	Angles mgl32.Vec3
+	// GetUniformScale Uniform scale of object in world
+	// v11 onwards
+	UniformScale float32 `bsp:"v11"`
+	// GetPropType
+	PropType uint16
+	// GetFirstLeaf Index into StaticPropLeafLump
+	FirstLeaf uint16
+	// GetLeafCount Number of leafs this prop is in
+	LeafCount uint16
+	// GetSolid
+	Solid uint8
+	// GetFlags
+	Flags uint8
+	// GetSkin Skin index of this prop
+	Skin int32
+	// GetFadeMinDist
+	FadeMinDist float32
+	// GetFadeMaxDist
+	FadeMaxDist float32
+	// GetLightingOrigin World position to sample light from.
+	LightingOrigin mgl32.Vec3
+	// GetForcedFadeScale
+	// v5 onwards
+	ForcedFadeScale float32 `bsp:"v5,v6,v7,v8,v9,v10,v11"`
+	// GetMinDXLevel Minimum directx level to render this prop
+	// v6+7 only
+	MinDXLevel uint16 `bsp:"v6,v7"`
+	// GetMaxDXLevel Maximum directx level to render this prop
+	// v6+7 only
+	MaxDXLevel uint16 `bsp:"v6,v7"`
+	// GetMinCPULevel Minimum CPU type to render this prop
+	// v8 onwards
+	MinCPULevel uint8 `bsp:"v8,v9,v10,v11"`
+	// GetMaxCPULevel Maximum CPU type to render this prop
+	// v8 onwards
+	MaxCPULevel uint8 `bsp:"v8,v9,v10,v11"`
+	// GetMinGPULevel
+	// v8 onwards
+	MinGPULevel uint8 `bsp:"v8,v9,v10,v11"`
+	// GetMaxGPULevel
+	// v8 onwards
+	MaxGPULevel uint8 `bsp:"v8,v9,v10,v11"`
+	// GetDiffuseModulation
+	// v7 onwards
+	DiffuseModulation float32 `bsp:"v7,v8,v9,v10,v11"`
+	// GetUnknown
+	// v10 onwards
+	Unknown float32 `bsp:"v10,v11"`
+	// GetDisableXBox360 Should be disabled on xbox 360?
+	// v9 onwards
+	DisableXBox360 bool `bsp:"v9,v10,v11"`
+}
+
 // IStaticPropDataLump There are many different staticprop versions
-// This interface should be up to date with all possible properties
+// This interface should be up-to-date with all possible properties
 // for any version.
 // Missing properties across version should return 0,false,"" etc
 type IStaticPropDataLump interface {

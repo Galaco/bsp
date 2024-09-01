@@ -20,6 +20,11 @@ func TestBsp_Crc(t *testing.T) {
 			expected: 3380635791,
 		},
 		{
+			name:     "ze_bioshock_v8",
+			filePath: "testdata/v20/ze_bioshock_v8.bsp.gz",
+			expected: 3383242764,
+		},
+		{
 			name:     "ar_baggage",
 			filePath: "testdata/v21/ar_baggage.bsp.gz",
 			expected: 2836609078,
