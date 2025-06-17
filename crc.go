@@ -11,7 +11,7 @@ func (bsp *Bsp) CRC32() (uint32, error) {
 	crc := crc32.NewIEEE()
 
 	lumpList := make([]LumpId, lumpCount)
-	for i := 0; i < lumpCount; i++ {
+	for i := range lumpList {
 		lumpList[i] = LumpId(i)
 	}
 
@@ -19,8 +19,7 @@ func (bsp *Bsp) CRC32() (uint32, error) {
 		return bsp.Header.Lumps[lumpList[i]].Offset < bsp.Header.Lumps[lumpList[j]].Offset
 	})
 
-	for i := 0; i < lumpCount; i++ {
-		l := lumpList[i]
+	for _, l := range lumpList {
 		if l == LumpEntities {
 			continue
 		}

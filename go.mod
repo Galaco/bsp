@@ -4,9 +4,7 @@ go 1.23.0
 
 toolchain go1.24.4
 
-require github.com/go-gl/mathgl v1.2.0
-
 require (
-	github.com/google/go-cmp v0.5.9 // indirect
-	golang.org/x/image v0.28.0 // indirect
+	github.com/go-gl/mathgl v1.2.0
+	github.com/google/go-cmp v0.5.9
 )
