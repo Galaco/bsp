@@ -35,23 +35,23 @@ func TestReadFromStream(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			f, err := os.Open(tc.filePath)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			defer func(f *os.File) {
 				if err := f.Close(); err != nil {
-					t.Error(err)
+					t.Fatal(err)
 				}
 			}(f)
 			binarygzr, err := gzip.NewReader(f)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 
 			r, err := NewReaderWithConfig(ReaderConfig{
 				LumpResolver: LumpResolverByBSPVersion,
 			}).Read(binarygzr)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 
 			r.Lumps[LumpGame].(*lump.Game).GetStaticPropLump()

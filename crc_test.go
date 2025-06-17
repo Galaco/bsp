@@ -34,7 +34,7 @@ func TestBsp_Crc(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			f, err := os.Open(tc.filePath)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 
 			gzR, err := gzip.NewReader(f)
