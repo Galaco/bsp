@@ -225,37 +225,42 @@ func (lump *Game) GetStaticPropLump() *primitive.StaticPropLump {
 				for idx := range vprops {
 					props[idx] = primitive.IStaticPropDataLump(&vprops[idx])
 				}
-			case 10:
-				// This switch is a major hackjob to avoid the need to know what game the bsp is for.
-				// Because Valve in all their wisdom have multiple DIFFERENT v10 formats (a true v10,
-				// and the MP2013 updated v6 which is REPORTED as v10 as well) we can attempt to infer
-				// which format it actually is.
-				switch {
-				case offset+(int(unsafe.Sizeof(primitive.StaticPropV10{}))*int(numProps)) <= len(sprpLump.Data):
-					// Real v10 format
-					propLumpSize = int(unsafe.Sizeof(primitive.StaticPropV10{})) * int(numProps)
-					vprops := make([]primitive.StaticPropV10, numProps)
-					err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
-					if err != nil {
-						return nil
-					}
-					for idx := range vprops {
-						props[idx] = primitive.IStaticPropDataLump(&vprops[idx])
-					}
-				case offset+(int(unsafe.Sizeof(primitive.StaticPropV10MP2013{}))*int(numProps)) <= len(sprpLump.Data):
-					// Fake v7* 2013MP format.
-					propLumpSize = int(unsafe.Sizeof(primitive.StaticPropV10MP2013{})) * int(numProps)
-					vprops := make([]primitive.StaticPropV10MP2013, numProps)
-					err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
-					if err != nil {
-						return nil
-					}
-					for idx := range vprops {
-						props[idx] = primitive.IStaticPropDataLump(&vprops[idx])
-					}
-				default:
-					panic("staticpropdata doesn't correspond to a known v10 format")
+		case 10:
+			// Version 10 has two different formats that both report as v10:
+			// 1. StaticPropV10MP2013 (72 bytes) - Used by Source 2013 MP games (TF2, CS:S, etc.)
+			//    This format has DX levels and lightmap resolution fields
+			// 2. StaticPropV10 (72 bytes) - Standard v10 format used by most other games
+			//    This format has CPU/GPU levels instead of DX levels
+			//
+			// Both formats are 72 bytes, so we cannot reliably distinguish them by size alone.
+			// We try MP2013 format first as it's more commonly encountered in v10 BSPs.
+			// Note: This may incorrectly parse some standard v10 BSPs as MP2013 format.
+			switch {
+			case offset+(int(unsafe.Sizeof(primitive.StaticPropV10MP2013{}))*int(numProps)) <= len(sprpLump.Data):
+				// Try MP2013 format first (TF2, CS:S, etc. - more common)
+				propLumpSize = int(unsafe.Sizeof(primitive.StaticPropV10MP2013{})) * int(numProps)
+				vprops := make([]primitive.StaticPropV10MP2013, numProps)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
+				if err != nil {
+					return nil
 				}
+				for idx := range vprops {
+					props[idx] = primitive.IStaticPropDataLump(&vprops[idx])
+				}
+			case offset+(int(unsafe.Sizeof(primitive.StaticPropV10{}))*int(numProps)) <= len(sprpLump.Data):
+				// Fallback to standard v10 format
+				propLumpSize = int(unsafe.Sizeof(primitive.StaticPropV10{})) * int(numProps)
+				vprops := make([]primitive.StaticPropV10, numProps)
+				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:offset+propLumpSize]), binary.LittleEndian, &vprops)
+				if err != nil {
+					return nil
+				}
+				for idx := range vprops {
+					props[idx] = primitive.IStaticPropDataLump(&vprops[idx])
+				}
+			default:
+				panic("staticpropdata doesn't correspond to a known v10 format")
+			}
 			case 11:
 				vprops := make([]primitive.StaticPropV11, numProps)
 				err = binary.Read(bytes.NewBuffer(sprpLump.Data[offset:]), binary.LittleEndian, &vprops)

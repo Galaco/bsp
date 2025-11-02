@@ -57,7 +57,7 @@ func TestStaticPropV10MP2013_GetFirstLeaf(t *testing.T) {
 
 func TestStaticPropV10MP2013_GetFlags(t *testing.T) {
 	sut := getStaticPropV10MP2013()
-	if sut.GetFlags() != 0 {
+	if sut.GetFlags() != 85 {
 		t.Error("unexpected value for flags property")
 	}
 

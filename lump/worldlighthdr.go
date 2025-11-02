@@ -31,5 +31,5 @@ func (lump *WorldLightHDR) Contents() []primitives.WorldLightHDR {
 
 // ToBytes converts this lump back to raw byte Data
 func (lump *WorldLightHDR) ToBytes() ([]byte, error) {
-	return marshallTaggedLump[primitives.WorldLightHDR](lump.Data, fmt.Sprintf("v%d", lump.Version()))
+	return marshallTaggedLump(lump.Data, fmt.Sprintf("v%d", lump.Version()))
 }

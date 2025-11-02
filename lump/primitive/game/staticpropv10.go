@@ -5,7 +5,10 @@ import (
 )
 
 // StaticPropV10 v10 type
-// v10 is the model prolific format, most of Valves games use v10
+// v10 is the most prolific format, most of Valve's games use v10.
+// This is the standard 72-byte v10 format (same size as v9).
+// Note: StaticPropV10MP2013 is also 72 bytes but has a different field layout
+// (DX levels + lightmap resolution instead of CPU/GPU levels).
 type StaticPropV10 struct {
 	Origin            mgl32.Vec3
 	Angles            mgl32.Vec3
@@ -25,10 +28,6 @@ type StaticPropV10 struct {
 	MaxGPULevel       uint8
 	DiffuseModulation float32
 	DisableXBox360    bool
-	ExtraFlags        int32
-	_                 byte
-	_                 byte
-	_                 byte
 }
 
 // GetOrigin Origin of object in world
@@ -135,12 +134,8 @@ func (l *StaticPropV10) GetDiffuseModulation() float32 {
 	return l.DiffuseModulation
 }
 
-// GetExtraFlags
-func (l *StaticPropV10) GetExtraFlags() int32 {
-	return l.ExtraFlags
-}
-
 // GetUnknown
+// Note: Unknown field is not part of standard v10 format
 func (l *StaticPropV10) GetUnknown() float32 {
 	return 0
 }

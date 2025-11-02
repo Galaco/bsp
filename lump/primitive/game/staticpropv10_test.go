@@ -177,13 +177,6 @@ func TestStaticPropV10_GetUniformScale(t *testing.T) {
 	}
 }
 
-func TestStaticPropV10_GetExtraFlags(t *testing.T) {
-	sut := getStaticPropV10()
-	if sut.GetExtraFlags() != 0 {
-		t.Error("unexpected value for extra flags property")
-	}
-}
-
 func TestStaticPropV10_GetUnknown(t *testing.T) {
 	sut := getStaticPropV10()
 	if sut.GetUnknown() != 0 {

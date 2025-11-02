@@ -65,7 +65,7 @@ func (l *StaticPropV10MP2013) GetSolid() uint8 {
 
 // GetFlags prop flags
 func (l *StaticPropV10MP2013) GetFlags() uint8 {
-	return 0
+	return l.Flags
 }
 
 // GetSkin skin index of this prop (default 0)
