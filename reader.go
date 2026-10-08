@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"github.com/galaco/bsp/lumps"
 )
 
 // Reader is a Bsp File reader.
@@ -45,16 +43,7 @@ func (r *Reader) Read() (*Bsp, error) {
 		if err != nil {
 			return nil, &FormatError{fmt.Sprintf("lump %d offset %d length %d", index, descriptor.Offset, descriptor.Length), err}
 		}
-		decoder, err := getReferenceLumpByIndex(index, file.header.Version)
-		if err != nil {
-			return nil, err
-		}
-		if game, ok := decoder.(*lumps.Game); ok {
-			game.UpdateInternalOffsets(descriptor.Offset)
-		}
-		file.lumps[index].SetId(LumpId(index))
-		file.lumps[index].SetRawContents(raw[start:end])
-		file.lumps[index].SetContents(decoder)
+		file.lumps[index] = payload{raw: raw[start:end:end]}
 	}
 	return file, nil
 }

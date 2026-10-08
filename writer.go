@@ -4,46 +4,24 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"github.com/galaco/bsp/lumps"
 )
 
-// Writer is a Bsp export writer.
-type Writer struct {
-	data Bsp
-}
-
-// GetBsp Gets bsp file to write.
-func (w *Writer) GetBsp() Bsp {
-	return w.data
-}
-
-// SetBsp Sets bsp file to write.
-func (w *Writer) SetBsp(file Bsp) {
-	w.data = file
-}
+// Writer binds a file explicitly; export never mutates its authoritative payloads.
+type Writer struct{ data *Bsp }
 
 // Write bsp to []byte.
 func (w *Writer) Write() ([]byte, error) {
+	if w.data == nil {
+		return nil, fmt.Errorf("%w: nil file", ErrMalformed)
+	}
+	header := w.data.header
 	// First we need to update the header to reflect any lump changes
 	// At the same time we can dump our lumps as bytes to write later
 	lumpBytes := make([][]byte, 64)
 	currentOffset := 1036 // Header always 1036bytes
 
 	for _, index := range getDefaultLumpOrdering() {
-		// We have to handle lump 35 (GameData differently)
-		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
-		if index == LumpGame {
-			decoded, err := w.data.lumps[int(index)].Contents()
-			if err != nil {
-				return nil, err
-			}
-			gamelump, ok := decoded.(*lumps.Game)
-			if !ok {
-				return nil, fmt.Errorf("%w: game container", ErrUnsupportedLump)
-			}
-			w.data.lumps[int(index)].SetContents(
-				gamelump.UpdateInternalOffsets(int32(currentOffset) - w.data.header.Lumps[int(index)].Offset))
-		}
+		// Plan locally; never decode or mutate authoritative payloads during export.
 		exportBytes, err := w.WriteLump(index)
 		if err != nil {
 			return nil, err
@@ -52,8 +30,8 @@ func (w *Writer) Write() ([]byte, error) {
 
 		lumpSize := len(lumpBytes[int(index)])
 
-		w.data.header.Lumps[int(index)].Length = int32(lumpSize)
-		w.data.header.Lumps[int(index)].Offset = int32(currentOffset)
+		header.Lumps[int(index)].Length = int32(lumpSize)
+		header.Lumps[int(index)].Offset = int32(currentOffset)
 
 		currentOffset += lumpSize
 
@@ -66,7 +44,7 @@ func (w *Writer) Write() ([]byte, error) {
 	var buf bytes.Buffer
 
 	//Write Header
-	err := binary.Write(&buf, binary.LittleEndian, w.data.header)
+	err := binary.Write(&buf, binary.LittleEndian, header)
 	if err != nil {
 		return nil, err
 	}
@@ -83,18 +61,14 @@ func (w *Writer) Write() ([]byte, error) {
 
 // WriteLump Exports a single lump to []byte.
 func (w *Writer) WriteLump(index LumpId) ([]byte, error) {
-	lump, err := w.data.Lump(index)
-	if err != nil {
-		return nil, err
+	if w.data == nil {
+		return nil, fmt.Errorf("%w: nil file", ErrMalformed)
 	}
-	return lump.Marshall()
+	return w.data.RawLump(index)
 }
 
-// NewWriter Returns a new bsp writer instance.
-func NewWriter() Writer {
-	w := Writer{}
-	return w
-}
+// NewWriter binds the supplied file without a misleading value-copy facade.
+func NewWriter(file *Bsp) *Writer { return &Writer{data: file} }
 
 // getDefaultLumpOrdering gets Source Engines default export order.
 // Source compile tools write lumps out of order

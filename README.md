@@ -84,7 +84,6 @@ package main
 
 import (
 	"github.com/galaco/bsp"
-	"github.com/galaco/bsp/lumps"
 	"log"
 )
 
@@ -93,13 +92,20 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	data, err := file.Lump(bsp.LumpEntities)
+	text, err := file.Entities()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(data.(*lumps.EntData).GetData())
+	log.Println(text)
 }
 ```
+
+Raw and decoded values are independent snapshots. Use `SetRawLump`, `SetEntities`,
+or `SetPlanes` to commit an edit; modifying a returned slice does not edit the file.
+`Header`/`Descriptor` return copied metadata, and stored lengths are derived from
+committed bytes. `NewWriter(file).WriteLump(id)` preserves stored bytes without
+requiring typed decoding. Whole-file layout and game relocation remain subject to
+the write-support limitations above.
 
 ## Real World examples
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)

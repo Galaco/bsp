@@ -56,8 +56,8 @@ func TestReadValidation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !bytes.Equal(raw.RawContents(), []byte("hello")) {
-		t.Fatalf("payload=%q", raw.RawContents())
+	if !bytes.Equal(raw, []byte("hello")) {
+		t.Fatalf("payload=%q", raw)
 	}
 }
 
@@ -72,10 +72,9 @@ func TestLazyDecodeErrors(t *testing.T) {
 			t.Fatalf("data=%v error=%v", data, err)
 		}
 	}
-	writer := bsp.NewWriter()
-	writer.SetBsp(*file)
-	if _, err := writer.WriteLump(4); !errors.Is(err, io.ErrUnexpectedEOF) {
-		t.Fatalf("write error=%v", err)
+	writer := bsp.NewWriter(file)
+	if raw, err := writer.WriteLump(4); err != nil || !bytes.Equal(raw, []byte{0}) {
+		t.Fatalf("raw passthrough=%x error=%v", raw, err)
 	}
 }
 
@@ -91,7 +90,7 @@ func TestInvalidLumpID(t *testing.T) {
 		if _, err := file.RawLump(id); !errors.Is(err, bsp.ErrInvalidLumpID) {
 			t.Fatal(err)
 		}
-		if err := file.SetLump(id, bsp.Lump{}); !errors.Is(err, bsp.ErrInvalidLumpID) {
+		if err := file.SetRawLump(id, bsp.HeaderLump{}, nil); !errors.Is(err, bsp.ErrInvalidLumpID) {
 			t.Fatal(err)
 		}
 	}
