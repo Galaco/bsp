@@ -86,24 +86,18 @@ import (
 	"github.com/galaco/bsp"
 	"github.com/galaco/bsp/lumps"
 	"log"
-	"os"
 )
 
 func main() {
-	f,_ := os.Open("de_dust2.bsp")
-
-	// Create a new bsp reader
-	reader := bsp.NewReader(f)
-	
-	// Read buffer
-	file,err := reader.Read()
+	file, err := bsp.ReadFromFile("de_dust2.bsp")
 	if err != nil {
 		log.Fatal(err)
 	}
-	f.Close()
-    
-	lump := file.Lump(bsp.LumpEntities).(*lumps.Entities)
-	log.Println(lump.GetData())
+	data, err := file.Lump(bsp.LumpEntities)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(data.(*lumps.EntData).GetData())
 }
 ```
 

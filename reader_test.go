@@ -1,30 +1,120 @@
-package bsp
+package bsp_test
 
 import (
-	"github.com/galaco/bsp/lumps"
+	"bytes"
+	"encoding/binary"
+	"errors"
+	"io"
 	"os"
+	"path/filepath"
 	"testing"
+
+	"github.com/galaco/bsp"
 )
 
-func TestReadFromFile(t *testing.T) {
-	t.Skip()
-	_, err := ReadFromFile("maps/v20/de_dust2.bsp")
+func containerBytes(id int, payload []byte) []byte {
+	raw := make([]byte, bsp.HeaderSize+len(payload))
+	binary.LittleEndian.PutUint32(raw, 0x50534256)
+	binary.LittleEndian.PutUint32(raw[4:], 20)
+	if id >= 0 {
+		binary.LittleEndian.PutUint32(raw[8+16*id:], bsp.HeaderSize)
+		binary.LittleEndian.PutUint32(raw[12+16*id:], uint32(len(payload)))
+		copy(raw[bsp.HeaderSize:], payload)
+	}
+	return raw
+}
+
+func TestReadValidation(t *testing.T) {
+	cases := []struct {
+		name   string
+		change func([]byte) []byte
+		want   error
+	}{
+		{"magic", func(b []byte) []byte { b[0] = 0; return b }, bsp.ErrMalformed},
+		{"byte order", func(b []byte) []byte { copy(b, "PSBV"); return b }, bsp.ErrUnsupportedFormat},
+		{"version", func(b []byte) []byte { binary.LittleEndian.PutUint32(b[4:], 987); return b }, bsp.ErrUnsupportedFormat},
+		{"short header", func(b []byte) []byte { return b[:1035] }, io.ErrUnexpectedEOF},
+		{"negative offset", func(b []byte) []byte { binary.LittleEndian.PutUint32(b[8:], 0xffffffff); return b }, bsp.ErrMalformed},
+		{"negative length", func(b []byte) []byte { binary.LittleEndian.PutUint32(b[12:], 0xffffffff); return b }, bsp.ErrMalformed},
+		{"header range", func(b []byte) []byte { binary.LittleEndian.PutUint32(b[8:], 1035); return b }, bsp.ErrMalformed},
+		{"huge length", func(b []byte) []byte { binary.LittleEndian.PutUint32(b[12:], 0x7fffffff); return b }, io.ErrUnexpectedEOF},
+		{"truncated payload", func(b []byte) []byte { return b[:len(b)-1] }, io.ErrUnexpectedEOF},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := bsp.ReadFromStream(bytes.NewReader(tc.change(containerBytes(0, []byte("hello")))))
+			if !errors.Is(err, tc.want) {
+				t.Fatalf("error=%v, want %v", err, tc.want)
+			}
+		})
+	}
+	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(0, []byte("hello"))))
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
+	}
+	raw, err := file.RawLump(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(raw.RawContents(), []byte("hello")) {
+		t.Fatalf("payload=%q", raw.RawContents())
 	}
 }
 
-func TestReadFromStream(t *testing.T) {
-	t.Skip()
-	f, err := os.Open("maps/v20/de_dust2.bsp")
+func TestLazyDecodeErrors(t *testing.T) {
+	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(4, []byte{0})))
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
+	for i := 0; i < 2; i++ {
+		data, err := file.Lump(4)
+		if data != nil || !errors.Is(err, bsp.ErrMalformed) || !errors.Is(err, io.ErrUnexpectedEOF) {
+			t.Fatalf("data=%v error=%v", data, err)
+		}
+	}
+	writer := bsp.NewWriter()
+	writer.SetBsp(*file)
+	if _, err := writer.WriteLump(4); !errors.Is(err, io.ErrUnexpectedEOF) {
+		t.Fatalf("write error=%v", err)
+	}
+}
 
-	r, err := ReadFromStream(f)
+func TestInvalidLumpID(t *testing.T) {
+	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(-1, nil)))
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
+	for _, id := range []bsp.LumpId{-1, 64} {
+		if _, err := file.Lump(id); !errors.Is(err, bsp.ErrInvalidLumpID) {
+			t.Fatal(err)
+		}
+		if _, err := file.RawLump(id); !errors.Is(err, bsp.ErrInvalidLumpID) {
+			t.Fatal(err)
+		}
+		if err := file.SetLump(id, bsp.Lump{}); !errors.Is(err, bsp.ErrInvalidLumpID) {
+			t.Fatal(err)
+		}
+	}
+}
 
-	r.Lump(LumpGame).(*lumps.Game).GetStaticPropLump()
+func TestStreamOwnership(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "owned.bsp")
+	if err := os.WriteFile(path, containerBytes(-1, nil), 0600); err != nil {
+		t.Fatal(err)
+	}
+	stream, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stream.Close()
+	if _, err := bsp.ReadFromStream(stream); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := stream.Seek(0, io.SeekStart); err != nil {
+		t.Fatalf("caller stream was closed: %v", err)
+	}
+	var magic [4]byte
+	if _, err := io.ReadFull(stream, magic[:]); err != nil || string(magic[:]) != "VBSP" {
+		t.Fatalf("stream magic=%q error=%v", magic, err)
+	}
 }

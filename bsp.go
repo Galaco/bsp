@@ -31,17 +31,28 @@ func (bsp *Bsp) Header() *Header {
 	return &bsp.header
 }
 
-// Lump gets the lump for a given id.
-func (bsp *Bsp) Lump(index LumpId) lumps.ILump {
-	return bsp.RawLump(index).Contents()
+// Lump decodes a payload and returns its decoding error.
+func (bsp *Bsp) Lump(index LumpId) (lumps.ILump, error) {
+	lump, err := bsp.RawLump(index)
+	if err != nil {
+		return nil, err
+	}
+	return lump.Contents()
 }
 
-// RawLump gets the lump for a given id.
-func (bsp *Bsp) RawLump(index LumpId) *Lump {
-	return &bsp.lumps[int(index)]
+// RawLump returns a range-checked lump container.
+func (bsp *Bsp) RawLump(index LumpId) (*Lump, error) {
+	if err := validateID(index); err != nil {
+		return nil, err
+	}
+	return &bsp.lumps[int(index)], nil
 }
 
-// SetLump sets the lump data for a given id.
-func (bsp *Bsp) SetLump(index LumpId, lump Lump) {
+// SetLump replaces a range-checked lump.
+func (bsp *Bsp) SetLump(index LumpId, lump Lump) error {
+	if err := validateID(index); err != nil {
+		return err
+	}
 	bsp.lumps[int(index)] = lump
+	return nil
 }

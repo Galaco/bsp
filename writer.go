@@ -3,6 +3,7 @@ package bsp
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"github.com/galaco/bsp/lumps"
 )
 
@@ -32,7 +33,14 @@ func (w *Writer) Write() ([]byte, error) {
 		// We have to handle lump 35 (GameData differently)
 		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
 		if index == LumpGame {
-			gamelump := w.data.lumps[int(index)].Contents().(*lumps.Game)
+			decoded, err := w.data.lumps[int(index)].Contents()
+			if err != nil {
+				return nil, err
+			}
+			gamelump, ok := decoded.(*lumps.Game)
+			if !ok {
+				return nil, fmt.Errorf("%w: game container", ErrUnsupportedLump)
+			}
 			w.data.lumps[int(index)].SetContents(
 				gamelump.UpdateInternalOffsets(int32(currentOffset) - w.data.header.Lumps[int(index)].Offset))
 		}
@@ -75,7 +83,10 @@ func (w *Writer) Write() ([]byte, error) {
 
 // WriteLump Exports a single lump to []byte.
 func (w *Writer) WriteLump(index LumpId) ([]byte, error) {
-	lump := w.data.Lump(index)
+	lump, err := w.data.Lump(index)
+	if err != nil {
+		return nil, err
+	}
 	return lump.Marshall()
 }
 

@@ -23,16 +23,18 @@ func (l *Lump) SetId(index LumpId) {
 	l.id = index
 }
 
-// Contents Get the contents of a lump.
-// NOTE: Will need to be cast to the relevant lumps
-func (l *Lump) Contents() lumps.ILump {
+// Contents decodes the payload without hiding its underlying error.
+func (l *Lump) Contents() (lumps.ILump, error) {
+	if l.data == nil {
+		return nil, fmt.Errorf("%w: lump %d", ErrUnsupportedLump, l.id)
+	}
 	if !l.loaded {
-		if l.data.Unmarshall(l.raw) != nil {
-			return nil
+		if err := l.data.Unmarshall(l.raw); err != nil {
+			return nil, &FormatError{fmt.Sprintf("decode lump %d", l.id), err}
 		}
 		l.loaded = true
 	}
-	return l.data
+	return l.data, nil
 }
 
 // SetContents Set content type of a lump.

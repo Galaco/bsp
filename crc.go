@@ -25,7 +25,7 @@ func (bsp *Bsp) CRC32() (uint32, error) {
 			continue
 		}
 
-		_, err := crc.Write(bsp.RawLump(l).raw)
+		_, err := crc.Write(bsp.lumps[l].raw)
 		if err != nil {
 			return 0, err
 		}
