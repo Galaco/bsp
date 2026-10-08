@@ -44,14 +44,12 @@ func (w *Writer) Write() ([]byte, error) {
 	var buf bytes.Buffer
 
 	//Write Header
-	err := binary.Write(&buf, binary.LittleEndian, header)
-	if err != nil {
-		return nil, err
-	}
+	headerBytes := encodeHeader(header, w.data.layout)
+	buf.Write(headerBytes[:])
 
 	//Write lumps
 	for _, lumpData := range lumpBytes {
-		if err = binary.Write(&buf, binary.LittleEndian, lumpData); err != nil {
+		if err := binary.Write(&buf, binary.LittleEndian, lumpData); err != nil {
 			return nil, err
 		}
 	}

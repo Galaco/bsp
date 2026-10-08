@@ -1,91 +1,122 @@
 package lumps
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
-	"github.com/galaco/bsp/primitives/common"
+
 	primitives "github.com/galaco/bsp/primitives/leaf"
-	"unsafe"
 )
 
 const (
-	// MaxMapLeafs is the maximum number of leafs the engine can handle
-	MaxMapLeafs = 65536
+	// MaxMapLeafs is the maximum number of leafs the engine can handle.
+	MaxMapLeafs  = 65536
+	leafV0Stride = 56
+	leafV1Stride = 32
 )
 
-const (
-	// maxBspVersionOfV0Leaf is the last bsp revision to use the old leafv0 structure
-	maxBspVersionOfV0Leaf = 19
-)
-
-// Leaf is Lump 10: Leaf
+// Leaf is Lump 10: Leaf.
 type Leaf struct {
 	Generic
 	data []primitives.Leaf
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Leaf) Unmarshall(raw []byte) (err error) {
-	// There are 2 version of leaf:
-	// v0 contains a light sample
-	// v1 removes the light sample, and is padded by 2 bytes
-	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
-	if lump.Version() > maxBspVersionOfV0Leaf {
-		// Correct size of v1+ leafs
-		structSize -= int(unsafe.Sizeof(common.CompressedLightCube{}))
+func (lump *Leaf) stride() (int, error) {
+	switch lump.Context().LumpVersion {
+	case 0:
+		return leafV0Stride, nil
+	case 1:
+		return leafV1Stride, nil
+	default:
+		return 0, fmt.Errorf("unsupported leaf lump version %d", lump.Context().LumpVersion)
 	}
-
-	length := len(raw)
-	lump.data = make([]primitives.Leaf, length/structSize)
-	numLeafs := len(lump.data)
-	i := 0
-
-	for i < numLeafs {
-		leafBuf := make([]byte, structSize)
-		copy(leafBuf, raw[(structSize * i) : (structSize*i)+structSize])
-		// Pad the raw data to the correct size of a leaf
-		if lump.Version() > maxBspVersionOfV0Leaf {
-			leafBuf = append(leafBuf, make([]byte, int(unsafe.Sizeof(common.CompressedLightCube{})))...)
-		}
-		rawLeaf := bytes.NewBuffer(leafBuf)
-		err = binary.Read(rawLeaf, binary.LittleEndian, &lump.data[i])
-		if err != nil {
-			return err
-		}
-		i++
-		if i > MaxMapLeafs {
-			return fmt.Errorf("leaf count overflows maximum allowed size of %d", MaxMapLeafs)
-		}
-	}
-	lump.SetLength(length)
-
-	return err
 }
 
-// GetData gets internal format structure data
+// Unmarshall imports leaf records using the actual lump descriptor version.
+func (lump *Leaf) Unmarshall(raw []byte) error {
+	stride, err := lump.stride()
+	if err != nil {
+		return err
+	}
+	if len(raw)%stride != 0 {
+		return fmt.Errorf("leaf lump length %d is not a multiple of record size %d", len(raw), stride)
+	}
+	count := len(raw) / stride
+	if count > MaxMapLeafs {
+		return fmt.Errorf("leaf count overflows maximum allowed size of %d", MaxMapLeafs)
+	}
+	data := make([]primitives.Leaf, count)
+	for i := range data {
+		record := raw[i*stride : (i+1)*stride]
+		leaf := &data[i]
+		leaf.Contents = int32(binary.LittleEndian.Uint32(record[0:4]))
+		leaf.Cluster = int16(binary.LittleEndian.Uint16(record[4:6]))
+		leaf.BitField = int16(binary.LittleEndian.Uint16(record[6:8]))
+		for axis := range leaf.Mins {
+			leaf.Mins[axis] = int16(binary.LittleEndian.Uint16(record[8+axis*2 : 10+axis*2]))
+			leaf.Maxs[axis] = int16(binary.LittleEndian.Uint16(record[14+axis*2 : 16+axis*2]))
+		}
+		leaf.FirstLeafFace = binary.LittleEndian.Uint16(record[20:22])
+		leaf.NumLeafFaces = binary.LittleEndian.Uint16(record[22:24])
+		leaf.FirstLeafBrush = binary.LittleEndian.Uint16(record[24:26])
+		leaf.NumLeafBrushes = binary.LittleEndian.Uint16(record[26:28])
+		leaf.LeafWaterDataID = int16(binary.LittleEndian.Uint16(record[28:30]))
+		if stride == leafV0Stride {
+			for side := range leaf.LightSample.Color {
+				color := &leaf.LightSample.Color[side]
+				offset := 30 + side*4
+				color.R = record[offset]
+				color.G = record[offset+1]
+				color.B = record[offset+2]
+				color.Exponent = int8(record[offset+3])
+			}
+		}
+		// The last two bytes are wire padding, not a light sample.
+	}
+	lump.data = data
+	lump.SetLength(len(raw))
+	return nil
+}
+
+// GetData gets internal format structure data.
 func (lump *Leaf) GetData() []primitives.Leaf {
 	return lump.data
 }
 
-// Marshall dumps this lump back to raw byte data
+// Marshall exports leaf records with two zero-filled tail padding bytes.
 func (lump *Leaf) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	var err error
-
-	switch lump.Version() {
-	case 0:
-		err = binary.Write(&buf, binary.LittleEndian, lump.data)
-	default:
-		structSize := int(unsafe.Sizeof(primitives.Leaf{})) - int(unsafe.Sizeof(common.CompressedLightCube{}))
-		for _, l := range lump.data {
-			var leafBuf bytes.Buffer
-			if err = binary.Write(&leafBuf, binary.LittleEndian, l); err != nil {
-				return nil, err
+	stride, err := lump.stride()
+	if err != nil {
+		return nil, err
+	}
+	if len(lump.data) > MaxMapLeafs {
+		return nil, fmt.Errorf("leaf count overflows maximum allowed size of %d", MaxMapLeafs)
+	}
+	raw := make([]byte, len(lump.data)*stride)
+	for i := range lump.data {
+		record := raw[i*stride : (i+1)*stride]
+		leaf := &lump.data[i]
+		binary.LittleEndian.PutUint32(record[0:4], uint32(leaf.Contents))
+		binary.LittleEndian.PutUint16(record[4:6], uint16(leaf.Cluster))
+		binary.LittleEndian.PutUint16(record[6:8], uint16(leaf.BitField))
+		for axis := range leaf.Mins {
+			binary.LittleEndian.PutUint16(record[8+axis*2:10+axis*2], uint16(leaf.Mins[axis]))
+			binary.LittleEndian.PutUint16(record[14+axis*2:16+axis*2], uint16(leaf.Maxs[axis]))
+		}
+		binary.LittleEndian.PutUint16(record[20:22], leaf.FirstLeafFace)
+		binary.LittleEndian.PutUint16(record[22:24], leaf.NumLeafFaces)
+		binary.LittleEndian.PutUint16(record[24:26], leaf.FirstLeafBrush)
+		binary.LittleEndian.PutUint16(record[26:28], leaf.NumLeafBrushes)
+		binary.LittleEndian.PutUint16(record[28:30], uint16(leaf.LeafWaterDataID))
+		if stride == leafV0Stride {
+			for side := range leaf.LightSample.Color {
+				color := &leaf.LightSample.Color[side]
+				offset := 30 + side*4
+				record[offset] = color.R
+				record[offset+1] = color.G
+				record[offset+2] = color.B
+				record[offset+3] = byte(color.Exponent)
 			}
-			err = binary.Write(&buf, binary.LittleEndian, leafBuf.Bytes()[0:structSize])
 		}
 	}
-
-	return buf.Bytes(), err
+	return raw, nil
 }

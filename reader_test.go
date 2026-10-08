@@ -42,13 +42,13 @@ func TestReadValidation(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := bsp.ReadFromStream(bytes.NewReader(tc.change(containerBytes(0, []byte("hello")))))
+			_, err := bsp.ReadFromStream(bytes.NewReader(tc.change(containerBytes(0, []byte("hello")))), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 			if !errors.Is(err, tc.want) {
 				t.Fatalf("error=%v, want %v", err, tc.want)
 			}
 		})
 	}
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(0, []byte("hello"))))
+	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(0, []byte("hello"))), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,7 +62,7 @@ func TestReadValidation(t *testing.T) {
 }
 
 func TestLazyDecodeErrors(t *testing.T) {
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(4, []byte{0})))
+	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(4, []byte{0})), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,7 +79,7 @@ func TestLazyDecodeErrors(t *testing.T) {
 }
 
 func TestInvalidLumpID(t *testing.T) {
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(-1, nil)))
+	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(-1, nil)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,7 +106,7 @@ func TestStreamOwnership(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer stream.Close()
-	if _, err := bsp.ReadFromStream(stream); err != nil {
+	if _, err := bsp.ReadFromStream(stream, bsp.ReadOptions{Profile: bsp.ProfileSDK2013}); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := stream.Seek(0, io.SeekStart); err != nil {

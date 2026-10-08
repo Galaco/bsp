@@ -1,5 +1,7 @@
 package lumps
 
+import "github.com/galaco/bsp/internal/format"
+
 // ILump Lump interface.
 // Organise Lump data in a cleaner and more accessible manner
 type ILump interface {
@@ -9,5 +11,5 @@ type ILump interface {
 	// Marshall Exports lump structure back to []byte.
 	Marshall() ([]byte, error)
 
-	SetVersion(version int32)
+	SetContext(format.Context)
 }

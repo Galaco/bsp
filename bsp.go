@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/galaco/bsp/internal/format"
 	"github.com/galaco/bsp/lumps"
 	"github.com/galaco/bsp/primitives/plane"
 )
@@ -13,8 +14,10 @@ import (
 // Bsp is the root .bsp filetype container.
 // Consists of a 1036byte header and 64 lump blocks.
 type Bsp struct {
-	header Header
-	lumps  [LumpCount]payload
+	header  Header
+	lumps   [LumpCount]payload
+	profile Profile
+	layout  format.HeaderLayout
 }
 
 // Header is the Bsp header. Contains format and lump layout data.
@@ -31,7 +34,7 @@ type HeaderLump struct {
 	Offset  int32
 	Length  int32
 	Version int32
-	Id      [4]byte
+	FourCC  [4]byte // Fourth header word: compressed uncompressed-size metadata, not a lump ID.
 }
 
 // Header returns metadata by value. Offsets describe the input, not a future export.
@@ -50,18 +53,17 @@ func (bsp *Bsp) Lump(index LumpId) (lumps.ILump, error) {
 	if err := validateID(index); err != nil {
 		return nil, err
 	}
-	decoder, err := getReferenceLumpByIndex(int(index), bsp.header.Version)
+	context := bsp.codecContext(index)
+	decoder, err := getReferenceLumpByIndex(int(index), context)
 	if err != nil {
 		return nil, err
 	}
-	raw := bsp.lumps[index].raw
-	switch decoder.(type) {
-	case *lumps.Generic, *lumps.Unimplemented, *lumps.Game, *lumps.Visibility,
-		*lumps.PhysDisp, *lumps.DispLightmapSamplePosition:
-		raw = cloneBytes(raw)
+	if context.CompressionSize != 0 {
+		return nil, fmt.Errorf("%w: compressed lump %d", ErrUnsupportedLump, index)
 	}
-	if game, ok := decoder.(*lumps.Game); ok {
-		game.UpdateInternalOffsets(bsp.header.Lumps[index].Offset)
+	raw := bsp.lumps[index].raw
+	if _, ok := decoder.(*lumps.Visibility); ok {
+		raw = cloneBytes(raw)
 	}
 	if err := decoder.Unmarshall(raw); err != nil {
 		return nil, &FormatError{fmt.Sprintf("decode lump %d", index), err}
@@ -111,11 +113,14 @@ func (bsp *Bsp) Entities() (string, error) {
 
 // SetEntities commits exact entity bytes.
 func (bsp *Bsp) SetEntities(text string) error {
+	if err := bsp.checkTypedRevision(LumpEntities); err != nil {
+		return err
+	}
 	if int64(len(text)) > math.MaxInt32 {
 		return fmt.Errorf("%w: entity payload too large", ErrMalformed)
 	}
 	descriptor := bsp.header.Lumps[LumpEntities]
-	descriptor.Id = [4]byte{}
+	descriptor.FourCC = [4]byte{}
 	bsp.storeOwned(LumpEntities, descriptor, []byte(text))
 	return nil
 }
@@ -135,6 +140,9 @@ func (bsp *Bsp) Planes() ([]plane.Plane, error) {
 
 // SetPlanes validates and commits plane records without retaining caller slices.
 func (bsp *Bsp) SetPlanes(planes []plane.Plane) error {
+	if err := bsp.checkTypedRevision(LumpPlanes); err != nil {
+		return err
+	}
 	if len(planes) > 65536 {
 		return fmt.Errorf("%w: too many planes", ErrMalformed)
 	}
@@ -148,7 +156,7 @@ func (bsp *Bsp) SetPlanes(planes []plane.Plane) error {
 		return err
 	}
 	descriptor := bsp.header.Lumps[LumpPlanes]
-	descriptor.Id = [4]byte{}
+	descriptor.FourCC = [4]byte{}
 	bsp.storeOwned(LumpPlanes, descriptor, out.Bytes())
 	return nil
 }

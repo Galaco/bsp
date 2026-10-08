@@ -12,7 +12,7 @@ import (
 
 func TestOwnedRawReplacement(t *testing.T) {
 	input := containerBytes(0, []byte("old"))
-	file, err := bsp.ReadFromStream(bytes.NewReader(input))
+	file, err := bsp.ReadFromStream(bytes.NewReader(input), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func TestAtomicTypedReplacement(t *testing.T) {
 	raw := make([]byte, 20)
 	binary.LittleEndian.PutUint32(raw, math.Float32bits(1))
 	binary.LittleEndian.PutUint32(raw[12:], math.Float32bits(7))
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(1, raw)))
+	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(1, raw)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func TestAtomicTypedReplacement(t *testing.T) {
 }
 
 func TestOpaqueSnapshotIsolation(t *testing.T) {
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(63, []byte{1, 2, 3})))
+	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(63, []byte{1, 2, 3})), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,11 +100,11 @@ func TestOpaqueSnapshotIsolation(t *testing.T) {
 		t.Fatal(err)
 	}
 	first[0] = 9
-	if err := file.SetRawLump(63, bsp.HeaderLump{Version: 987, Id: [4]byte{1, 2, 3, 4}}, []byte{4, 5}); err != nil {
+	if err := file.SetRawLump(63, bsp.HeaderLump{Version: 987, FourCC: [4]byte{1, 2, 3, 4}}, []byte{4, 5}); err != nil {
 		t.Fatal(err)
 	}
 	desc, err := file.Descriptor(63)
-	if err != nil || desc.Version != 987 || desc.Id != [4]byte{1, 2, 3, 4} || desc.Length != 2 {
+	if err != nil || desc.Version != 987 || desc.FourCC != [4]byte{1, 2, 3, 4} || desc.Length != 2 {
 		t.Fatalf("metadata=%+v error=%v", desc, err)
 	}
 	stored, err := file.RawLump(63)

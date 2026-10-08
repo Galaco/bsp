@@ -1,5 +1,7 @@
 package lumps
 
+import "github.com/galaco/bsp/internal/format"
+
 // Generic is a raw byte lump
 // It should be used in cases where the data has no or unknown
 // structures.
@@ -24,7 +26,7 @@ func (lump *Generic) Marshall() ([]byte, error) {
 // Metadata is a Helper info for a lump
 type Metadata struct {
 	length  int
-	version int32
+	context format.Context
 }
 
 // Length Returns lump import length in bytes.
@@ -37,12 +39,12 @@ func (info *Metadata) SetLength(length int) {
 	info.length = length
 }
 
-// Version Returns lump import version in bytes.
-func (info *Metadata) Version() int32 {
-	return info.version
+// Context returns the file profile and descriptor version used by this codec.
+func (info *Metadata) Context() format.Context {
+	return info.context
 }
 
-// SetVersion sets bsp version of lump
-func (info *Metadata) SetVersion(version int32) {
-	info.version = version
+// SetContext sets the file profile and descriptor version used by this codec.
+func (info *Metadata) SetContext(context format.Context) {
+	info.context = context
 }

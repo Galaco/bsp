@@ -1,14 +1,17 @@
 package versions
 
 import (
-	"errors"
+	"fmt"
+	"github.com/galaco/bsp/internal/format"
 	"github.com/galaco/bsp/lumps"
 )
 
-// Getv20Lump returns the corresponding v20 lump for provided index
-func Getv20Lump(index int) (lumps.ILump, error) {
+// New selects a codec using the actual lump revision and engine dialect.
+func New(index int, context format.Context) (lumps.ILump, error) {
+	if err := ValidateRevision(index, context); err != nil {
+		return nil, err
+	}
 	var ret lumps.ILump
-	var err error
 	switch index {
 	case 0:
 		ret = new(lumps.EntData)
@@ -54,38 +57,28 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 		ret = new(lumps.Area)
 	case 21:
 		ret = new(lumps.AreaPortal)
-	case 22:
-		ret = new(lumps.Unimplemented) //portals | unused0 | propcollision
-	case 23:
-		ret = new(lumps.Unimplemented) //clusters | unused1 | prophulls
-	case 24:
-		ret = new(lumps.Unimplemented) //portalverts | unused2 | prophullverts
-	case 25:
-		ret = new(lumps.Unimplemented) //clusterportals | unused3 | proptris
+	case 22, 23, 24, 25:
+		return nil, fmt.Errorf("opaque lump %d", index)
 	case 26:
 		ret = new(lumps.DispInfo)
 	case 27:
 		ret = new(lumps.Face)
-	case 28:
-		ret = new(lumps.PhysDisp)
-	case 29:
-		ret = new(lumps.Unimplemented) //physcollide - IN PROGRESS
+	case 28, 29:
+		return nil, fmt.Errorf("opaque lump %d", index)
 	case 30:
 		ret = new(lumps.VertNormal)
 	case 31:
 		ret = new(lumps.VertNormalIndice)
 	case 32:
-		ret = new(lumps.Unimplemented) //disp lightmap alphas - IS STRIPPED ANYWAY?
+		return nil, fmt.Errorf("opaque lump %d", index)
 	case 33:
 		ret = new(lumps.DispVert)
-	case 34:
-		ret = new(lumps.DispLightmapSamplePosition)
-	case 35:
-		ret = new(lumps.Game)
+	case 34, 35:
+		return nil, fmt.Errorf("opaque lump %d", index)
 	case 36:
 		ret = new(lumps.LeafWaterData)
 	case 37:
-		ret = new(lumps.Unimplemented) //primitives FIXME - Appears to be 4bytes unaccounted for at end of lump?
+		return nil, fmt.Errorf("opaque lump %d", index)
 	case 38:
 		ret = new(lumps.PrimVert)
 	case 39:
@@ -108,10 +101,8 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 		ret = new(lumps.FaceMacroTextureInfo)
 	case 48:
 		ret = new(lumps.DispTris)
-	case 49:
-		ret = new(lumps.Unimplemented) //physcollidesurface | prop blob
-	case 50:
-		ret = new(lumps.Unimplemented) //wateroverlays
+	case 49, 50:
+		return nil, fmt.Errorf("opaque lump %d", index)
 	case 51:
 		ret = new(lumps.LeafAmbientIndexHDR)
 	case 52:
@@ -125,22 +116,18 @@ func Getv20Lump(index int) (lumps.ILump, error) {
 	case 56:
 		ret = new(lumps.LeafAmbientLighting) //leaf ambient lighting
 	case 57:
-		ret = new(lumps.Unimplemented) //xzippakfile
+		return nil, fmt.Errorf("opaque lump %d", index)
 	case 58:
 		ret = new(lumps.FaceHDR)
 	case 59:
 		ret = new(lumps.MapFlags)
 	case 60:
 		ret = new(lumps.OverlayFade)
-	case 61:
-		ret = new(lumps.Unimplemented) //overlay system levels
-	case 62:
-		ret = new(lumps.Unimplemented) //physlevel
-	case 63:
-		ret = new(lumps.Unimplemented) //disp multiblend
+	case 61, 62, 63:
+		return nil, fmt.Errorf("opaque lump %d", index)
 	default:
-		err = errors.New("invalid lump id")
+		return nil, fmt.Errorf("invalid lump %d", index)
 	}
-
-	return ret, err
+	ret.SetContext(context)
+	return ret, nil
 }

@@ -19,7 +19,7 @@ func TestBsp_Crc(t *testing.T) {
 		t.Error(err)
 	}
 
-	bspF, err := bsp.ReadFromStream(gzR)
+	bspF, err := bsp.ReadFromStream(gzR, bsp.ReadOptions{Profile: bsp.ProfileCSGO})
 	if err != nil {
 		t.Error(err)
 	}
