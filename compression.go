@@ -84,6 +84,10 @@ func (bsp *Bsp) SetDecodedGameLump(index int, decoded []byte) error {
 	if index < 0 || index >= len(directory.Entries) {
 		return fmt.Errorf("%w: %d", ErrInvalidGameLumpIndex, index)
 	}
+	return bsp.commitDecodedGameEntry(directory, index, decoded)
+}
+
+func (bsp *Bsp) commitDecodedGameEntry(directory codec.GameDirectory, index int, decoded []byte) error {
 	entry := &directory.Entries[index]
 	var tail []byte
 	if entry.Flags&1 != 0 {

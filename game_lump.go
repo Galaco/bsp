@@ -65,23 +65,31 @@ func (bsp *Bsp) GameLumpByID(id uint32) (lumps.GameLump, error) {
 	if err != nil {
 		return lumps.GameLump{}, err
 	}
+	index, err := gameEntryIndex(directory.Entries, id)
+	if err != nil {
+		return lumps.GameLump{}, err
+	}
+	return gameSnapshot(directory.Entries[index]), nil
+}
+
+func gameEntryIndex(entries []lumps.GameLump, id uint32) (int, error) {
 	found := -1
-	for i, entry := range directory.Entries {
-		if i == len(directory.Entries)-1 && terminalGameEntry(entry) {
+	for i, entry := range entries {
+		if i == len(entries)-1 && terminalGameEntry(entry) {
 			continue
 		}
 		if entry.ID != id {
 			continue
 		}
 		if found >= 0 {
-			return lumps.GameLump{}, fmt.Errorf("%w: %#x", ErrAmbiguousGameLumpID, id)
+			return -1, fmt.Errorf("%w: %#x", ErrAmbiguousGameLumpID, id)
 		}
 		found = i
 	}
 	if found < 0 {
-		return lumps.GameLump{}, fmt.Errorf("%w: game ID %#x", ErrLumpNotFound, id)
+		return -1, fmt.Errorf("%w: game ID %#x", ErrLumpNotFound, id)
 	}
-	return gameSnapshot(directory.Entries[found]), nil
+	return found, nil
 }
 
 // SetGameLumps atomically encodes an ordered directory at an internal base of zero.

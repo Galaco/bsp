@@ -17,9 +17,9 @@ Go library for handling Source Engine .bsp map files.
 * Native Source LZMA decoding with bounded output/dictionary allocations; unchanged streams stay stored.
 
 Container/raw support and typed record support are separate. See the profile
-matrix below. Branch-specific ordinary records and static-prop codecs are tracked
-by the ordered implementation tasks; directory acceptance does not establish a
-correct typed layout for every payload.
+matrix and record sections below. Remaining layout fixes follow the ordered
+implementation tasks; directory acceptance does not establish a typed layout
+for every payload.
 
 Canonical export intentionally uses numeric ID order, four-byte alignment and
 zero locations for empty descriptors. It does not preserve original physical
@@ -71,7 +71,7 @@ not a decoder selector.
 | Profile | BSP versions | Descriptor order | Exercised container/record baseline |
 | --- | --- | --- | --- |
 | `ProfileSDK2013` | 19–20 | offset, length, version, fourth word | Valve `dm_lockdown.bsp`: BSP19, leaf0; entities, planes and leaves decoded |
-| `ProfileCSGO` | 21 | standard | `ar_baggage.bsp.gz`: leaf1; entities, planes and leaves decoded; game entries `sprp`10/`dprp`4 preserved |
+| `ProfileCSGO` | 21 | standard | `ar_baggage.bsp.gz`: leaf1 and correctly aligned sprp10; authored v11 maps independently corroborated |
 | `ProfileL4D2` | 21 | version, offset, length, fourth word | BSPSource's game-compiled `l4d2_tooltextures.bsp`: leaf1; entities, planes and leaves decoded |
 | Reactive Drop | not admitted yet | source-defined standard | Public declarations exist; genuine compiled-fixture gate remains open |
 
@@ -151,6 +151,47 @@ regardless unreliable sample revisions. Available indices/cubes must match
 leaves; positive spans address samples, zero-count indices reference leaves.
 Absent channels stay absent, with no fallback or implicit layout migration.
 Occlusion getters/setters validate polygon spans and actual plane/vertex references.
+
+## Static-prop editing
+
+`StaticProps()` returns fresh `lumps.StaticProps` arrays; `SetStaticProps(value)`
+commits them into the existing unique sprp entry. Counts derive from slices.
+Models/leaf spans and actual File leaf references are checked before commit.
+Unknown versions and ambiguous sprp IDs return errors; raw preservation remains
+available. Failed edits do not change bytes or metadata.
+
+| Profile | Typed static-prop layouts |
+| --- | --- |
+| SDK2013 | common4–6; distinct SDK10 (72 bytes, uint32 primary flags, lightmap X/Y) |
+| L4D2 | common4–9 |
+| CS:GO | common4–11; v10 extended uint32 at72, v11 scale float at76 |
+
+Records expose RGBA bytes, complete flags, explicit padding and optional fields.
+`Layout` describes the selected dialect, not a request to convert it. Fields
+absent from that dialect must remain zero; unsupported edits fail rather than
+disappear. Original128-byte model slots retain bytes after the first NUL;
+`Models[i].Name()` reads the name, and `SetName(name)` rejects embedded NUL or
+more than127 encoded bytes, then deliberately clears the new slot's tail.
+
+```go
+props, err := file.StaticProps()
+if err != nil {
+	return err
+}
+if len(props.Props) == 0 {
+	return nil
+}
+props.Props[0].Origin[0] += 16
+if err := file.SetStaticProps(props); err != nil {
+	return err
+}
+```
+
+Modified compressed sprp emits uncompressed bytes, preserving the descriptor
+version, other flags, game gaps and opaque siblings. Genuine v11 baseline scales
+and independently decoded multi-instance edits are recorded in
+[task08](08-static-prop-codecs-and-editing.md); no unverified v11 branch is inferred.
+
 
 ## Real World examples
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)
