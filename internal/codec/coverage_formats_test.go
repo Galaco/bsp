@@ -398,8 +398,8 @@ func TestCoverageAdaptersRetainOnFailureAndResetEmpty(t *testing.T) {
 		adapter interface {
 			SetContext(format.Context)
 			Length() int
-			Unmarshall([]byte) error
-			Marshall() ([]byte, error)
+			Decode([]byte) error
+			Encode() ([]byte, error)
 		}
 		raw    []byte
 		mutate func()
@@ -416,21 +416,21 @@ func TestCoverageAdaptersRetainOnFailureAndResetEmpty(t *testing.T) {
 	}
 	for _, tc := range cases {
 		tc.adapter.SetContext(context)
-		if err := tc.adapter.Unmarshall(tc.raw); err != nil {
+		if err := tc.adapter.Decode(tc.raw); err != nil {
 			t.Fatalf("%s decode: %v", tc.name, err)
 		}
 		tc.mutate()
 		binary.LittleEndian.PutUint32(tc.raw[tc.offset:], tc.bits)
-		if err := tc.adapter.Unmarshall([]byte{1}); err == nil || tc.adapter.Length() != len(tc.raw) {
+		if err := tc.adapter.Decode([]byte{1}); err == nil || tc.adapter.Length() != len(tc.raw) {
 			t.Fatalf("%s bad decode accepted/metadata mutated", tc.name)
 		}
-		if encoded, err := tc.adapter.Marshall(); err != nil || !bytes.Equal(encoded, tc.raw) {
+		if encoded, err := tc.adapter.Encode(); err != nil || !bytes.Equal(encoded, tc.raw) {
 			t.Fatalf("%s adapter lost edited data on failure: %v", tc.name, err)
 		}
-		if err := tc.adapter.Unmarshall(nil); err != nil || tc.adapter.Length() != 0 {
+		if err := tc.adapter.Decode(nil); err != nil || tc.adapter.Length() != 0 {
 			t.Fatalf("%s empty reset: %v", tc.name, err)
 		}
-		if encoded, err := tc.adapter.Marshall(); err != nil || len(encoded) != 0 {
+		if encoded, err := tc.adapter.Encode(); err != nil || len(encoded) != 0 {
 			t.Fatalf("%s stale records after empty reset: %v", tc.name, err)
 		}
 	}

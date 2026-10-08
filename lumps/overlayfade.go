@@ -1,47 +1,9 @@
 package lumps
 
-import (
-	"bytes"
-	"encoding/binary"
-	"github.com/galaco/bsp/internal/format"
-	primitives "github.com/galaco/bsp/primitives/overlayfade"
-)
-
-// OverlayFade is Lump 60: Overlayfades
+// OverlayFade
 type OverlayFade struct {
-	Generic
-	data []primitives.OverlayFade
-}
-
-// Unmarshall Imports this lump from raw byte data
-func (lump *OverlayFade) Unmarshall(raw []byte) error {
-	count, err := format.FixedRecordCount(len(raw), 8)
-	if err != nil {
-		return err
-	}
-	data := make([]primitives.OverlayFade, count)
-	if err := binary.Read(bytes.NewReader(raw), binary.LittleEndian, data); err != nil {
-		return err
-	}
-	lump.data = data
-	lump.Metadata.SetLength(len(raw))
-	return nil
-}
-
-// GetData gets internal format structure data
-func (lump *OverlayFade) GetData() []primitives.OverlayFade {
-	return lump.data
-}
-
-// Marshall dumps this lump back to raw byte data
-func (lump *OverlayFade) Marshall() ([]byte, error) {
-	length, err := format.FixedRecordBytes(len(lump.data), 8)
-	if err != nil {
-		return nil, err
-	}
-	buf := bytes.NewBuffer(make([]byte, 0, length))
-	if err := binary.Write(buf, binary.LittleEndian, lump.data); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	// FadeDistMinSq is distance to start fading in
+	FadeDistMinSq float32
+	// FadeDistMaxSq is distance to fully fade in
+	FadeDistMaxSq float32
 }

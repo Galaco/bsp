@@ -96,6 +96,46 @@ func (plan GameRelocation) CopyTo(raw []byte) error {
 	return nil
 }
 
+// WriteTo emits the relocated bytes directly, without staging the payload.
+// Planning has already validated all offset changes before any write occurs.
+func (plan GameRelocation) WriteTo(writer io.Writer) (int64, error) {
+	var total int64
+	write := func(raw []byte) error {
+		if len(raw) == 0 {
+			return nil
+		}
+		n, err := writer.Write(raw)
+		total += int64(n)
+		if err == nil && n != len(raw) {
+			err = io.ErrShortWrite
+		}
+		return err
+	}
+	if plan.delta == 0 {
+		err := write(plan.raw)
+		return total, err
+	}
+	cursor := 0
+	var word [4]byte
+	for index := 0; index < plan.count; index++ {
+		position := 4 + index*gameEntrySize + 8
+		offset := int32(binary.LittleEndian.Uint32(plan.raw[position : position+4]))
+		if offset == 0 {
+			continue
+		}
+		if err := write(plan.raw[cursor:position]); err != nil {
+			return total, err
+		}
+		binary.LittleEndian.PutUint32(word[:], uint32(int64(offset)+plan.delta))
+		if err := write(word[:]); err != nil {
+			return total, err
+		}
+		cursor = position + 4
+	}
+	err := write(plan.raw[cursor:])
+	return total, err
+}
+
 // UpdateCRC32 hashes exactly CopyTo's relocated bytes without staging a game
 // payload. The accumulator uses Go's finalized IEEE representation; callers
 // choose the target's external finalization convention.

@@ -1,47 +1,21 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"github.com/galaco/bsp/internal/format"
-	primitives "github.com/galaco/bsp/primitives/model"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
-// Model is Lump 14: Model
+// Model is a BSP root node.
 type Model struct {
-	Generic
-	data []primitives.Model
-}
-
-// Unmarshall Imports this lump from raw byte data
-func (lump *Model) Unmarshall(raw []byte) error {
-	count, err := format.FixedRecordCount(len(raw), 48)
-	if err != nil {
-		return err
-	}
-	data := make([]primitives.Model, count)
-	if err := binary.Read(bytes.NewReader(raw), binary.LittleEndian, data); err != nil {
-		return err
-	}
-	lump.data = data
-	lump.Metadata.SetLength(len(raw))
-	return nil
-}
-
-// GetData gets internal format structure data
-func (lump *Model) GetData() []primitives.Model {
-	return lump.data
-}
-
-// Marshall dumps this lump back to raw byte data
-func (lump *Model) Marshall() ([]byte, error) {
-	length, err := format.FixedRecordBytes(len(lump.data), 48)
-	if err != nil {
-		return nil, err
-	}
-	buf := bytes.NewBuffer(make([]byte, 0, length))
-	if err := binary.Write(buf, binary.LittleEndian, lump.data); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	// Mins is bounding volume smallest value corner
+	Mins mgl32.Vec3
+	// Maxs is bounding volume largest value corner
+	Maxs mgl32.Vec3
+	// Origin is the center/specified origin position
+	Origin mgl32.Vec3
+	// HeadNode
+	HeadNode int32
+	// FirstFace is index into the faces lump
+	FirstFace int32
+	// NumFaces is number of faces in this model
+	NumFaces int32
 }

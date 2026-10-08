@@ -52,12 +52,12 @@ func EncodeMapFlags(value lumps.MapFlags, present bool, context format.Context) 
 // MapFlags adapts the optional map-wide flag word for the internal registry.
 // Failed decoding preserves the previously decoded value, presence and length.
 type MapFlags struct {
-	lumps.Metadata
+	Metadata
 	data    lumps.MapFlags
 	present bool
 }
 
-func (lump *MapFlags) Unmarshall(raw []byte) error {
+func (lump *MapFlags) Decode(raw []byte) error {
 	data, present, err := DecodeMapFlags(raw, lump.Context())
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func (lump *MapFlags) Unmarshall(raw []byte) error {
 	return nil
 }
 
-func (lump *MapFlags) Marshall() ([]byte, error) {
+func (lump *MapFlags) Encode() ([]byte, error) {
 	return EncodeMapFlags(lump.data, lump.present, lump.Context())
 }
 

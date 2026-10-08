@@ -2,12 +2,11 @@ package bsp
 
 import (
 	"fmt"
+	"io"
+
 	"github.com/galaco/bsp/internal/codec"
 	"github.com/galaco/bsp/internal/format"
 )
-
-// Writer binds a file explicitly; export never mutates authoritative bytes.
-type Writer struct{ data *Bsp }
 
 type exportPlan struct {
 	layout       codec.Layout
@@ -16,8 +15,8 @@ type exportPlan struct {
 }
 
 // prepareExport is shared by emission and current-state map checksums.
-func (file *Bsp) prepareExport() (exportPlan, error) {
-	if file == nil || file.header.Id != fileIdent {
+func (file *File) prepareExport() (exportPlan, error) {
+	if file == nil || file.header.ID != fileIdent {
 		return exportPlan{}, fmt.Errorf("%w: nil file or invalid file identity", ErrMalformed)
 	}
 	layoutKind, err := profileLayout(file.profile, file.header.Version)
@@ -46,24 +45,28 @@ func (file *Bsp) prepareExport() (exportPlan, error) {
 	return exportPlan{layout: layout, headerLayout: layoutKind, game: game}, nil
 }
 
-// Write emits a canonical numeric-ID layout with aligned, lossless stored payloads.
-// Historical input positions are not changed; game directory offsets are relocated.
-func (w *Writer) Write() ([]byte, error) {
-	if w == nil || w.data == nil {
-		return nil, fmt.Errorf("%w: nil file", ErrMalformed)
+// exportHeader derives output descriptors without changing historical metadata.
+func (file *File) exportHeader(plan exportPlan) Header {
+	header := file.header
+	for i := range header.Lumps {
+		header.Lumps[i].Offset = plan.layout.Offsets[i]
+		header.Lumps[i].Length = plan.layout.Lengths[i]
 	}
-	file := w.data
+	return header
+}
+
+// MarshalBinary emits a canonical numeric-ID layout with aligned stored payloads.
+// Export does not mutate the file; game-directory offsets are relocated.
+func (file *File) MarshalBinary() ([]byte, error) {
 	plan, err := file.prepareExport()
 	if err != nil {
 		return nil, err
 	}
 	layout, game := plan.layout, plan.game
-	// The entire layout and game fixups are checked before the sole output allocation.
+	// Validate the entire layout and game fixups before the output allocation.
 	raw := make([]byte, int(layout.Size))
-	header := file.header
+	header := file.exportHeader(plan)
 	for i := range header.Lumps {
-		header.Lumps[i].Offset = layout.Offsets[i]
-		header.Lumps[i].Length = layout.Lengths[i]
 		if layout.Lengths[i] == 0 {
 			continue
 		}
@@ -81,14 +84,63 @@ func (w *Writer) Write() ([]byte, error) {
 	return raw, nil
 }
 
-// WriteLump returns an owned snapshot of committed stored bytes.
-// Game positions remain its stored base; use MarshalGameLump for explicit relocation.
-func (w *Writer) WriteLump(index LumpId) ([]byte, error) {
-	if w == nil || w.data == nil {
-		return nil, fmt.Errorf("%w: nil file", ErrMalformed)
+// WriteTo emits the same bytes as MarshalBinary without staging a complete BSP.
+// Semantic validation precedes all writes. I/O errors return the actual emitted
+// byte count, and the caller retains ownership of the writer.
+func (file *File) WriteTo(writer io.Writer) (int64, error) {
+	plan, err := file.prepareExport()
+	if err != nil {
+		return 0, err
 	}
-	return w.data.RawLump(index)
+	if writer == nil {
+		return 0, fmt.Errorf("%w: nil writer", ErrMalformed)
+	}
+	header := file.exportHeader(plan)
+	var headerBytes [HeaderSize]byte
+	encodeHeader(headerBytes[:], &header, plan.headerLayout)
+	written, err := writeChunk(writer, headerBytes[:])
+	if err != nil {
+		return written, err
+	}
+	var zeros [3]byte
+	for id, length := range plan.layout.Lengths {
+		if length == 0 {
+			continue
+		}
+		padding := int64(plan.layout.Offsets[id]) - written
+		if padding != 0 {
+			n, err := writeChunk(writer, zeros[:padding])
+			written += n
+			if err != nil {
+				return written, err
+			}
+		}
+		var n int64
+		if id == int(LumpGame) {
+			n, err = plan.game.WriteTo(writer)
+		} else {
+			n, err = writeChunk(writer, file.lumps[id].raw)
+		}
+		written += n
+		if err != nil {
+			return written, err
+		}
+	}
+	padding := int64(plan.layout.Size) - written
+	if padding != 0 {
+		n, err := writeChunk(writer, zeros[:padding])
+		written += n
+		if err != nil {
+			return written, err
+		}
+	}
+	return written, nil
 }
 
-// NewWriter binds the supplied file without an ownership-by-value facade.
-func NewWriter(file *Bsp) *Writer { return &Writer{data: file} }
+func writeChunk(writer io.Writer, raw []byte) (int64, error) {
+	n, err := writer.Write(raw)
+	if n != len(raw) && err == nil {
+		err = io.ErrShortWrite
+	}
+	return int64(n), err
+}

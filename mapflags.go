@@ -7,8 +7,8 @@ import (
 
 // MapFlags returns an independent map-wide flag value and its explicit presence.
 // An absent payload has present=false; a present zero word has present=true.
-func (bsp *Bsp) MapFlags() (lumps.MapFlags, bool, error) {
-	decoded, err := bsp.Lump(LumpMapFlags)
+func (bsp *File) MapFlags() (lumps.MapFlags, bool, error) {
+	decoded, err := bsp.decodeLump(LumpMapFlags)
 	if err != nil {
 		return lumps.MapFlags{}, false, err
 	}
@@ -18,7 +18,7 @@ func (bsp *Bsp) MapFlags() (lumps.MapFlags, bool, error) {
 
 // SetMapFlags atomically stores an explicitly present word, including zero.
 // It preserves the selected descriptor revision and clears compression metadata.
-func (bsp *Bsp) SetMapFlags(value lumps.MapFlags) error {
+func (bsp *File) SetMapFlags(value lumps.MapFlags) error {
 	if err := bsp.checkTypedRevision(LumpMapFlags); err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (bsp *Bsp) SetMapFlags(value lumps.MapFlags) error {
 
 // RemoveMapFlags atomically removes the optional word rather than setting zero.
 // It preserves the selected descriptor revision and clears compression metadata.
-func (bsp *Bsp) RemoveMapFlags() error {
+func (bsp *File) RemoveMapFlags() error {
 	if err := bsp.checkTypedRevision(LumpMapFlags); err != nil {
 		return err
 	}

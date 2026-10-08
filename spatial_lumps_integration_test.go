@@ -10,7 +10,7 @@ import (
 	"github.com/galaco/bsp"
 )
 
-func spatialFixture(t *testing.T, profile bsp.Profile, payloads map[bsp.LumpId][]byte) *bsp.Bsp {
+func spatialFixture(t *testing.T, profile bsp.Profile, payloads map[bsp.LumpID][]byte) *bsp.File {
 	t.Helper()
 	raw := make([]byte, bsp.HeaderSize)
 	copy(raw, "VBSP")
@@ -19,7 +19,7 @@ func spatialFixture(t *testing.T, profile bsp.Profile, payloads map[bsp.LumpId][
 		version = 20
 	}
 	binary.LittleEndian.PutUint32(raw[4:], version)
-	for id := bsp.LumpId(0); id < 64; id++ {
+	for id := bsp.LumpID(0); id < 64; id++ {
 		payload := payloads[id]
 		if len(payload) == 0 {
 			continue
@@ -35,14 +35,14 @@ func spatialFixture(t *testing.T, profile bsp.Profile, payloads map[bsp.LumpId][
 		}
 		raw = append(raw, payload...)
 	}
-	file, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
+	file, err := bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
 	if err != nil {
 		t.Fatal(err)
 	}
 	return file
 }
 
-func spatialPayloads() map[bsp.LumpId][]byte {
+func spatialPayloads() map[bsp.LumpID][]byte {
 	overlays := make([]byte, 704)
 	for i := 0; i < 2; i++ {
 		wire := overlays[i*352 : (i+1)*352]
@@ -76,7 +76,7 @@ func spatialPayloads() map[bsp.LumpId][]byte {
 	for i := 0; i < 6; i++ {
 		binary.LittleEndian.PutUint16(indices[i*2:], uint16(i+1))
 	}
-	return map[bsp.LumpId][]byte{bsp.LumpOverlays: overlays, bsp.LumpCubemaps: cubes, bsp.LumpPrimitives: primitives, bsp.LumpPrimVerts: make([]byte, 7*12), bsp.LumpPrimIndices: indices, bsp.LumpTexInfo: make([]byte, 72), bsp.LumpFaces: make([]byte, 2*56)}
+	return map[bsp.LumpID][]byte{bsp.LumpOverlays: overlays, bsp.LumpCubemaps: cubes, bsp.LumpPrimitives: primitives, bsp.LumpPrimVerts: make([]byte, 7*12), bsp.LumpPrimIndices: indices, bsp.LumpTexInfo: make([]byte, 72), bsp.LumpFaces: make([]byte, 2*56)}
 }
 
 func TestSpatialPublicSnapshotsAndExactCommittedBytes(t *testing.T) {
@@ -132,7 +132,7 @@ func TestSpatialPublicSnapshotsAndExactCommittedBytes(t *testing.T) {
 			binary.LittleEndian.PutUint16(payloads[bsp.LumpPrimitives][12:], 4)
 			binary.LittleEndian.PutUint16(payloads[bsp.LumpPrimitives][14:], 2)
 			next := rereadOrdinary(t, file)
-			for _, id := range []bsp.LumpId{bsp.LumpOverlays, bsp.LumpCubemaps, bsp.LumpPrimitives} {
+			for _, id := range []bsp.LumpID{bsp.LumpOverlays, bsp.LumpCubemaps, bsp.LumpPrimitives} {
 				got, err := next.RawLump(id)
 				if err != nil || !bytes.Equal(got, payloads[id]) {
 					t.Fatalf("lump%d exact committed bytes lost: %v", id, err)
@@ -166,7 +166,7 @@ func TestSpatialSetterFailuresAreAtomic(t *testing.T) {
 	}
 	for _, tc := range []struct {
 		name   string
-		id     bsp.LumpId
+		id     bsp.LumpID
 		change func() error
 	}{
 		{"count65", bsp.LumpOverlays, func() error {
@@ -253,7 +253,7 @@ func TestPrimitiveFaceLocalIndicesAndOpaqueUnknownTypes(t *testing.T) {
 	}
 	unknown := append([]byte(nil), payloads[bsp.LumpPrimitives]...)
 	unknown[0] = 99
-	file = spatialFixture(t, bsp.ProfileCSGO, map[bsp.LumpId][]byte{bsp.LumpPrimitives: unknown})
+	file = spatialFixture(t, bsp.ProfileCSGO, map[bsp.LumpID][]byte{bsp.LumpPrimitives: unknown})
 	if _, err := file.Primitives(); !errors.Is(err, bsp.ErrUnsupportedLump) {
 		t.Fatalf("unknown typed primitive=%v", err)
 	}
@@ -263,13 +263,90 @@ func TestPrimitiveFaceLocalIndicesAndOpaqueUnknownTypes(t *testing.T) {
 	}
 }
 
+func fixedBoundaryError(file *bsp.File, id bsp.LumpID) error {
+	var err error
+	switch id {
+	case 1:
+		_, err = file.Planes()
+	case 2:
+		_, err = file.TextureData()
+	case 3:
+		_, err = file.Vertices()
+	case 5:
+		_, err = file.Nodes()
+	case 6:
+		_, err = file.TextureInfo()
+	case 7:
+		_, err = file.Faces()
+	case 8:
+		_, err = file.Lighting()
+	case 11:
+		_, err = file.FaceIDs()
+	case 12:
+		_, err = file.Edges()
+	case 13:
+		_, err = file.SurfaceEdges()
+	case 14:
+		_, err = file.Models()
+	case 16:
+		_, err = file.LeafFaces()
+	case 17:
+		_, err = file.LeafBrushes()
+	case 18:
+		_, err = file.Brushes()
+	case 20:
+		_, err = file.Areas()
+	case 21:
+		_, err = file.AreaPortals()
+	case 26:
+		_, err = file.Displacements()
+	case 27:
+		_, err = file.OriginalFaces()
+	case 30:
+		_, err = file.VertexNormals()
+	case 31:
+		_, err = file.VertexNormalIndices()
+	case 33:
+		_, err = file.DisplacementVertices()
+	case 36:
+		_, err = file.LeafWaterData()
+	case 37:
+		_, err = file.Primitives()
+	case 38:
+		_, err = file.PrimitiveVertices()
+	case 39:
+		_, err = file.PrimitiveIndices()
+	case 41:
+		_, err = file.ClipPortalVertices()
+	case 42:
+		_, err = file.Cubemaps()
+	case 44:
+		_, err = file.TextureStringTable()
+	case 45:
+		_, err = file.Overlays()
+	case 46:
+		_, err = file.LeafMinDistancesToWater()
+	case 47:
+		_, err = file.FaceMacroTextureInfo()
+	case 48:
+		_, err = file.DisplacementTriangles()
+	case 53:
+		_, err = file.LightingHDR()
+	case 58:
+		_, err = file.FacesHDR()
+	case 60:
+		_, err = file.OverlayFades()
+	}
+	return err
+}
+
 func TestPublicFixedRecordBoundariesRetainOpaqueBytes(t *testing.T) {
-	inventory := map[bsp.LumpId]int{1: 20, 2: 32, 3: 12, 5: 32, 6: 72, 7: 56, 8: 4, 11: 2, 12: 4, 13: 4, 14: 48, 16: 2, 17: 2, 18: 12, 20: 8, 21: 12, 26: 176, 27: 56, 30: 12, 31: 2, 33: 20, 36: 12, 37: 10, 38: 12, 39: 2, 41: 12, 42: 16, 44: 4, 45: 352, 46: 2, 47: 2, 48: 2, 53: 4, 58: 56, 60: 8}
+	inventory := map[bsp.LumpID]int{1: 20, 2: 32, 3: 12, 5: 32, 6: 72, 7: 56, 8: 4, 11: 2, 12: 4, 13: 4, 14: 48, 16: 2, 17: 2, 18: 12, 20: 8, 21: 12, 26: 176, 27: 56, 30: 12, 31: 2, 33: 20, 36: 12, 37: 10, 38: 12, 39: 2, 41: 12, 42: 16, 44: 4, 45: 352, 46: 2, 47: 2, 48: 2, 53: 4, 58: 56, 60: 8}
 	for id, width := range inventory {
 		for _, length := range []int{width - 1, width + 1} {
 			raw := make([]byte, length)
-			file := spatialFixture(t, bsp.ProfileCSGO, map[bsp.LumpId][]byte{id: raw})
-			if _, err := file.Lump(id); !errors.Is(err, bsp.ErrMalformed) {
+			file := spatialFixture(t, bsp.ProfileCSGO, map[bsp.LumpID][]byte{id: raw})
+			if err := fixedBoundaryError(file, id); !errors.Is(err, bsp.ErrMalformed) {
 				t.Fatalf("lump%d length%d error=%v", id, length, err)
 			}
 			preserved, err := rereadOrdinary(t, file).RawLump(id)

@@ -17,9 +17,8 @@ Go library for handling Source Engine .bsp map files.
 * Native Source LZMA decoding with bounded output/dictionary allocations; unchanged streams stay stored.
 
 Container/raw support and typed record support are separate. See the profile
-matrix and record sections below. Remaining layout fixes follow the ordered
-implementation tasks; directory acceptance does not establish a typed layout
-for every payload.
+matrix and record sections below. A recognized container profile does not imply
+typed support for every payload; unknown/proprietary records remain opaque.
 
 Canonical export intentionally uses numeric ID order, four-byte alignment and
 zero locations for empty descriptors. It does not preserve original physical
@@ -39,7 +38,7 @@ import (
 )
 
 func main() {
-	file, err := bsp.ReadFromFile("de_dust2.bsp", bsp.ReadOptions{Profile: bsp.ProfileCSGO})
+	file, err := bsp.ReadFile("de_dust2.bsp", bsp.ReadOptions{Profile: bsp.ProfileCSGO})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,13 +50,27 @@ func main() {
 }
 ```
 
-Raw and decoded values are independent snapshots. Use `SetRawLump`, `SetEntities`,
-or `SetPlanes` to commit an edit; modifying a returned slice does not edit the file.
-`Header`/`Descriptor` return copied metadata, and stored lengths are derived from
-committed bytes. `NewWriter(file).Write()` plans checked sizes before allocating,
-then emits committed payloads without typed decoding or source mutation.
-`WriteLump(id)` returns stored bytes; `MarshalGameLump(base)` explicitly relocates
-game bytes. Input descriptor offsets remain historical, not planned output locations.
+Raw and decoded values are owned snapshots. Commit edits through `SetRawLump` or
+the corresponding typed setter; modifying a returned slice does not edit `File`.
+`Header`/`Descriptor` return copied metadata with current stored lengths.
+`MarshalBinary()` returns the complete canonical BSP; `WriteTo(io.Writer)` streams
+the same export and returns the actual byte count, including partial I/O failures.
+Both validate the full layout before writing and leave input metadata/bytes unchanged.
+Neither `Read` nor `WriteTo` closes caller-owned streams.
+`RawLump(id)` returns stored bytes; `MarshalGameLump(base)` relocates game bytes.
+Input offsets are historical, not planned export locations. Synchronize access to
+the same file externally; snapshots allocate and there is no concurrent-edit promise.
+
+## Breaking API migration
+
+Only `github.com/galaco/bsp` and `github.com/galaco/bsp/lumps` are public packages.
+Use `File`, `LumpID`, `Header.ID`, `Read`/`ReadFile`, `MarshalBinary`/`WriteTo`,
+and `MapCRC32`. Public records—including `lumps.Plane`, `lumps.Face` and
+`lumps.TextureData`—no longer require one-record primitive packages.
+Replace generic decoder/type-assertion access with named getters, such as
+`file.TextureData()`, and commit with `file.SetTextureData(records)`.
+Decoder installation, live header mutation and the copied reader/writer facade
+are removed, without aliases or deprecated forwarding paths.
 
 ## Format selection
 
@@ -315,36 +328,36 @@ and independently decoded multi-instance edits are recorded in
 
 ## Numeric lump support inventory
 
-`Bsp.Support(id)` reports capabilities for the admitted file profile/BSP version and actual lump descriptor revision; it is not payload validation or proof of presence. SDK means SDK2013 BSP19/20; C means CS:GO BSP21; L means L4D2 BSP21; R means Reactive Drop BSP21. Map revision does not select a codec. Every valid numeric ID has independent `RawLump`/`SetRawLump` access and stored payload/metadata preservation, including unknown revisions and unsupported branch interpretations. Canonical export does not preserve physical ordering/gaps; game directory absolute offsets relocate.
+`File.Support(id)` reports capabilities for the admitted file profile/BSP version and actual lump descriptor revision; it is not payload validation or proof of presence. SDK means SDK2013 BSP19/20; C means CS:GO BSP21; L means L4D2 BSP21; R means Reactive Drop BSP21. Map revision does not select a codec. Every valid numeric ID has independent `RawLump`/`SetRawLump` access and stored payload/metadata preservation, including unknown revisions and unsupported branch interpretations. Canonical export does not preserve physical ordering/gaps; game directory absolute offsets relocate.
 
-Cells: `T` typed, `B` byte-stream, `O` opaque, `U` unsupported profile interpretation; following digits are accepted descriptor revisions. `r` means advertised getter-only; `rw` means attached persistent getter/setter. Unknown descriptor revisions become opaque without losing raw access. A zero width means variable/opaque/context-bypassed, never a guessed physics or alpha width. Getter-only legacy snapshots are not editable through mutation or codec `Marshall`. `RawReadable`, `RawEditable`, `Preserved` always remain true. `Readable`/`Editable` refer only to the decoded/attached contract listed below.
+Cells: `T` typed, `B` byte-stream, `O` opaque, `U` unsupported profile interpretation; following digits are accepted descriptor revisions. `r` means read-only; `rw` means attached persistent getter/setter. Unknown descriptor revisions become opaque without losing raw access. A zero width means variable/opaque/context-bypassed, never a guessed physics or alpha width. Snapshot mutation never commits changes. `RawReadable`, `RawEditable`, `Preserved` always remain true. `Readable`/`Editable` refer only to the decoded/attached contract listed below.
 
-Evidence: [pinned SDK header](https://github.com/ValveSoftware/source-sdk-2013/blob/b8cfb12c0e083a2ef5b2f9f9b50f3902fa034474/src/public/bspfile.h), [pinned Reactive Drop header](https://github.com/ReactiveDrop/reactivedrop_public_src/blob/af3be02c1d7db2cd07c41105e7519cf8edd66ce3/src/public/bspfile.h), repository `README.md`, `internal/versions/{registry,versions}.go`, `lumps/fixed_arrays_test.go`, `internal/codec/{leaf,worldlight,occlusion,ambient,displacement,coverage_formats,game_directory,staticprops}.go`, and root attached APIs. Genuine Steam-distributed RD BSP21 maps establish profile admission, v1 worldlights/faces/leaves, sprp v9 and populated ID61/26/34. IDs22–25/49/50/63 were empty in the genuine RD fixtures: their populated layouts rely on source and authored wire evidence, not fabricated genuine coverage.
+Evidence: [pinned SDK header](https://github.com/ValveSoftware/source-sdk-2013/blob/b8cfb12c0e083a2ef5b2f9f9b50f3902fa034474/src/public/bspfile.h), [pinned Reactive Drop header](https://github.com/ReactiveDrop/reactivedrop_public_src/blob/af3be02c1d7db2cd07c41105e7519cf8edd66ce3/src/public/bspfile.h), `internal/codec/{registry,fixed_arrays_test,leaf,worldlight,occlusion,ambient,displacement,coverage_formats,game_directory,staticprops}.go`, and root attached APIs. Genuine Steam-distributed RD BSP21 maps establish profile admission, v1 worldlights/faces/leaves, sprp v9 and populated ID61/26/34. IDs22–25/49/50/63 were empty in the genuine RD fixtures: their populated layouts rely on source and authored wire evidence, not fabricated genuine coverage.
 
 | ID | Name / branch aliases | SDK | C | L | R | Width bytes | Accessors | Practical contract / limitations |
 | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
 | 0 | entities | B0rw | B0rw | B0rw | B0rw | 0 | `Entities`, `SetEntities` | Exact entity text; no key/value parser or reference rewriting. |
 | 1 | planes | T0rw | T0rw | T0rw | T0rw | 20 | `Planes`, `SetPlanes` | Setter checks plane axis and count; no automatic geometry rebuild. |
-| 2 | texdata | T0r | T0r | T0r | T0r | 32 | `Lump -> lumps.TexData.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 3 | vertexes | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.Vertex.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 2 | texdata | T0rw | T0rw | T0rw | T0rw | 32 | `TextureData`, `SetTextureData` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 3 | vertexes | T0rw | T0rw | T0rw | T0rw | 12 | `Vertices`, `SetVertices` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 4 | visibility | T0rw | T0rw | T0rw | T0rw | 0 | `Visibility`, `SetVisibility` | Derived count <=65536; lump-relative shared PVS/PAS offsets, bounded RLE, explicit missing rows; no recomputation. |
-| 5 | nodes | T0r | T0r | T0r | T0r | 32 | `Lump -> lumps.Node.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 6 | texinfo | T0r | T0r | T0r | T0r | 72 | `Lump -> lumps.TexInfo.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 5 | nodes | T0rw | T0rw | T0rw | T0rw | 32 | `Nodes`, `SetNodes` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 6 | texinfo | T0rw | T0rw | T0rw | T0rw | 72 | `TextureInfo`, `SetTextureInfo` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 7 | faces | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 56 | `Faces`, `SetFaces` | Masked primitive spans and local winding references checked; high bit disables dynamic shadows. No topology regeneration. |
-| 8 | lighting | T0,1r | T0,1r | T0,1r | T0,1r | 4 | `Lump -> lumps.Lighting.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 8 | lighting | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 4 | `Lighting`, `SetLighting` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 9 | occlusion | T1,2rw | T1,2rw | T1,2rw | T2rw | 0 | `Occlusion`, `SetOcclusion` | Counted occluders/polygons/indices, not a uniform array; plane/vertex references checked; v1 cannot encode area edits. Reactive Drop accepts only v2. |
 | 10 | leafs | T0,1rw | T0,1rw | T0,1rw | T0,1rw | v0:56; v1:32 | `Leaves`, `SetLeaves` | Leaf descriptor selects inline lighting (v0) or compact layout (v1); no inferred conversion. |
-| 11 | faceids | T0r | T0r | T0r | T0r | 2 | `Lump -> lumps.FaceId.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 12 | edges | T0r | T0r | T0r | T0r | 4 | `Lump -> lumps.Edge.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 13 | surfedges | T0r | T0r | T0r | T0r | 4 | `Lump -> lumps.Surfedge.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 14 | models | T0r | T0r | T0r | T0r | 48 | `Lump -> lumps.Model.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 11 | faceids | T0rw | T0rw | T0rw | T0rw | 2 | `FaceIDs`, `SetFaceIDs` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 12 | edges | T0rw | T0rw | T0rw | T0rw | 4 | `Edges`, `SetEdges` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 13 | surfedges | T0rw | T0rw | T0rw | T0rw | 4 | `SurfaceEdges`, `SetSurfaceEdges` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 14 | models | T0rw | T0rw | T0rw | T0rw | 48 | `Models`, `SetModels` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 15 | worldlights | T0rw | T0,1rw | T0rw | T0,1rw | v0:88; C/R v1:100 | `WorldLights`, `SetWorldLights` | v0=88 bytes; v1=100 only CS:GO/Reactive Drop. HDR is independent. |
-| 16 | leaffaces | T0r | T0r | T0r | T0r | 2 | `Lump -> lumps.LeafFace.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 17 | leafbrushes | T0r | T0r | T0r | T0r | 2 | `Lump -> lumps.LeafBrush.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 18 | brushes | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.Brush.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 16 | leaffaces | T0rw | T0rw | T0rw | T0rw | 2 | `LeafFaces`, `SetLeafFaces` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 17 | leafbrushes | T0rw | T0rw | T0rw | T0rw | 2 | `LeafBrushes`, `SetLeafBrushes` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 18 | brushes | T0rw | T0rw | T0rw | T0rw | 12 | `Brushes`, `SetBrushes` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 19 | brushsides | T0rw | T0rw | T0rw | T0rw | 8 | `BrushSides`, `SetBrushSides` | Eight bytes in all admitted profiles; branch selects bevel/thin fields. |
-| 20 | areas | T0r | T0r | T0r | T0r | 8 | `Lump -> lumps.Area.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 21 | areaportals | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.AreaPortal.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 20 | areas | T0rw | T0rw | T0rw | T0rw | 8 | `Areas`, `SetAreas` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 21 | areaportals | T0rw | T0rw | T0rw | T0rw | 12 | `AreaPortals`, `SetAreaPortals` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 22 | portals / unused0, propcollision (R uses last alias) | U | U | U | T0rw | 8 | `PropCollisions`, `SetPropCollisions` | Reactive Drop only; negative/overflow scalar span checks, not guessed hull/dictionary resolution. Populated genuine evidence unavailable. |
 | 23 | clusters / unused1, prophulls (R uses last alias) | U | U | U | T0rw | 16 | `PropHulls`, `SetPropHulls` | Reactive Drop only; negative/overflow scalar span checks, not guessed vertex/dictionary resolution; contents bits preserved. Populated genuine evidence unavailable. |
 | 24 | portalverts / unused2, prophullverts (R uses last alias) | U | U | U | T0rw | 12 | `PropHullVertices`, `SetPropHullVertices` | Reactive Drop only; raw float bits preserved; no guessed collision dictionary association. |
@@ -353,37 +366,37 @@ Evidence: [pinned SDK header](https://github.com/ValveSoftware/source-sdk-2013/b
 | 27 | originalfaces | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 56 | `OriginalFaces`, `SetOriginalFaces` | Independent original-face channel with exact packed words; no automatic split-face rebuild. |
 | 28 | physdisp | O | O | O | O | 0 | raw only | Physics displacement interior is opaque; no proprietary physics codec. |
 | 29 | physcollide | O | O | O | O | 0 | raw only | Physics collision interior is opaque; no proprietary physics codec. |
-| 30 | vertnormals | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.VertNormal.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 31 | vertnormalindices | T0r | T0r | T0r | T0r | 2 | `Lump -> lumps.VertNormalIndice.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 30 | vertnormals | T0rw | T0rw | T0rw | T0rw | 12 | `VertexNormals`, `SetVertexNormals` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 31 | vertnormalindices | T0rw | T0rw | T0rw | T0rw | 2 | `VertexNormalIndices`, `SetVertexNormalIndices` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 32 | displightmapalphas | O | O | O | O | 0 | raw only | Stripped/opaque alpha data; no proven record width or typed codec. |
-| 33 | dispverts | T0r | T0r | T0r | T0r | 20 | `Lump -> lumps.DispVert.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 33 | dispverts | T0rw | T0rw | T0rw | T0rw | 20 | `DisplacementVertices`, `SetDisplacementVertices` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 34 | displightmapsamplepositions | B0rw | B0rw | B0rw | B0rw | 0 | `DisplacementSamples`, `SetDisplacementSamples` | Face-derived count and displacement start/span select variable-width sample stream; indexed getter/setter preserves unclaimed bytes and adjusts following starts. Missing face lighting is an error. |
 | 35 | game | B0rw | B0rw | B0rw | B0rw | 0 | `GameLumps`, `GameLump`, `GameLumpByID`, `SetGameLumps`, `SetGameLump`, `StaticProps`, `SetStaticProps` | Counted 16-byte directory entries, not uniform game records; unknown children/gaps preserved. Static props require one unique sprp entry and explicit profile/revision selector; compressed outer directory unsupported. StaticPropStatus describes selection, not successful payload validation. |
-| 36 | leafwaterdata | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.LeafWaterData.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 36 | leafwaterdata | T0rw | T0rw | T0rw | T0rw | 12 | `LeafWaterData`, `SetLeafWaterData` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 37 | primitives | T0rw | T0rw | T0rw | T0rw | 10 | `Primitives`, `SetPrimitives` | Primitive types 0 and 1 supported; sibling index/vertex spans checked; other types return unsupported. |
-| 38 | primverts | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.PrimVert.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 39 | primindices | T0r | T0r | T0r | T0r | 2 | `Lump -> lumps.PrimIndice.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 38 | primverts | T0rw | T0rw | T0rw | T0rw | 12 | `PrimitiveVertices`, `SetPrimitiveVertices` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 39 | primindices | T0rw | T0rw | T0rw | T0rw | 2 | `PrimitiveIndices`, `SetPrimitiveIndices` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 40 | pakfile | B0r | B0r | B0r | B0r | 0 | `Pakfile`, `Pakfile.Entries`, `Pakfile.ReadFile` | Read-only ZIP snapshots with normalized first-match lookup, not-found/errors and closed readers. Whole replacement is raw; ZIP methods0/8 supported, method14 returns `zip.ErrAlgorithm`. No ZIP expansion cap. |
-| 41 | clipportalverts | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.ClipPortalVerts.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 41 | clipportalverts | T0rw | T0rw | T0rw | T0rw | 12 | `ClipPortalVertices`, `SetClipPortalVertices` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 42 | cubemaps | T0rw | T0rw | T0rw | T0rw | 16 | `Cubemaps`, `SetCubemaps` | Integer origin, size code and padding preserved; no texture-resource synthesis. |
-| 43 | texdatastringdata | B0r | B0r | B0r | B0r | 0 | `Lump -> lumps.TexDataStringData.GetData` | Exact NUL-separated string bytes; no table-reference-aware attached editor. |
-| 44 | texdatastringtable | T0r | T0r | T0r | T0r | 4 | `Lump -> lumps.TexDataStringTable.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 43 | texdatastringdata | B0rw | B0rw | B0rw | B0rw | 0 | `TextureStringData`, `SetTextureStringData` | Exact NUL-separated bytes; no automatic string-table rebasing. |
+| 44 | texdatastringtable | T0rw | T0rw | T0rw | T0rw | 4 | `TextureStringTable`, `SetTextureStringTable` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 45 | overlays | T0rw | T0rw | T0rw | T0rw | 352 | `Overlays`, `SetOverlays` | Active face/material references and packed count/order checked; inactive slots preserved. |
-| 46 | leafmindisttowater | T0r | T0r | T0r | T0r | 2 | `Lump -> lumps.LeafMinDistToWater.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 47 | facemacrotextureinfo | T0r | T0r | T0r | T0r | 2 | `Lump -> lumps.FaceMacroTextureInfo.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 48 | disptris | T0r | T0r | T0r | T0r | 2 | `Lump -> lumps.DispTris.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 46 | leafmindisttowater | T0rw | T0rw | T0rw | T0rw | 2 | `LeafMinDistancesToWater`, `SetLeafMinDistancesToWater` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 47 | facemacrotextureinfo | T0rw | T0rw | T0rw | T0rw | 2 | `FaceMacroTextureInfo`, `SetFaceMacroTextureInfo` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
+| 48 | disptris | T0rw | T0rw | T0rw | T0rw | 2 | `DisplacementTriangles`, `SetDisplacementTriangles` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 49 | physcollidesurface / propblob (R uses last alias) | U | U | U | B0rw | 0 | `PropBlob`, `SetPropBlob` | Reactive Drop defines a byte blob; interior/index units/dictionary association are opaque. Other profiles retain deprecated physcollidesurface alias without a codec. |
 | 50 | wateroverlays | T0rw | T0rw | T0rw | T0rw | 1120 | `WaterOverlays`, `SetWaterOverlays` | 1120-byte water overlays; face/material references checked. RD evidence is source/authored wire, not a populated genuine lump. |
 | 51 | leafambientindexhdr / lightmappages | T0rw | T0rw | T0rw | T0rw | indexed:4; bypass:0 | `AmbientIndicesHDR`, `SetAmbientIndicesHDR` | Leaf-v0 bypasses standalone lighting; absent LDR index selects legacy mode for both channels. Old lightmappages alias is not a separate codec. |
 | 52 | leafambientindex / lightmappagesinfo | T0rw | T0rw | T0rw | T0rw | indexed:4; bypass:0 | `AmbientIndices`, `SetAmbientIndices` | Leaf-v0 bypasses standalone lighting; absent LDR index selects legacy mode for both channels. Old lightmappagesinfo alias is not a separate codec. |
-| 53 | lightinghdr | T0,1r | T0,1r | T0,1r | T0,1r | 4 | `Lump -> lumps.Lighting.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 53 | lightinghdr | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 4 | `LightingHDR`, `SetLightingHDR` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 54 | worldlightshdr | T0rw | T0,1rw | T0rw | T0,1rw | v0:88; C/R v1:100 | `WorldLightsHDR`, `SetWorldLightsHDR` | v0=88 bytes; v1=100 only CS:GO/Reactive Drop. LDR is independent. |
 | 55 | leafambientlightinghdr | T0,1rw | T0,1rw | T0,1rw | T0,1rw | inline:0; legacy:24; indexed:28 | `AmbientSamplesHDR`, `SetAmbientSamplesHDR` | Leaf-v0 supplies inline lighting; legacy mode uses 24-byte cubes, indexed mode 28-byte samples; no implicit HDR fallback. |
 | 56 | leafambientlighting | T0,1rw | T0,1rw | T0,1rw | T0,1rw | inline:0; legacy:24; indexed:28 | `AmbientSamples`, `SetAmbientSamples` | Leaf-v0 supplies inline lighting; legacy mode uses 24-byte cubes, indexed mode 28-byte samples; no implicit HDR fallback. |
 | 57 | xzippakfile | O | O | O | O | 0 | raw only | Deprecated console XZIP payload; PC profiles preserve raw bytes only. |
 | 58 | faceshdr | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 56 | `FacesHDR`, `SetFacesHDR` | Independent HDR channel; no fallback to ordinary faces. |
 | 59 | mapflags | T0rw | T0rw | T0rw | T0rw | 4 | `MapFlags`, `SetMapFlags`, `RemoveMapFlags` | Explicit presence: absent0 bytes versus present4 bytes, including zero; other lengths malformed. |
-| 60 | overlayfades | T0r | T0r | T0r | T0r | 8 | `Lump -> lumps.OverlayFade.GetData` | Getter-only fade distances; no attached setter or overlay-reference-aware mutation. |
+| 60 | overlayfades | T0rw | T0rw | T0rw | T0rw | 8 | `OverlayFades`, `SetOverlayFades` | Owned records and explicit persistent setter; no automatic geometry or sibling-reference rebuilding. |
 | 61 | overlaysystemlevels | U | T0rw | T0rw | T0rw | 4 | `OverlaySystemLevels`, `SetOverlaySystemLevels` | Only L4D2/CS:GO/Reactive Drop; four CPU/GPU level bytes preserved without guessing engine policy. |
 | 62 | physlevel | O | O | O | O | 0 | raw only | Physics level interior opaque; no proprietary physics codec. |
 | 63 | dispmultiblend | U | T0rw | U | T0rw | 80 | `DisplacementMultiblends`, `SetDisplacementMultiblends` | Only CS:GO/Reactive Drop; 80-byte weights/alpha/colors, reference spans checked; no invented SDK/L4D2 support. RD populated genuine evidence unavailable. |
@@ -392,7 +405,6 @@ Ambient metadata is conservative for unknown revisions even where the actual con
 
 ID35 is a counted directory, not a uniformly typed game-record array. `StaticPropVersions` comes from the shared static-prop profile selector; `StaticPropStatus` is typed only when the actual directory has one unique `sprp` child with an accepted revision (RD v9 is accepted). Missing/duplicate/unknown-revision children remain opaque while directory and other children remain accessible. This status is selector coverage, not successful validation of the child payload. The selector never infers versions from byte length.
 
-ID4 intentionally advertises no safe decoded consumer until task12 repairs visibility count/offset/RLE bounds. ID40 advertises no attached safe resource API until task13 repairs ZIP empty/presence/path/read-limit/closure contracts. ID59 remains a legacy getter-only record whose empty-as-zero semantics do not distinguish absence and whose exact payload size is not enforced; task12 owns that repair. These limitations are not advertised as fully supported editing.
 
 ## Real World examples
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)

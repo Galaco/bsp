@@ -5,19 +5,19 @@ import (
 	"fmt"
 
 	"github.com/galaco/bsp/internal/codec"
-	facevalue "github.com/galaco/bsp/primitives/face"
+	"github.com/galaco/bsp/lumps"
 )
 
 // Faces returns owned ordinary face records; HDR never substitutes for LDR.
-func (bsp *Bsp) Faces() ([]facevalue.Face, error) { return bsp.faces(LumpFaces) }
+func (bsp *File) Faces() ([]lumps.Face, error) { return bsp.faces(LumpFaces) }
 
 // OriginalFaces returns the independent pre-split face channel.
-func (bsp *Bsp) OriginalFaces() ([]facevalue.Face, error) { return bsp.faces(LumpOriginalFaces) }
+func (bsp *File) OriginalFaces() ([]lumps.Face, error) { return bsp.faces(LumpOriginalFaces) }
 
 // FacesHDR returns only the independent HDR channel.
-func (bsp *Bsp) FacesHDR() ([]facevalue.Face, error) { return bsp.faces(LumpFacesHDR) }
-func (bsp *Bsp) faces(id LumpId) ([]facevalue.Face, error) {
-	decoded, err := bsp.Lump(id)
+func (bsp *File) FacesHDR() ([]lumps.Face, error) { return bsp.faces(LumpFacesHDR) }
+func (bsp *File) faces(id LumpID) ([]lumps.Face, error) {
+	decoded, err := bsp.decodeLump(id)
 	if err != nil {
 		return nil, err
 	}
@@ -25,16 +25,16 @@ func (bsp *Bsp) faces(id LumpId) ([]facevalue.Face, error) {
 }
 
 // SetFaces commits ordinary records after masked primitive-range validation.
-func (bsp *Bsp) SetFaces(values []facevalue.Face) error { return bsp.setFaces(LumpFaces, values) }
+func (bsp *File) SetFaces(values []lumps.Face) error { return bsp.setFaces(LumpFaces, values) }
 
 // SetOriginalFaces commits the independent original-face channel.
-func (bsp *Bsp) SetOriginalFaces(values []facevalue.Face) error {
+func (bsp *File) SetOriginalFaces(values []lumps.Face) error {
 	return bsp.setFaces(LumpOriginalFaces, values)
 }
 
 // SetFacesHDR commits HDR records without changing ordinary faces.
-func (bsp *Bsp) SetFacesHDR(values []facevalue.Face) error { return bsp.setFaces(LumpFacesHDR, values) }
-func (bsp *Bsp) setFaces(id LumpId, values []facevalue.Face) error {
+func (bsp *File) SetFacesHDR(values []lumps.Face) error { return bsp.setFaces(LumpFacesHDR, values) }
+func (bsp *File) setFaces(id LumpID, values []lumps.Face) error {
 	if err := bsp.checkTypedRevision(id); err != nil {
 		return err
 	}
@@ -45,8 +45,7 @@ func (bsp *Bsp) setFaces(id LumpId, values []facevalue.Face) error {
 	return bsp.commitOrdinary(id, raw, err)
 }
 
-func (bsp *Bsp) validateFacePrimitiveReferences(values []facevalue.Face) error {
-	// Absent primitive references must not force interpretation of opaque peers.
+func (bsp *File) validateFacePrimitiveReferences(values []lumps.Face) error { // Absent primitive references must not force interpretation of opaque peers.
 	used := false
 	for i := range values {
 		if values[i].PrimitiveCount() != 0 {

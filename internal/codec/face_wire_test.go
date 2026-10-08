@@ -87,13 +87,13 @@ func TestFacePartialRecordsAndUnsupportedContexts(t *testing.T) {
 	}
 	adapter := new(Faces)
 	adapter.SetContext(context)
-	if err := adapter.Unmarshall(raw); err != nil {
+	if err := adapter.Decode(raw); err != nil {
 		t.Fatal(err)
 	}
-	if err := adapter.Unmarshall(raw[:111]); err == nil {
+	if err := adapter.Decode(raw[:111]); err == nil {
 		t.Fatal("partial second record accepted")
 	}
-	after, err := adapter.Marshall()
+	after, err := adapter.Encode()
 	if err != nil || adapter.Length() != 112 || !bytes.Equal(after, raw) {
 		t.Fatalf("failed face decode published partial state: %v", err)
 	}

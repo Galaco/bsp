@@ -7,14 +7,14 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-func (bsp *Bsp) gameDirectoryView() (codec.GameDirectory, error) {
+func (bsp *File) gameDirectoryView() (codec.GameDirectory, error) {
 	desc := bsp.header.Lumps[LumpGame]
 	if binary.LittleEndian.Uint32(desc.FourCC[:]) != 0 {
 		return codec.GameDirectory{}, fmt.Errorf("%w: compressed outer game lump", ErrUnsupportedLump)
 	}
 	return codec.GameDirectory{Raw: bsp.lumps[LumpGame].raw, Base: desc.Offset}, nil
 }
-func (bsp *Bsp) gameDirectory() (codec.GameDirectory, error) {
+func (bsp *File) gameDirectory() (codec.GameDirectory, error) {
 	view, err := bsp.gameDirectoryView()
 	if err != nil {
 		return codec.GameDirectory{}, err
@@ -35,7 +35,7 @@ func terminalGameEntry(entry lumps.GameLump) bool {
 
 // GameLumps returns ordered, independently owned stored-entry snapshots.
 // The terminal boundary is preserved; compressed payloads are not decoded here.
-func (bsp *Bsp) GameLumps() ([]lumps.GameLump, error) {
+func (bsp *File) GameLumps() ([]lumps.GameLump, error) {
 	directory, err := bsp.gameDirectory()
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (bsp *Bsp) GameLumps() ([]lumps.GameLump, error) {
 }
 
 // GameLump addresses a directory index, preserving duplicate IDs.
-func (bsp *Bsp) GameLump(index int) (lumps.GameLump, error) {
+func (bsp *File) GameLump(index int) (lumps.GameLump, error) {
 	directory, err := bsp.gameDirectory()
 	if err != nil {
 		return lumps.GameLump{}, err
@@ -60,7 +60,7 @@ func (bsp *Bsp) GameLump(index int) (lumps.GameLump, error) {
 }
 
 // GameLumpByID excludes the terminal boundary and rejects ambiguous duplicate IDs.
-func (bsp *Bsp) GameLumpByID(id uint32) (lumps.GameLump, error) {
+func (bsp *File) GameLumpByID(id uint32) (lumps.GameLump, error) {
 	directory, err := bsp.gameDirectory()
 	if err != nil {
 		return lumps.GameLump{}, err
@@ -94,12 +94,12 @@ func gameEntryIndex(entries []lumps.GameLump, id uint32) (int, error) {
 
 // SetGameLumps atomically encodes an ordered directory at an internal base of zero.
 // Uncompressed lengths and all nonterminal positions are derived from stored bytes.
-func (bsp *Bsp) SetGameLumps(entries []lumps.GameLump) error {
+func (bsp *File) SetGameLumps(entries []lumps.GameLump) error {
 	return bsp.commitGameEntries(entries)
 }
 
 // SetGameLump replaces one indexed entry without losing siblings or duplicate IDs.
-func (bsp *Bsp) SetGameLump(index int, entry lumps.GameLump) error {
+func (bsp *File) SetGameLump(index int, entry lumps.GameLump) error {
 	directory, err := bsp.gameDirectory()
 	if err != nil {
 		return err
@@ -110,7 +110,7 @@ func (bsp *Bsp) SetGameLump(index int, entry lumps.GameLump) error {
 	directory.Entries[index] = entry
 	return bsp.commitGameDirectoryEdit(directory, index, nil)
 }
-func (bsp *Bsp) commitGameEntries(entries []lumps.GameLump) error {
+func (bsp *File) commitGameEntries(entries []lumps.GameLump) error {
 	raw, err := codec.EncodeGameDirectory(entries, 0)
 	if err != nil {
 		return &FormatError{"encode game directory", err}
@@ -119,7 +119,7 @@ func (bsp *Bsp) commitGameEntries(entries []lumps.GameLump) error {
 	return nil
 }
 
-func (bsp *Bsp) commitGameDirectoryEdit(directory codec.GameDirectory, index int, tail []byte) error {
+func (bsp *File) commitGameDirectoryEdit(directory codec.GameDirectory, index int, tail []byte) error {
 	raw, err := codec.EncodeGameDirectoryEdit(directory, index, tail, 0)
 	if err != nil {
 		return &FormatError{"encode game directory edit", err}
@@ -128,7 +128,7 @@ func (bsp *Bsp) commitGameDirectoryEdit(directory codec.GameDirectory, index int
 	return nil
 }
 
-func (bsp *Bsp) storeGameDirectory(raw []byte) {
+func (bsp *File) storeGameDirectory(raw []byte) {
 	desc := bsp.header.Lumps[LumpGame]
 	desc.Offset = 0
 	desc.FourCC = [4]byte{}
@@ -137,7 +137,7 @@ func (bsp *Bsp) storeGameDirectory(raw []byte) {
 
 // MarshalGameLump relocates an unchanged stored directory without mutating the file.
 // It preserves shared views, unknown bytes, gaps and terminal offset conventions.
-func (bsp *Bsp) MarshalGameLump(base int32) ([]byte, error) {
+func (bsp *File) MarshalGameLump(base int32) ([]byte, error) {
 	directory, err := bsp.gameDirectoryView()
 	if err != nil {
 		return nil, err

@@ -22,16 +22,16 @@ func putGameEntry(raw []byte, index int, id uint32, flags, version uint16, offse
 	binary.LittleEndian.PutUint32(entry[12:], uint32(length))
 }
 
-func readGameFixture(t *testing.T, raw []byte) *bsp.Bsp {
+func readGameFixture(t *testing.T, raw []byte) *bsp.File {
 	t.Helper()
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(35, raw)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(containerBytes(35, raw)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
 	return file
 }
 
-func requireGameEntries(t *testing.T, file *bsp.Bsp, count int) []lumps.GameLump {
+func requireGameEntries(t *testing.T, file *bsp.File, count int) []lumps.GameLump {
 	t.Helper()
 	entries, err := file.GameLumps()
 	if err != nil {
@@ -50,14 +50,14 @@ func requireGameEntry(t *testing.T, got, want lumps.GameLump) {
 	}
 }
 
-func requireStoredGame(t *testing.T, file *bsp.Bsp, want []byte) {
+func requireStoredGame(t *testing.T, file *bsp.File, want []byte) {
 	t.Helper()
 	for _, getter := range []struct {
 		name string
 		get  func() ([]byte, error)
 	}{
 		{"raw", func() ([]byte, error) { return file.RawLump(35) }},
-		{"writer", func() ([]byte, error) { return bsp.NewWriter(file).WriteLump(35) }},
+		{"writer", func() ([]byte, error) { return file.RawLump(35) }},
 	} {
 		got, err := getter.get()
 		if err != nil || !bytes.Equal(got, want) {
@@ -66,7 +66,7 @@ func requireStoredGame(t *testing.T, file *bsp.Bsp, want []byte) {
 	}
 }
 
-func requireGameRelocation(t *testing.T, file *bsp.Bsp, original []byte, base int32) []byte {
+func requireGameRelocation(t *testing.T, file *bsp.File, original []byte, base int32) []byte {
 	t.Helper()
 	got, err := file.MarshalGameLump(base)
 	if err != nil {
@@ -113,7 +113,7 @@ func TestGameLumpMinimalWireHasNoPayloadLengthPrefix(t *testing.T) {
 		binary.LittleEndian.PutUint32(container[8+35*16:], uint32(base))
 		binary.LittleEndian.PutUint32(container[12+35*16:], uint32(len(emitted)))
 		copy(container[int(base):], emitted)
-		reloaded, err := bsp.ReadFromStream(bytes.NewReader(container), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+		reloaded, err := bsp.Read(bytes.NewReader(container), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -326,7 +326,7 @@ func TestGameLumpAbsentAndCountZeroRemainDistinct(t *testing.T) {
 		{"present zero count", 35, []byte{0, 0, 0, 0}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(tc.id, tc.raw)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+			file, err := bsp.Read(bytes.NewReader(containerBytes(tc.id, tc.raw)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 			if err != nil {
 				t.Fatal(err)
 			}

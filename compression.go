@@ -7,7 +7,7 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-func (bsp *Bsp) decodedLumpView(index LumpId) ([]byte, error) {
+func (bsp *File) decodedLumpView(index LumpID) ([]byte, error) {
 	raw := bsp.lumps[index].raw
 	expected := binary.LittleEndian.Uint32(bsp.header.Lumps[index].FourCC[:])
 	if expected == 0 {
@@ -25,7 +25,7 @@ func (bsp *Bsp) decodedLumpView(index LumpId) ([]byte, error) {
 
 // DecodedLump returns owned logical bytes; RawLump returns exact stored bytes.
 // Only explicit nonzero descriptor metadata selects Source LZMA compression.
-func (bsp *Bsp) DecodedLump(index LumpId) ([]byte, error) {
+func (bsp *File) DecodedLump(index LumpID) ([]byte, error) {
 	if err := validateID(index); err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (bsp *Bsp) DecodedLump(index LumpId) ([]byte, error) {
 	return decoded, nil
 }
 
-func (bsp *Bsp) decodedGameEntry(entry lumps.GameLump) ([]byte, error) {
+func (bsp *File) decodedGameEntry(entry lumps.GameLump) ([]byte, error) {
 	if entry.Flags&1 == 0 {
 		if uint64(len(entry.StoredData)) > bsp.limits.MaxDecodedLumpBytes {
 			return nil, fmt.Errorf("%w: game ID %#x bytes %d", ErrLimitExceeded, entry.ID, len(entry.StoredData))
@@ -55,7 +55,7 @@ func (bsp *Bsp) decodedGameEntry(entry lumps.GameLump) ([]byte, error) {
 
 // DecodedGameLump returns an owned logical entry snapshot without editing storage.
 // Compression is selected by the entry flag, never by sniffing unmarked prefixes.
-func (bsp *Bsp) DecodedGameLump(index int) ([]byte, error) {
+func (bsp *File) DecodedGameLump(index int) ([]byte, error) {
 	directory, err := bsp.gameDirectory()
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (bsp *Bsp) DecodedGameLump(index int) ([]byte, error) {
 
 // SetDecodedGameLump commits logical bytes uncompressed, preserving ID/version
 // and every flag except the compression bit. Counts/positions/lengths are derived.
-func (bsp *Bsp) SetDecodedGameLump(index int, decoded []byte) error {
+func (bsp *File) SetDecodedGameLump(index int, decoded []byte) error {
 	directory, err := bsp.gameDirectory()
 	if err != nil {
 		return err
@@ -87,7 +87,7 @@ func (bsp *Bsp) SetDecodedGameLump(index int, decoded []byte) error {
 	return bsp.commitDecodedGameEntry(directory, index, decoded)
 }
 
-func (bsp *Bsp) commitDecodedGameEntry(directory codec.GameDirectory, index int, decoded []byte) error {
+func (bsp *File) commitDecodedGameEntry(directory codec.GameDirectory, index int, decoded []byte) error {
 	entry := &directory.Entries[index]
 	var tail []byte
 	if entry.Flags&1 != 0 {

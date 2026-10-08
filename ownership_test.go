@@ -12,7 +12,7 @@ import (
 
 func TestOwnedRawReplacement(t *testing.T) {
 	input := containerBytes(0, []byte("old"))
-	file, err := bsp.ReadFromStream(bytes.NewReader(input), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(input), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func TestAtomicTypedReplacement(t *testing.T) {
 	raw := make([]byte, 20)
 	binary.LittleEndian.PutUint32(raw, math.Float32bits(1))
 	binary.LittleEndian.PutUint32(raw[12:], math.Float32bits(7))
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(1, raw)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(containerBytes(1, raw)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func TestAtomicTypedReplacement(t *testing.T) {
 	if err != nil || current[0].Distance != 23 {
 		t.Fatalf("committed=%v error=%v", current, err)
 	}
-	before, err := bsp.NewWriter(file).WriteLump(1)
+	before, err := file.RawLump(1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,7 +81,7 @@ func TestAtomicTypedReplacement(t *testing.T) {
 	if err := file.SetPlanes(current); !errors.Is(err, bsp.ErrMalformed) {
 		t.Fatal(err)
 	}
-	after, err := bsp.NewWriter(file).WriteLump(1)
+	after, err := file.RawLump(1)
 	if err != nil || !bytes.Equal(before, after) {
 		t.Fatalf("failed edit changed bytes: %x error=%v", after, err)
 	}
@@ -91,7 +91,7 @@ func TestAtomicTypedReplacement(t *testing.T) {
 }
 
 func TestOpaqueSnapshotIsolation(t *testing.T) {
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(63, []byte{1, 2, 3})), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(containerBytes(63, []byte{1, 2, 3})), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}

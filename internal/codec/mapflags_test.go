@@ -97,26 +97,26 @@ func TestMapFlagsAdapterTransactionalDecodeAndSnapshots(t *testing.T) {
 		var adapter MapFlags
 		adapter.SetContext(context)
 		for _, initial := range [][]byte{nil, {0, 0, 0, 0}, {0x67, 0x45, 0x23, 0x81}} {
-			if err := adapter.Unmarshall(initial); err != nil {
+			if err := adapter.Decode(initial); err != nil {
 				t.Fatal(err)
 			}
 			before, present, length := adapter.GetData(), adapter.Present(), adapter.Length()
 			for _, malformed := range [][]byte{{1}, {1, 2}, {1, 2, 3}, {1, 2, 3, 4, 5}, make([]byte, 8)} {
-				if err := adapter.Unmarshall(malformed); err == nil {
+				if err := adapter.Decode(malformed); err == nil {
 					t.Fatalf("accepted malformed raw=%x", malformed)
 				}
 				if adapter.GetData() != before || adapter.Present() != present || adapter.Length() != length {
 					t.Fatal("failed decode partially published state")
 				}
-				if raw, err := adapter.Marshall(); err != nil || !bytes.Equal(raw, initial) {
+				if raw, err := adapter.Encode(); err != nil || !bytes.Equal(raw, initial) {
 					t.Fatalf("failed decode changed encoding: raw=%x error=%v", raw, err)
 				}
 			}
 		}
-		if err := adapter.Unmarshall(nil); err != nil || adapter.Present() || adapter.Length() != 0 || adapter.GetData() != (lumps.MapFlags{}) {
+		if err := adapter.Decode(nil); err != nil || adapter.Present() || adapter.Length() != 0 || adapter.GetData() != (lumps.MapFlags{}) {
 			t.Fatalf("decode removal: value=%+v present=%v length=%d error=%v", adapter.GetData(), adapter.Present(), adapter.Length(), err)
 		}
-		if raw, err := adapter.Marshall(); err != nil || len(raw) != 0 {
+		if raw, err := adapter.Encode(); err != nil || len(raw) != 0 {
 			t.Fatalf("removed encoding: raw=%x error=%v", raw, err)
 		}
 	}

@@ -11,12 +11,12 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-func supportFixture(t *testing.T, profile bsp.Profile, version int32) *bsp.Bsp {
+func supportFixture(t *testing.T, profile bsp.Profile, version int32) *bsp.File {
 	t.Helper()
 	raw := make([]byte, bsp.HeaderSize)
 	copy(raw, "VBSP")
 	binary.LittleEndian.PutUint32(raw[4:], uint32(version))
-	file, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
+	file, err := bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func TestSupportRawCapabilitiesEveryNumericID(t *testing.T) {
 		{bsp.ProfileCSGO, 21}, {bsp.ProfileL4D2, 21}, {bsp.ProfileReactiveDrop, 21},
 	} {
 		file := supportFixture(t, tc.profile, tc.version)
-		for id := bsp.LumpId(0); id < bsp.LumpCount; id++ {
+		for id := bsp.LumpID(0); id < bsp.LumpCount; id++ {
 			// Deliberately opaque unknown revisions and non-record payloads:
 			// metadata inspection must not decode them or deny raw replacement.
 			want := []byte{byte(id), 0x80, 0, byte(tc.version), 0xff}
@@ -62,7 +62,7 @@ func TestSupportRawCapabilitiesEveryNumericID(t *testing.T) {
 
 func TestSupportInvalidIDs(t *testing.T) {
 	file := supportFixture(t, bsp.ProfileSDK2013, 20)
-	for _, id := range []bsp.LumpId{-1, 64, 1 << 30} {
+	for _, id := range []bsp.LumpID{-1, 64, 1 << 30} {
 		if _, err := file.Support(id); !errors.Is(err, bsp.ErrInvalidLumpID) {
 			t.Fatalf("ID%d error=%v", id, err)
 		}
@@ -77,7 +77,7 @@ func TestSupportProfileAliasesAndGates(t *testing.T) {
 		}
 		file := supportFixture(t, profile, version)
 		for _, tc := range []struct {
-			id         bsp.LumpId
+			id         bsp.LumpID
 			legacy, rd string
 			width      int
 		}{
@@ -101,7 +101,7 @@ func TestSupportProfileAliasesAndGates(t *testing.T) {
 				t.Fatalf("%s ID%d=%+v", profile, tc.id, info)
 			}
 		}
-		for _, id := range []bsp.LumpId{50, 61, 63} {
+		for _, id := range []bsp.LumpID{50, 61, 63} {
 			info, err := file.Support(id)
 			if err != nil {
 				t.Fatal(err)
@@ -117,7 +117,7 @@ func TestSupportProfileAliasesAndGates(t *testing.T) {
 func TestSupportRevisionWidthsAndConsumerLimits(t *testing.T) {
 	for _, tc := range []struct {
 		profile  bsp.Profile
-		id       bsp.LumpId
+		id       bsp.LumpID
 		revision int32
 		status   bsp.LumpSupportStatus
 		width    int
@@ -142,13 +142,6 @@ func TestSupportRevisionWidthsAndConsumerLimits(t *testing.T) {
 		info, err := file.Support(tc.id)
 		if err != nil || info.Status != tc.status || info.RecordWidth != tc.width || info.Limitations == "" || info.Evidence == "" {
 			t.Fatalf("%s ID%d revision%d=%+v error=%v", tc.profile, tc.id, tc.revision, info, err)
-		}
-	}
-	file := supportFixture(t, bsp.ProfileSDK2013, 20)
-	for _, id := range []bsp.LumpId{2, 3, 5, 33, 60} {
-		info, err := file.Support(id)
-		if err != nil || info.Status != bsp.SupportTyped || !info.Readable || info.Editable {
-			t.Fatalf("legacy getter ID%d=%+v error=%v", id, info, err)
 		}
 	}
 }

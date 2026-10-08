@@ -1,7 +1,5 @@
 package lumps
 
-import "github.com/galaco/bsp/primitives/common"
-
 // MaxMapLeafs is the maximum number of leaves supported by the engine.
 const MaxMapLeafs = 65536
 
@@ -24,7 +22,7 @@ type Leaf struct {
 	FirstLeafBrush    uint16
 	NumLeafBrushes    uint16
 	LeafWaterDataID   int16
-	LightSample       common.CompressedLightCube
+	LightSample       CompressedLightCube
 	HasInlineLighting bool
 	Padding           [2]byte
 }

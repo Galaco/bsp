@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/galaco/bsp/lumps"
-	facevalue "github.com/galaco/bsp/primitives/face"
 )
 
 func TestLeafUnsignedPackedFields(t *testing.T) {
@@ -32,7 +31,7 @@ func TestLeafUnsignedPackedFields(t *testing.T) {
 
 func TestFaceCountAndInvertedShadowStateTransitions(t *testing.T) {
 	for _, count := range []uint16{0, 1, 32767} {
-		face := facevalue.Face{NumPrims: count}
+		face := lumps.Face{NumPrims: count}
 		face.SetDynamicShadowsEnabled(false)
 		if face.NumPrims != count|0x8000 || face.PrimitiveCount() != count || face.DynamicShadowsEnabled() {
 			t.Fatalf("disable count%d word%04x", count, face.NumPrims)
@@ -43,7 +42,7 @@ func TestFaceCountAndInvertedShadowStateTransitions(t *testing.T) {
 		}
 	}
 	for _, tc := range []struct{ initial, input, word uint16 }{{0x8000, 1, 0x8001}, {0x8001, 32767, 0xffff}, {0xffff, 0, 0x8000}, {0xffff, 32768, 0x8000}, {0x0001, 0xffff, 0x7fff}} {
-		face := facevalue.Face{NumPrims: tc.initial}
+		face := lumps.Face{NumPrims: tc.initial}
 		enabled := face.DynamicShadowsEnabled()
 		face.SetPrimitiveCount(tc.input)
 		if face.NumPrims != tc.word || face.DynamicShadowsEnabled() != enabled {

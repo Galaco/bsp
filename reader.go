@@ -8,23 +8,17 @@ import (
 	"os"
 )
 
-// Reader is a Bsp File reader.
-type Reader struct {
-	stream  io.Reader
-	options ReadOptions
-}
-
 // Read validates the dialect before buffering payloads; the caller owns the stream.
-func (r *Reader) Read() (*Bsp, error) {
-	if r.stream == nil {
+func Read(reader io.Reader, options ReadOptions) (*File, error) {
+	if reader == nil {
 		return nil, fmt.Errorf("%w: nil reader", ErrMalformed)
 	}
-	limits, err := r.options.limits()
+	limits, err := options.limits()
 	if err != nil {
 		return nil, err
 	}
 	var headerBytes [HeaderSize]byte
-	if _, err := io.ReadFull(r.stream, headerBytes[:]); err != nil {
+	if _, err := io.ReadFull(reader, headerBytes[:]); err != nil {
 		if err == io.EOF {
 			err = io.ErrUnexpectedEOF
 		}
@@ -38,15 +32,15 @@ func (r *Reader) Read() (*Bsp, error) {
 		return nil, fmt.Errorf("%w: invalid magic", ErrMalformed)
 	}
 	version := int32(binary.LittleEndian.Uint32(headerBytes[4:]))
-	layout, err := profileLayout(r.options.Profile, version)
+	layout, err := profileLayout(options.Profile, version)
 	if err != nil {
 		return nil, err
 	}
-	file := &Bsp{header: decodeHeader(headerBytes[:], layout), profile: r.options.Profile, layout: layout, limits: limits}
+	file := &File{header: decodeHeader(headerBytes[:], layout), profile: options.Profile, layout: layout, limits: limits}
 	var input bytes.Buffer
 	input.Grow(HeaderSize)
 	input.Write(headerBytes[:])
-	if _, err := input.ReadFrom(r.stream); err != nil {
+	if _, err := input.ReadFrom(reader); err != nil {
 		return nil, err
 	}
 	raw := input.Bytes()
@@ -77,25 +71,16 @@ func checkedLumpRange(offset, length int32, total int) (int, int, error) {
 	return int(offset), int(end), nil
 }
 
-// ReadFromFile Wraps ReadFromStream to control the file access as well.
-// Use ReadFromStream if you already have a file handle
-func ReadFromFile(filepath string, options ReadOptions) (*Bsp, error) {
+// ReadFile reads a BSP and closes the file it opens.
+func ReadFile(filepath string, options ReadOptions) (*File, error) {
 	f, err := os.Open(filepath)
 	if err != nil {
 		return nil, err
 	}
-	b, readErr := ReadFromStream(f, options)
+	b, readErr := Read(f, options)
 	closeErr := f.Close()
 	if readErr != nil {
 		return nil, readErr
 	}
 	return b, closeErr
-}
-
-// ReadFromStream Reads from any struct that implements io.Reader
-// handy for passing in a string/bytes/other stream
-func ReadFromStream(reader io.Reader, options ReadOptions) (*Bsp, error) {
-	r := &Reader{stream: reader, options: options}
-
-	return r.Read()
 }

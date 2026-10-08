@@ -29,7 +29,7 @@ func TestProfileHeaderNormalization(t *testing.T) {
 	for _, profile := range []bsp.Profile{bsp.ProfileCSGO, bsp.ProfileL4D2} {
 		raw := profileContainer(profile, 21, []byte("entity"))
 		copy(raw[8+63*16+12:], []byte{0xab, 0xcd, 0xef, 1})
-		file, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
+		file, err := bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -65,7 +65,7 @@ func TestDescriptorRevisionSelectsLeafLayout(t *testing.T) {
 		raw := containerBytes(10, payload)
 		binary.LittleEndian.PutUint32(raw[4:], uint32(tc.fileVersion))
 		binary.LittleEndian.PutUint32(raw[8+10*16+8:], uint32(tc.leafVersion))
-		file, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: tc.profile})
+		file, err := bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: tc.profile})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -92,7 +92,7 @@ func TestDescriptorRevisionSelectsLeafLayout(t *testing.T) {
 func TestUnknownRevisionIsOpaqueAndCannotBeTypedEdited(t *testing.T) {
 	raw := containerBytes(0, []byte("future"))
 	binary.LittleEndian.PutUint32(raw[16:], 987)
-	file, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func TestUnknownRevisionIsOpaqueAndCannotBeTypedEdited(t *testing.T) {
 	if err := file.SetEntities("replacement"); !errors.Is(err, bsp.ErrUnsupportedLump) {
 		t.Fatal(err)
 	}
-	stored, err := bsp.NewWriter(file).WriteLump(0)
+	stored, err := file.RawLump(0)
 	if err != nil || string(stored) != "future" {
 		t.Fatalf("opaque=%q error=%v", stored, err)
 	}
@@ -114,7 +114,7 @@ func TestUnsupportedProfileStopsAtHeader(t *testing.T) {
 		version int32
 	}{{"", 20}, {"unknown", 20}, {bsp.ProfileSDK2013, 21}, {bsp.ProfileCSGO, 20}, {bsp.ProfileL4D2, 20}, {bsp.ProfileReactiveDrop, 19}, {bsp.ProfileReactiveDrop, 20}} {
 		stream := bytes.NewReader(profileContainer(bsp.ProfileCSGO, tc.version, []byte("unread payload")))
-		if _, err := bsp.ReadFromStream(stream, bsp.ReadOptions{Profile: tc.profile}); !errors.Is(err, bsp.ErrUnsupportedFormat) {
+		if _, err := bsp.Read(stream, bsp.ReadOptions{Profile: tc.profile}); !errors.Is(err, bsp.ErrUnsupportedFormat) {
 			t.Fatalf("profile=%s version=%d error=%v", tc.profile, tc.version, err)
 		}
 		if stream.Len() != len("unread payload") {

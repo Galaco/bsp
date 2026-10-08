@@ -341,11 +341,11 @@ func EncodeDisplacementSamples(records []lumps.DisplacementSample, triangleCount
 
 // Displacements is the private registry adapter for the complete value codec.
 type Displacements struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.Displacement
 }
 
-func (lump *Displacements) Unmarshall(raw []byte) error {
+func (lump *Displacements) Decode(raw []byte) error {
 	data, err := DecodeDisplacements(raw, lump.Context())
 	if err != nil {
 		return err
@@ -355,7 +355,7 @@ func (lump *Displacements) Unmarshall(raw []byte) error {
 	return nil
 }
 
-func (lump *Displacements) Marshall() ([]byte, error) {
+func (lump *Displacements) Encode() ([]byte, error) {
 	return EncodeDisplacements(lump.data, lump.Context())
 }
 

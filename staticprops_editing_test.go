@@ -30,7 +30,7 @@ type editingGameWire struct {
 
 // Author all container/directory fields directly. No production static-prop or
 // game encoder participates in the input fixture or the expected payload.
-func readStaticEditingFixture(t *testing.T, profile bsp.Profile, entries []editingGameWire) *bsp.Bsp {
+func readStaticEditingFixture(t *testing.T, profile bsp.Profile, entries []editingGameWire) *bsp.File {
 	t.Helper()
 	game := make([]byte, 4+16*(len(entries)+1))
 	binary.LittleEndian.PutUint32(game, uint32(len(entries)+1))
@@ -68,7 +68,7 @@ func readStaticEditingFixture(t *testing.T, profile bsp.Profile, entries []editi
 	binary.LittleEndian.PutUint32(raw[8+10*16:], uint32(leafOffset))
 	binary.LittleEndian.PutUint32(raw[12+10*16:], uint32(len(leaves)))
 	binary.LittleEndian.PutUint32(raw[16+10*16:], 1)
-	file, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
+	file, err := bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,7 +151,7 @@ func staticEditingPayload(sdk bool, version uint16) []byte {
 	return raw
 }
 
-func requireStaticEditingSiblings(t *testing.T, file *bsp.Bsp, original []editingGameWire) {
+func requireStaticEditingSiblings(t *testing.T, file *bsp.File, original []editingGameWire) {
 	t.Helper()
 	entries, err := file.GameLumps()
 	if err != nil || len(entries) != len(original)+1 {
@@ -186,7 +186,7 @@ func requireStaticEditingSiblings(t *testing.T, file *bsp.Bsp, original []editin
 	}
 }
 
-func requireStaticEditingPayload(t *testing.T, file *bsp.Bsp, want []byte) {
+func requireStaticEditingPayload(t *testing.T, file *bsp.File, want []byte) {
 	t.Helper()
 	got, err := file.DecodedGameLump(1)
 	if err != nil || !bytes.Equal(got, want) {
@@ -398,7 +398,7 @@ func TestStaticPropNamesByteLimitAndAtomicFailures(t *testing.T) {
 	}
 }
 
-func requireStaticSetterAtomic(t *testing.T, file *bsp.Bsp, value lumps.StaticProps) {
+func requireStaticSetterAtomic(t *testing.T, file *bsp.File, value lumps.StaticProps) {
 	t.Helper()
 	before, err := file.RawLump(35)
 	if err != nil {
@@ -656,7 +656,7 @@ func TestBundledMapPublicStaticPropsAlignment(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer stream.Close()
-	file, err := bsp.ReadFromStream(stream, bsp.ReadOptions{Profile: bsp.ProfileCSGO})
+	file, err := bsp.Read(stream, bsp.ReadOptions{Profile: bsp.ProfileCSGO})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -708,7 +708,7 @@ func TestExternalGenuineCSGOStaticPropsV11(t *testing.T) {
 			if got := fmt.Sprintf("%x", sha256.Sum256(raw)); got != tc.hash {
 				t.Fatalf("fixture hash=%s, want %s", got, tc.hash)
 			}
-			file, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: bsp.ProfileCSGO})
+			file, err := bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: bsp.ProfileCSGO})
 			if err != nil {
 				t.Fatal(err)
 			}

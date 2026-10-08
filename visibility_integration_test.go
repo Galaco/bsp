@@ -24,7 +24,7 @@ func publicVisibilityWire(pairs [][2]int32, data []byte) []byte {
 	return raw
 }
 
-func requireVisibilityIDs(t *testing.T, file *bsp.Bsp, cluster int, kind lumps.VisibilityKind, expected []int, wantPresent bool) {
+func requireVisibilityIDs(t *testing.T, file *bsp.File, cluster int, kind lumps.VisibilityKind, expected []int, wantPresent bool) {
 	t.Helper()
 	value, err := file.Visibility()
 	if err != nil {

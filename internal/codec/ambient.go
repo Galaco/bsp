@@ -6,7 +6,6 @@ import (
 
 	"github.com/galaco/bsp/internal/format"
 	"github.com/galaco/bsp/lumps"
-	"github.com/galaco/bsp/primitives/common"
 )
 
 // Valve SDK2013 and Reactive Drop af3be02 bsplib.cpp LoadLeafAmbientLighting:
@@ -60,18 +59,18 @@ func ambientOutputSize(count, stride int) (int, error) {
 	return int(uint64(count) * uint64(stride)), nil
 }
 
-func decodeAmbientCube(raw []byte) common.CompressedLightCube {
-	var cube common.CompressedLightCube
+func decodeAmbientCube(raw []byte) lumps.CompressedLightCube {
+	var cube lumps.CompressedLightCube
 	for side := range cube.Color {
 		offset := side * 4
-		cube.Color[side] = common.ColorRGBExponent32{
+		cube.Color[side] = lumps.ColorRGBExponent32{
 			R: raw[offset], G: raw[offset+1], B: raw[offset+2], Exponent: int8(raw[offset+3]),
 		}
 	}
 	return cube
 }
 
-func encodeAmbientCube(raw []byte, cube common.CompressedLightCube) {
+func encodeAmbientCube(raw []byte, cube lumps.CompressedLightCube) {
 	for side := range cube.Color {
 		offset := side * 4
 		color := cube.Color[side]
@@ -237,16 +236,16 @@ func ValidateAmbient(indices []lumps.AmbientIndex, samples []lumps.AmbientSample
 
 // LeafAmbientIndex and LeafAmbientIndexHDR retain independent channel data.
 type LeafAmbientIndex struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.AmbientIndex
 }
 
 type LeafAmbientIndexHDR struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.AmbientIndex
 }
 
-func (lump *LeafAmbientIndex) Unmarshall(raw []byte) error {
+func (lump *LeafAmbientIndex) Decode(raw []byte) error {
 	data, err := DecodeAmbientIndices(raw, lump.Context())
 	if err != nil {
 		return err
@@ -255,12 +254,12 @@ func (lump *LeafAmbientIndex) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *LeafAmbientIndex) Marshall() ([]byte, error) {
+func (lump *LeafAmbientIndex) Encode() ([]byte, error) {
 	return EncodeAmbientIndices(lump.data, lump.Context())
 }
 func (lump *LeafAmbientIndex) GetData() []lumps.AmbientIndex { return lump.data }
 
-func (lump *LeafAmbientIndexHDR) Unmarshall(raw []byte) error {
+func (lump *LeafAmbientIndexHDR) Decode(raw []byte) error {
 	data, err := DecodeAmbientIndices(raw, lump.Context())
 	if err != nil {
 		return err
@@ -269,23 +268,23 @@ func (lump *LeafAmbientIndexHDR) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *LeafAmbientIndexHDR) Marshall() ([]byte, error) {
+func (lump *LeafAmbientIndexHDR) Encode() ([]byte, error) {
 	return EncodeAmbientIndices(lump.data, lump.Context())
 }
 func (lump *LeafAmbientIndexHDR) GetData() []lumps.AmbientIndex { return lump.data }
 
 // LeafAmbientLighting and LeafAmbientLightingHDR do not infer channel fallback.
 type LeafAmbientLighting struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.AmbientSample
 }
 
 type LeafAmbientLightingHDR struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.AmbientSample
 }
 
-func (lump *LeafAmbientLighting) Unmarshall(raw []byte) error {
+func (lump *LeafAmbientLighting) Decode(raw []byte) error {
 	data, err := DecodeAmbientSamples(raw, lump.Context())
 	if err != nil {
 		return err
@@ -294,12 +293,12 @@ func (lump *LeafAmbientLighting) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *LeafAmbientLighting) Marshall() ([]byte, error) {
+func (lump *LeafAmbientLighting) Encode() ([]byte, error) {
 	return EncodeAmbientSamples(lump.data, lump.Context())
 }
 func (lump *LeafAmbientLighting) GetData() []lumps.AmbientSample { return lump.data }
 
-func (lump *LeafAmbientLightingHDR) Unmarshall(raw []byte) error {
+func (lump *LeafAmbientLightingHDR) Decode(raw []byte) error {
 	data, err := DecodeAmbientSamples(raw, lump.Context())
 	if err != nil {
 		return err
@@ -308,7 +307,7 @@ func (lump *LeafAmbientLightingHDR) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *LeafAmbientLightingHDR) Marshall() ([]byte, error) {
+func (lump *LeafAmbientLightingHDR) Encode() ([]byte, error) {
 	return EncodeAmbientSamples(lump.data, lump.Context())
 }
 func (lump *LeafAmbientLightingHDR) GetData() []lumps.AmbientSample { return lump.data }

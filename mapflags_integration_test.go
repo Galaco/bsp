@@ -27,31 +27,31 @@ func mapFlagsProfiles() []struct {
 	}
 }
 
-func readMapFlagsFixture(t *testing.T, profile bsp.Profile, version int32, wire ordinaryWire) *bsp.Bsp {
+func readMapFlagsFixture(t *testing.T, profile bsp.Profile, version int32, wire ordinaryWire) *bsp.File {
 	t.Helper()
 	file := readOrdinaryFixture(t, profile, map[int]ordinaryWire{int(bsp.LumpMapFlags): wire})
 	if file.Header().Version == version {
 		return file
 	}
-	raw, err := bsp.NewWriter(file).Write()
+	raw, err := file.MarshalBinary()
 	if err != nil {
 		t.Fatal(err)
 	}
 	binary.LittleEndian.PutUint32(raw[4:], uint32(version))
-	file, err = bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
+	file, err = bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
 	if err != nil {
 		t.Fatal(err)
 	}
 	return file
 }
 
-func requireMapFlagsState(t *testing.T, file *bsp.Bsp, value uint32, present bool, wantRaw []byte) {
+func requireMapFlagsState(t *testing.T, file *bsp.File, value uint32, present bool, wantRaw []byte) {
 	t.Helper()
 	got, gotPresent, err := file.MapFlags()
 	if err != nil || got.LevelFlags != value || gotPresent != present {
 		t.Fatalf("flags=%+v present=%v error=%v; want=%08x present=%v", got, gotPresent, err, value, present)
 	}
-	raw, err := bsp.NewWriter(file).WriteLump(bsp.LumpMapFlags)
+	raw, err := file.RawLump(bsp.LumpMapFlags)
 	if err != nil || !bytes.Equal(raw, wantRaw) {
 		t.Fatalf("exported flags=%x error=%v; want=%x", raw, err, wantRaw)
 	}

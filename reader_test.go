@@ -42,13 +42,13 @@ func TestReadValidation(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := bsp.ReadFromStream(bytes.NewReader(tc.change(containerBytes(0, []byte("hello")))), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+			_, err := bsp.Read(bytes.NewReader(tc.change(containerBytes(0, []byte("hello")))), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 			if !errors.Is(err, tc.want) {
 				t.Fatalf("error=%v, want %v", err, tc.want)
 			}
 		})
 	}
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(0, []byte("hello"))), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(containerBytes(0, []byte("hello"))), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,29 +62,28 @@ func TestReadValidation(t *testing.T) {
 }
 
 func TestLazyDecodeErrors(t *testing.T) {
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(4, []byte{0})), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(containerBytes(4, []byte{0})), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
 	for i := 0; i < 2; i++ {
-		data, err := file.Lump(4)
-		if data != nil || !errors.Is(err, bsp.ErrMalformed) || !errors.Is(err, io.ErrUnexpectedEOF) {
+		data, err := file.Visibility()
+		if len(data.Offsets) != 0 || len(data.Data) != 0 || !errors.Is(err, bsp.ErrMalformed) || !errors.Is(err, io.ErrUnexpectedEOF) {
 			t.Fatalf("data=%v error=%v", data, err)
 		}
 	}
-	writer := bsp.NewWriter(file)
-	if raw, err := writer.WriteLump(4); err != nil || !bytes.Equal(raw, []byte{0}) {
+	if raw, err := file.RawLump(4); err != nil || !bytes.Equal(raw, []byte{0}) {
 		t.Fatalf("raw passthrough=%x error=%v", raw, err)
 	}
 }
 
 func TestInvalidLumpID(t *testing.T) {
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(-1, nil)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(containerBytes(-1, nil)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, id := range []bsp.LumpId{-1, 64} {
-		if _, err := file.Lump(id); !errors.Is(err, bsp.ErrInvalidLumpID) {
+	for _, id := range []bsp.LumpID{-1, 64} {
+		if _, err := file.Descriptor(id); !errors.Is(err, bsp.ErrInvalidLumpID) {
 			t.Fatal(err)
 		}
 		if _, err := file.RawLump(id); !errors.Is(err, bsp.ErrInvalidLumpID) {
@@ -106,7 +105,7 @@ func TestStreamOwnership(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer stream.Close()
-	if _, err := bsp.ReadFromStream(stream, bsp.ReadOptions{Profile: bsp.ProfileSDK2013}); err != nil {
+	if _, err := bsp.Read(stream, bsp.ReadOptions{Profile: bsp.ProfileSDK2013}); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := stream.Seek(0, io.SeekStart); err != nil {

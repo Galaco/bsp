@@ -45,7 +45,7 @@ func requirePakContents(t *testing.T, pak *bsp.Pakfile, name, want string) {
 func TestPakfileReadOnlyNamesAndMissingVersusEmpty(t *testing.T) {
 	raw := pakTestZIP(t, []pakTestEntry{{"Dir\\Mixed////file.TXT", "first", zip.Deflate}, {"dir/mixed/file.txt", "collision", zip.Store}, {"Empty", "", zip.Store}, {"dir/../literal", "literal", zip.Store}, {"literal", "resolved", zip.Store}})
 	for _, profile := range []bsp.Profile{bsp.ProfileSDK2013, bsp.ProfileCSGO, bsp.ProfileL4D2, bsp.ProfileReactiveDrop} {
-		file := spatialFixture(t, profile, map[bsp.LumpId][]byte{bsp.LumpPakfile: raw})
+		file := spatialFixture(t, profile, map[bsp.LumpID][]byte{bsp.LumpPakfile: raw})
 		pak, err := file.Pakfile()
 		if err != nil {
 			t.Fatal(err)
@@ -156,7 +156,7 @@ func TestPakfileCorruptEntriesPreserveUnderlyingErrors(t *testing.T) {
 		} else {
 			raw[offset] = 0xff
 		}
-		file := spatialFixture(t, bsp.ProfileCSGO, map[bsp.LumpId][]byte{bsp.LumpPakfile: raw})
+		file := spatialFixture(t, bsp.ProfileCSGO, map[bsp.LumpID][]byte{bsp.LumpPakfile: raw})
 		pak, err := file.Pakfile()
 		if err != nil {
 			t.Fatal(err)

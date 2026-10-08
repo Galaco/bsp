@@ -6,7 +6,6 @@ import (
 
 	"github.com/galaco/bsp/internal/format"
 	"github.com/galaco/bsp/lumps"
-	"github.com/galaco/bsp/primitives/common"
 )
 
 // LeafRecordSize selects the explicit wire width from the leaf descriptor,
@@ -78,7 +77,7 @@ func EncodeLeaves(data []lumps.Leaf, context format.Context) ([]byte, error) {
 		if data[i].HasInlineLighting != inline {
 			return nil, fmt.Errorf("leaf %d inline-lighting layout does not match leaf version %d", i, context.LumpVersion)
 		}
-		if !inline && data[i].LightSample != (common.CompressedLightCube{}) {
+		if !inline && data[i].LightSample != (lumps.CompressedLightCube{}) {
 			return nil, fmt.Errorf("leaf %d has nonrepresentable inline lighting in version 1", i)
 		}
 	}
@@ -108,11 +107,11 @@ func EncodeLeaves(data []lumps.Leaf, context format.Context) ([]byte, error) {
 
 // Leaf wraps the stateless leaf codec for the internal lump registry.
 type Leaf struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.Leaf
 }
 
-func (lump *Leaf) Unmarshall(raw []byte) error {
+func (lump *Leaf) Decode(raw []byte) error {
 	data, err := DecodeLeaves(raw, lump.Context())
 	if err != nil {
 		return err
@@ -122,7 +121,7 @@ func (lump *Leaf) Unmarshall(raw []byte) error {
 	return nil
 }
 
-func (lump *Leaf) Marshall() ([]byte, error) {
+func (lump *Leaf) Encode() ([]byte, error) {
 	return EncodeLeaves(lump.data, lump.Context())
 }
 

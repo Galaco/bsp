@@ -14,8 +14,8 @@ type Pakfile struct{ archive *codec.Pakfile }
 
 // Pakfile returns a read-only view of the current embedded ZIP. An absent lump
 // yields an empty view; corrupt nonempty bytes return a contextual parse error.
-func (file *Bsp) Pakfile() (*Pakfile, error) {
-	decoded, err := file.Lump(LumpPakfile)
+func (file *File) Pakfile() (*Pakfile, error) {
+	decoded, err := file.decodeLump(LumpPakfile)
 	if err != nil {
 		return nil, err
 	}

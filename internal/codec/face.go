@@ -7,7 +7,6 @@ import (
 
 	"github.com/galaco/bsp/internal/format"
 	"github.com/galaco/bsp/lumps"
-	facevalue "github.com/galaco/bsp/primitives/face"
 )
 
 func validateFaceContext(context format.Context) error {
@@ -22,7 +21,7 @@ func validateFaceContext(context format.Context) error {
 
 // DecodeFaces shares the invariant 56-byte layout for ordinary/original/HDR
 // faces. NumPrims remains the exact packed count/shadow word.
-func DecodeFaces(raw []byte, context format.Context) ([]facevalue.Face, error) {
+func DecodeFaces(raw []byte, context format.Context) ([]lumps.Face, error) {
 	if err := validateFaceContext(context); err != nil {
 		return nil, err
 	}
@@ -30,7 +29,7 @@ func DecodeFaces(raw []byte, context format.Context) ([]facevalue.Face, error) {
 	if err != nil {
 		return nil, err
 	}
-	records := make([]facevalue.Face, count)
+	records := make([]lumps.Face, count)
 	for i := range records {
 		wire := raw[i*56 : (i+1)*56]
 		record := &records[i]
@@ -56,7 +55,7 @@ func DecodeFaces(raw []byte, context format.Context) ([]facevalue.Face, error) {
 	return records, nil
 }
 
-func EncodeFaces(records []facevalue.Face, context format.Context) ([]byte, error) {
+func EncodeFaces(records []lumps.Face, context format.Context) ([]byte, error) {
 	if err := validateFaceContext(context); err != nil {
 		return nil, err
 	}
@@ -92,11 +91,11 @@ func EncodeFaces(records []facevalue.Face, context format.Context) ([]byte, erro
 
 // Faces is the shared private registry adapter for complete owned face records.
 type Faces struct {
-	lumps.Metadata
-	data []facevalue.Face
+	Metadata
+	data []lumps.Face
 }
 
-func (lump *Faces) Unmarshall(raw []byte) error {
+func (lump *Faces) Decode(raw []byte) error {
 	data, err := DecodeFaces(raw, lump.Context())
 	if err != nil {
 		return err
@@ -105,5 +104,5 @@ func (lump *Faces) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *Faces) Marshall() ([]byte, error) { return EncodeFaces(lump.data, lump.Context()) }
-func (lump *Faces) GetData() []facevalue.Face { return lump.data }
+func (lump *Faces) Encode() ([]byte, error) { return EncodeFaces(lump.data, lump.Context()) }
+func (lump *Faces) GetData() []lumps.Face   { return lump.data }

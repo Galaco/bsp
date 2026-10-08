@@ -8,7 +8,6 @@ import (
 
 	"github.com/galaco/bsp/internal/format"
 	"github.com/galaco/bsp/lumps"
-	"github.com/galaco/bsp/primitives/common"
 )
 
 func leafTestContext(version int32) format.Context {
@@ -58,12 +57,12 @@ func leafExpectedRecords(version int32) []lumps.Leaf {
 	}
 	if version == 0 {
 		data[0].HasInlineLighting, data[1].HasInlineLighting = true, true
-		data[0].LightSample.Color = [6]common.ColorRGBExponent32{
+		data[0].LightSample.Color = [6]lumps.ColorRGBExponent32{
 			{R: 1, G: 2, B: 3, Exponent: -1}, {R: 4, G: 5, B: 6, Exponent: -2},
 			{R: 7, G: 8, B: 9, Exponent: -3}, {R: 10, G: 11, B: 12, Exponent: -4},
 			{R: 13, G: 14, B: 15, Exponent: -5}, {R: 16, G: 17, B: 18, Exponent: -6},
 		}
-		data[1].LightSample.Color = [6]common.ColorRGBExponent32{
+		data[1].LightSample.Color = [6]lumps.ColorRGBExponent32{
 			{R: 21, G: 22, B: 23, Exponent: 1}, {R: 24, G: 25, B: 26, Exponent: 2},
 			{R: 27, G: 28, B: 29, Exponent: 3}, {R: 30, G: 31, B: 32, Exponent: 4},
 			{R: 33, G: 34, B: 35, Exponent: 5}, {R: 36, G: 37, B: 38, Exponent: 6},

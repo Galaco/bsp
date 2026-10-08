@@ -11,8 +11,8 @@ import (
 )
 
 // Displacements returns complete 176-byte records with checked geometry references.
-func (bsp *Bsp) Displacements() ([]lumps.Displacement, error) {
-	decoded, err := bsp.Lump(LumpDispInfo)
+func (bsp *File) Displacements() ([]lumps.Displacement, error) {
+	decoded, err := bsp.decodeLump(LumpDispInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (bsp *Bsp) Displacements() ([]lumps.Displacement, error) {
 }
 
 // SetDisplacements commits complete records without regenerating neighbor topology.
-func (bsp *Bsp) SetDisplacements(records []lumps.Displacement) error {
+func (bsp *File) SetDisplacements(records []lumps.Displacement) error {
 	if err := bsp.checkTypedRevision(LumpDispInfo); err != nil {
 		return err
 	}
@@ -34,11 +34,11 @@ func (bsp *Bsp) SetDisplacements(records []lumps.Displacement) error {
 	return bsp.commitOrdinary(LumpDispInfo, raw, err)
 }
 
-func (bsp *Bsp) validateDisplacementReferences(records []lumps.Displacement) error {
+func (bsp *File) validateDisplacementReferences(records []lumps.Displacement) error {
 	if len(records) == 0 {
 		return nil
 	}
-	for _, id := range []LumpId{LumpFaces, LumpDispVerts, LumpDispTris} {
+	for _, id := range []LumpID{LumpFaces, LumpDispVerts, LumpDispTris} {
 		if err := bsp.checkTypedRevision(id); err != nil {
 			return err
 		}
@@ -77,7 +77,7 @@ func (bsp *Bsp) validateDisplacementReferences(records []lumps.Displacement) err
 
 // DisplacementSamples reads one face-derived sample span. An absent lump 34
 // returns ErrLumpNotFound; it does not fabricate samples from missing lighting.
-func (bsp *Bsp) DisplacementSamples(displacement int) ([]lumps.DisplacementSample, error) {
+func (bsp *File) DisplacementSamples(displacement int) ([]lumps.DisplacementSample, error) {
 	_, raw, start, boundary, count, triangles, err := bsp.displacementSampleView(displacement)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (bsp *Bsp) DisplacementSamples(displacement int) ([]lumps.DisplacementSampl
 
 // SetDisplacementSamples preserves unclaimed bytes, shifts following byte starts
 // and atomically commits sample bytes and required offsets in lump 26.
-func (bsp *Bsp) SetDisplacementSamples(displacement int, values []lumps.DisplacementSample) error {
+func (bsp *File) SetDisplacementSamples(displacement int, values []lumps.DisplacementSample) error {
 	rawInfo, raw, start, boundary, count, triangles, err := bsp.displacementSampleView(displacement)
 	if err != nil {
 		return err
@@ -137,8 +137,8 @@ func (bsp *Bsp) SetDisplacementSamples(displacement int, values []lumps.Displace
 	return nil
 }
 
-func (bsp *Bsp) displacementSampleView(displacement int) (rawInfo, raw []byte, start, boundary, count, triangles int, err error) {
-	for _, id := range []LumpId{LumpDispInfo, LumpDispLightmapSamplePositions} {
+func (bsp *File) displacementSampleView(displacement int) (rawInfo, raw []byte, start, boundary, count, triangles int, err error) {
+	for _, id := range []LumpID{LumpDispInfo, LumpDispLightmapSamplePositions} {
 		if err = bsp.checkTypedRevision(id); err != nil {
 			return
 		}
@@ -202,8 +202,8 @@ func (bsp *Bsp) displacementSampleView(displacement int) (rawInfo, raw []byte, s
 }
 
 // DisplacementMultiblends returns explicit weights, alpha and four RGB colors.
-func (bsp *Bsp) DisplacementMultiblends() ([]lumps.DisplacementMultiblend, error) {
-	decoded, err := bsp.Lump(LumpDispMultiBlend)
+func (bsp *File) DisplacementMultiblends() ([]lumps.DisplacementMultiblend, error) {
+	decoded, err := bsp.decodeLump(LumpDispMultiBlend)
 	if err != nil {
 		return nil, err
 	}
@@ -211,7 +211,7 @@ func (bsp *Bsp) DisplacementMultiblends() ([]lumps.DisplacementMultiblend, error
 }
 
 // SetDisplacementMultiblends commits values only for a verified profile.
-func (bsp *Bsp) SetDisplacementMultiblends(records []lumps.DisplacementMultiblend) error {
+func (bsp *File) SetDisplacementMultiblends(records []lumps.DisplacementMultiblend) error {
 	if err := bsp.checkTypedRevision(LumpDispMultiBlend); err != nil {
 		return err
 	}
@@ -221,7 +221,7 @@ func (bsp *Bsp) SetDisplacementMultiblends(records []lumps.DisplacementMultiblen
 	raw, err := codec.EncodeDisplacementMultiblends(records, bsp.codecContext(LumpDispMultiBlend))
 	return bsp.commitOrdinary(LumpDispMultiBlend, raw, err)
 }
-func (bsp *Bsp) validateMultiblendReferences(values []lumps.DisplacementMultiblend) error {
+func (bsp *File) validateMultiblendReferences(values []lumps.DisplacementMultiblend) error {
 	if err := bsp.checkTypedRevision(LumpDispInfo); err != nil {
 		return err
 	}
@@ -239,7 +239,7 @@ func (bsp *Bsp) validateMultiblendReferences(values []lumps.DisplacementMultible
 	return nil
 }
 
-func (bsp *Bsp) validateDisplacementMultiblendCount(records []lumps.Displacement) error {
+func (bsp *File) validateDisplacementMultiblendCount(records []lumps.Displacement) error {
 	if bsp.profile != ProfileCSGO && bsp.profile != ProfileReactiveDrop {
 		return nil
 	}

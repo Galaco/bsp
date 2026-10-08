@@ -138,11 +138,11 @@ func EncodeWorldLights(records []lumps.WorldLight, context format.Context) ([]by
 
 // WorldLight wraps the LDR worldlight lump for the internal registry.
 type WorldLight struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.WorldLight
 }
 
-func (lump *WorldLight) Unmarshall(raw []byte) error {
+func (lump *WorldLight) Decode(raw []byte) error {
 	data, err := DecodeWorldLights(raw, lump.Context())
 	if err != nil {
 		return err
@@ -152,7 +152,7 @@ func (lump *WorldLight) Unmarshall(raw []byte) error {
 	return nil
 }
 
-func (lump *WorldLight) Marshall() ([]byte, error) {
+func (lump *WorldLight) Encode() ([]byte, error) {
 	return EncodeWorldLights(lump.data, lump.Context())
 }
 
@@ -160,11 +160,11 @@ func (lump *WorldLight) GetData() []lumps.WorldLight { return lump.data }
 
 // WorldLightHDR is a distinct HDR channel with the same versioned wire layout.
 type WorldLightHDR struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.WorldLight
 }
 
-func (lump *WorldLightHDR) Unmarshall(raw []byte) error {
+func (lump *WorldLightHDR) Decode(raw []byte) error {
 	data, err := DecodeWorldLights(raw, lump.Context())
 	if err != nil {
 		return err
@@ -174,7 +174,7 @@ func (lump *WorldLightHDR) Unmarshall(raw []byte) error {
 	return nil
 }
 
-func (lump *WorldLightHDR) Marshall() ([]byte, error) {
+func (lump *WorldLightHDR) Encode() ([]byte, error) {
 	return EncodeWorldLights(lump.data, lump.Context())
 }
 

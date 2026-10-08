@@ -14,14 +14,14 @@ import (
 // Pakfile binds ZIP decoding to an owned, immutable payload. Entry readers are
 // opened and closed inside ReadFile; no mutable zip.Reader escapes this view.
 type Pakfile struct {
-	lumps.Metadata
+	Metadata
 	raw      []byte
 	reader   *zip.Reader
 	names    []string
 	parseErr error
 }
 
-func (pak *Pakfile) Unmarshall(raw []byte) error {
+func (pak *Pakfile) Decode(raw []byte) error {
 	// A failed import must not make an earlier archive appear to be the new one.
 	pak.reader, pak.names, pak.parseErr = nil, nil, nil
 	pak.raw = nil
@@ -53,7 +53,7 @@ func (pak *Pakfile) Unmarshall(raw []byte) error {
 	return nil
 }
 
-func (pak *Pakfile) Marshall() ([]byte, error) {
+func (pak *Pakfile) Encode() ([]byte, error) {
 	raw := make([]byte, len(pak.raw))
 	copy(raw, pak.raw)
 	return raw, nil

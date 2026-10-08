@@ -90,11 +90,11 @@ func EncodeBrushSides(records []lumps.BrushSide, context format.Context) ([]byte
 
 // BrushSide wraps lump 19 for the internal registry.
 type BrushSide struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.BrushSide
 }
 
-func (lump *BrushSide) Unmarshall(raw []byte) error {
+func (lump *BrushSide) Decode(raw []byte) error {
 	data, err := DecodeBrushSides(raw, lump.Context())
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (lump *BrushSide) Unmarshall(raw []byte) error {
 	return nil
 }
 
-func (lump *BrushSide) Marshall() ([]byte, error) {
+func (lump *BrushSide) Encode() ([]byte, error) {
 	return EncodeBrushSides(lump.data, lump.Context())
 }
 

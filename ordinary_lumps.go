@@ -8,7 +8,7 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-func (bsp *Bsp) commitOrdinary(id LumpId, raw []byte, err error) error {
+func (bsp *File) commitOrdinary(id LumpID, raw []byte, err error) error {
 	if err != nil {
 		return &FormatError{fmt.Sprintf("encode lump %d", id), err}
 	}
@@ -19,8 +19,8 @@ func (bsp *Bsp) commitOrdinary(id LumpId, raw []byte, err error) error {
 }
 
 // Leaves returns owned records in the descriptor-selected inline/compact layout.
-func (bsp *Bsp) Leaves() ([]lumps.Leaf, error) {
-	decoded, err := bsp.Lump(LumpLeafs)
+func (bsp *File) Leaves() ([]lumps.Leaf, error) {
+	decoded, err := bsp.decodeLump(LumpLeafs)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (bsp *Bsp) Leaves() ([]lumps.Leaf, error) {
 }
 
 // SetLeaves preserves the selected revision and rejects incompatible lighting.
-func (bsp *Bsp) SetLeaves(records []lumps.Leaf) error {
+func (bsp *File) SetLeaves(records []lumps.Leaf) error {
 	if err := bsp.checkTypedRevision(LumpLeafs); err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (bsp *Bsp) SetLeaves(records []lumps.Leaf) error {
 		return bsp.commitOrdinary(LumpLeafs, nil, err)
 	}
 	if context.LeafVersion == 1 {
-		for _, channel := range [][2]LumpId{{LumpLeafAmbientIndex, LumpLeafAmbientLighting}, {LumpLeafAmbientIndexHDR, LumpLeafAmbientLightingHDR}} {
+		for _, channel := range [][2]LumpID{{LumpLeafAmbientIndex, LumpLeafAmbientLighting}, {LumpLeafAmbientIndexHDR, LumpLeafAmbientLightingHDR}} {
 			sampleContext := bsp.codecContext(channel[1])
 			if err := bsp.validateAmbientChannel(channel[0], channel[1], nil, nil, sampleContext, len(records)); err != nil {
 				return err
@@ -49,8 +49,8 @@ func (bsp *Bsp) SetLeaves(records []lumps.Leaf) error {
 }
 
 // WorldLights returns the LDR channel without implicit HDR fallback.
-func (bsp *Bsp) WorldLights() ([]lumps.WorldLight, error) {
-	decoded, err := bsp.Lump(LumpWorldLights)
+func (bsp *File) WorldLights() ([]lumps.WorldLight, error) {
+	decoded, err := bsp.decodeLump(LumpWorldLights)
 	if err != nil {
 		return nil, err
 	}
@@ -58,8 +58,8 @@ func (bsp *Bsp) WorldLights() ([]lumps.WorldLight, error) {
 }
 
 // WorldLightsHDR returns the separate HDR worldlight channel.
-func (bsp *Bsp) WorldLightsHDR() ([]lumps.WorldLight, error) {
-	decoded, err := bsp.Lump(LumpWorldLightsHDR)
+func (bsp *File) WorldLightsHDR() ([]lumps.WorldLight, error) {
+	decoded, err := bsp.decodeLump(LumpWorldLightsHDR)
 	if err != nil {
 		return nil, err
 	}
@@ -67,15 +67,15 @@ func (bsp *Bsp) WorldLightsHDR() ([]lumps.WorldLight, error) {
 }
 
 // SetWorldLights atomically commits the selected LDR layout.
-func (bsp *Bsp) SetWorldLights(records []lumps.WorldLight) error {
+func (bsp *File) SetWorldLights(records []lumps.WorldLight) error {
 	return bsp.setWorldLights(LumpWorldLights, records)
 }
 
 // SetWorldLightsHDR atomically commits the selected HDR layout.
-func (bsp *Bsp) SetWorldLightsHDR(records []lumps.WorldLight) error {
+func (bsp *File) SetWorldLightsHDR(records []lumps.WorldLight) error {
 	return bsp.setWorldLights(LumpWorldLightsHDR, records)
 }
-func (bsp *Bsp) setWorldLights(id LumpId, records []lumps.WorldLight) error {
+func (bsp *File) setWorldLights(id LumpID, records []lumps.WorldLight) error {
 	if err := bsp.checkTypedRevision(id); err != nil {
 		return err
 	}
@@ -84,8 +84,8 @@ func (bsp *Bsp) setWorldLights(id LumpId, records []lumps.WorldLight) error {
 }
 
 // BrushSides returns profile-selected eight-byte brush side records.
-func (bsp *Bsp) BrushSides() ([]lumps.BrushSide, error) {
-	decoded, err := bsp.Lump(LumpBrushSides)
+func (bsp *File) BrushSides() ([]lumps.BrushSide, error) {
+	decoded, err := bsp.decodeLump(LumpBrushSides)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (bsp *Bsp) BrushSides() ([]lumps.BrushSide, error) {
 }
 
 // SetBrushSides rejects thin fields unsupported by the retained profile.
-func (bsp *Bsp) SetBrushSides(records []lumps.BrushSide) error {
+func (bsp *File) SetBrushSides(records []lumps.BrushSide) error {
 	if err := bsp.checkTypedRevision(LumpBrushSides); err != nil {
 		return err
 	}
@@ -102,8 +102,8 @@ func (bsp *Bsp) SetBrushSides(records []lumps.BrushSide) error {
 }
 
 // AmbientIndices returns the LDR index channel; zero-count entries reference leaves.
-func (bsp *Bsp) AmbientIndices() ([]lumps.AmbientIndex, error) {
-	decoded, err := bsp.Lump(LumpLeafAmbientIndex)
+func (bsp *File) AmbientIndices() ([]lumps.AmbientIndex, error) {
+	decoded, err := bsp.decodeLump(LumpLeafAmbientIndex)
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +111,8 @@ func (bsp *Bsp) AmbientIndices() ([]lumps.AmbientIndex, error) {
 }
 
 // AmbientIndicesHDR returns the separate HDR ambient indices.
-func (bsp *Bsp) AmbientIndicesHDR() ([]lumps.AmbientIndex, error) {
-	decoded, err := bsp.Lump(LumpLeafAmbientIndexHDR)
+func (bsp *File) AmbientIndicesHDR() ([]lumps.AmbientIndex, error) {
+	decoded, err := bsp.decodeLump(LumpLeafAmbientIndexHDR)
 	if err != nil {
 		return nil, err
 	}
@@ -120,8 +120,8 @@ func (bsp *Bsp) AmbientIndicesHDR() ([]lumps.AmbientIndex, error) {
 }
 
 // AmbientSamples returns standalone LDR samples, not leaf-v0 inline lighting.
-func (bsp *Bsp) AmbientSamples() ([]lumps.AmbientSample, error) {
-	decoded, err := bsp.Lump(LumpLeafAmbientLighting)
+func (bsp *File) AmbientSamples() ([]lumps.AmbientSample, error) {
+	decoded, err := bsp.decodeLump(LumpLeafAmbientLighting)
 	if err != nil {
 		return nil, err
 	}
@@ -129,8 +129,8 @@ func (bsp *Bsp) AmbientSamples() ([]lumps.AmbientSample, error) {
 }
 
 // AmbientSamplesHDR returns standalone HDR samples without LDR fallback.
-func (bsp *Bsp) AmbientSamplesHDR() ([]lumps.AmbientSample, error) {
-	decoded, err := bsp.Lump(LumpLeafAmbientLightingHDR)
+func (bsp *File) AmbientSamplesHDR() ([]lumps.AmbientSample, error) {
+	decoded, err := bsp.decodeLump(LumpLeafAmbientLightingHDR)
 	if err != nil {
 		return nil, err
 	}
@@ -138,15 +138,15 @@ func (bsp *Bsp) AmbientSamplesHDR() ([]lumps.AmbientSample, error) {
 }
 
 // SetAmbientIndices commits LDR indices without implicitly migrating sample layout.
-func (bsp *Bsp) SetAmbientIndices(records []lumps.AmbientIndex) error {
+func (bsp *File) SetAmbientIndices(records []lumps.AmbientIndex) error {
 	return bsp.setAmbientIndices(LumpLeafAmbientIndex, records)
 }
 
 // SetAmbientIndicesHDR commits the separate HDR indices.
-func (bsp *Bsp) SetAmbientIndicesHDR(records []lumps.AmbientIndex) error {
+func (bsp *File) SetAmbientIndicesHDR(records []lumps.AmbientIndex) error {
 	return bsp.setAmbientIndices(LumpLeafAmbientIndexHDR, records)
 }
-func (bsp *Bsp) setAmbientIndices(id LumpId, records []lumps.AmbientIndex) error {
+func (bsp *File) setAmbientIndices(id LumpID, records []lumps.AmbientIndex) error {
 	if err := bsp.checkTypedRevision(id); err != nil {
 		return err
 	}
@@ -178,15 +178,15 @@ func (bsp *Bsp) setAmbientIndices(id LumpId, records []lumps.AmbientIndex) error
 }
 
 // SetAmbientSamples commits the current standalone LDR sample layout.
-func (bsp *Bsp) SetAmbientSamples(records []lumps.AmbientSample) error {
+func (bsp *File) SetAmbientSamples(records []lumps.AmbientSample) error {
 	return bsp.setAmbientSamples(LumpLeafAmbientLighting, records)
 }
 
 // SetAmbientSamplesHDR commits the separate standalone HDR sample layout.
-func (bsp *Bsp) SetAmbientSamplesHDR(records []lumps.AmbientSample) error {
+func (bsp *File) SetAmbientSamplesHDR(records []lumps.AmbientSample) error {
 	return bsp.setAmbientSamples(LumpLeafAmbientLightingHDR, records)
 }
-func (bsp *Bsp) setAmbientSamples(id LumpId, records []lumps.AmbientSample) error {
+func (bsp *File) setAmbientSamples(id LumpID, records []lumps.AmbientSample) error {
 	if err := bsp.checkTypedRevision(id); err != nil {
 		return err
 	}
@@ -206,8 +206,8 @@ func (bsp *Bsp) setAmbientSamples(id LumpId, records []lumps.AmbientSample) erro
 }
 
 // Occlusion returns owned occluders, polygons and vertex indices with checked references.
-func (bsp *Bsp) Occlusion() (lumps.Occlusion, error) {
-	decoded, err := bsp.Lump(LumpOcclusion)
+func (bsp *File) Occlusion() (lumps.Occlusion, error) {
+	decoded, err := bsp.decodeLump(LumpOcclusion)
 	if err != nil {
 		return lumps.Occlusion{}, err
 	}
@@ -215,7 +215,7 @@ func (bsp *Bsp) Occlusion() (lumps.Occlusion, error) {
 }
 
 // SetOcclusion validates counted spans and references before committing any bytes.
-func (bsp *Bsp) SetOcclusion(value lumps.Occlusion) error {
+func (bsp *File) SetOcclusion(value lumps.Occlusion) error {
 	if err := bsp.checkTypedRevision(LumpOcclusion); err != nil {
 		return err
 	}
@@ -226,7 +226,7 @@ func (bsp *Bsp) SetOcclusion(value lumps.Occlusion) error {
 	return bsp.commitOrdinary(LumpOcclusion, raw, err)
 }
 
-func (bsp *Bsp) logicalRecordCount(id LumpId, width int) (int, error) {
+func (bsp *File) logicalRecordCount(id LumpID, width int) (int, error) {
 	raw, err := bsp.decodedLumpView(id)
 	if err != nil {
 		return 0, err
@@ -236,7 +236,7 @@ func (bsp *Bsp) logicalRecordCount(id LumpId, width int) (int, error) {
 	}
 	return len(raw) / width, nil
 }
-func (bsp *Bsp) leafCount() (int, error) {
+func (bsp *File) leafCount() (int, error) {
 	if err := bsp.checkTypedRevision(LumpLeafs); err != nil {
 		return 0, err
 	}
@@ -253,7 +253,7 @@ func (bsp *Bsp) leafCount() (int, error) {
 	}
 	return count, nil
 }
-func (bsp *Bsp) validateOcclusionReferences(value lumps.Occlusion) error {
+func (bsp *File) validateOcclusionReferences(value lumps.Occlusion) error {
 	planes, vertices := 0, 0
 	var err error
 	if len(value.Polygons) > 0 {
@@ -273,7 +273,7 @@ func (bsp *Bsp) validateOcclusionReferences(value lumps.Occlusion) error {
 	}
 	return nil
 }
-func (bsp *Bsp) validateAmbientChannel(indexID, sampleID LumpId, indices *[]lumps.AmbientIndex, samples *[]lumps.AmbientSample, context format.Context, leafCount int) error {
+func (bsp *File) validateAmbientChannel(indexID, sampleID LumpID, indices *[]lumps.AmbientIndex, samples *[]lumps.AmbientSample, context format.Context, leafCount int) error {
 	var indexValues []lumps.AmbientIndex
 	var sampleValues []lumps.AmbientSample
 	var err error
@@ -318,7 +318,7 @@ func (bsp *Bsp) validateAmbientChannel(indexID, sampleID LumpId, indices *[]lump
 	return nil
 }
 
-func (bsp *Bsp) validateOrdinarySnapshot(id LumpId, decoded lumps.ILump) error {
+func (bsp *File) validateOrdinarySnapshot(id LumpID, decoded codec.Decoder) error {
 	switch id {
 	case LumpFaces, LumpOriginalFaces, LumpFacesHDR:
 		return bsp.validateFacePrimitiveReferences(decoded.(*codec.Faces).GetData())

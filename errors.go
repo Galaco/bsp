@@ -36,7 +36,7 @@ const (
 	fileIdent  int32 = 0x50534256
 )
 
-func validateID(id LumpId) error {
+func validateID(id LumpID) error {
 	if id < 0 || id >= LumpCount {
 		return fmt.Errorf("%w: %d", ErrInvalidLumpID, id)
 	}

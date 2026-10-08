@@ -189,7 +189,7 @@ func TestVisibilityAdapterDecodeAtomicAndOwned(t *testing.T) {
 	var adapter Visibility
 	adapter.SetContext(visibilityTestContext())
 	raw := visibilityWire(1, [][2]int32{{12, -1}}, []byte{0x80})
-	if err := adapter.Unmarshall(raw); err != nil {
+	if err := adapter.Decode(raw); err != nil {
 		t.Fatal(err)
 	}
 	before := lumps.Visibility{Offsets: [][2]int32{{12, -1}}, Data: []byte{0x80}}
@@ -199,7 +199,7 @@ func TestVisibilityAdapterDecodeAtomicAndOwned(t *testing.T) {
 		t.Fatal("decode retained input aliases")
 	}
 	for _, malformed := range [][]byte{{}, {255, 255, 255, 255}, visibilityWire(1, [][2]int32{{12, 12}}, []byte{0, 0})} {
-		if err := adapter.Unmarshall(malformed); err == nil {
+		if err := adapter.Decode(malformed); err == nil {
 			t.Fatal("accepted malformed replacement")
 		}
 		if adapter.Length() != length || !reflect.DeepEqual(adapter.GetData(), before) {

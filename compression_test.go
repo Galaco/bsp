@@ -21,17 +21,17 @@ func compressedPlaneFixture(t *testing.T) []byte {
 	}
 	return raw
 }
-func readCompressedPlanes(t *testing.T, options bsp.ReadOptions) *bsp.Bsp {
+func readCompressedPlanes(t *testing.T, options bsp.ReadOptions) *bsp.File {
 	t.Helper()
 	raw := containerBytes(1, compressedPlaneFixture(t))
 	binary.LittleEndian.PutUint32(raw[8+16+12:], 40)
-	file, err := bsp.ReadFromStream(bytes.NewReader(raw), options)
+	file, err := bsp.Read(bytes.NewReader(raw), options)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return file
 }
-func requireTwoPlanes(t *testing.T, file *bsp.Bsp, firstDistance float32) {
+func requireTwoPlanes(t *testing.T, file *bsp.File, firstDistance float32) {
 	t.Helper()
 	planes, err := file.Planes()
 	if err != nil {
@@ -56,11 +56,11 @@ func TestCompressedOrdinaryReadEditAndPreservation(t *testing.T) {
 	}
 	logical[0] = 9
 	requireTwoPlanes(t, file, 12)
-	exported, err := bsp.NewWriter(file).Write()
+	exported, err := file.MarshalBinary()
 	if err != nil {
 		t.Fatal(err)
 	}
-	reread, err := bsp.ReadFromStream(bytes.NewReader(exported), options)
+	reread, err := bsp.Read(bytes.NewReader(exported), options)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,11 +90,11 @@ func TestCompressedOrdinaryReadEditAndPreservation(t *testing.T) {
 	if err != nil || desc.FourCC != [4]byte{} || desc.Length != 40 {
 		t.Fatalf("metadata=%+v error=%v", desc, err)
 	}
-	edited, err := bsp.NewWriter(file).Write()
+	edited, err := file.MarshalBinary()
 	if err != nil {
 		t.Fatal(err)
 	}
-	reread, err = bsp.ReadFromStream(bytes.NewReader(edited), options)
+	reread, err = bsp.Read(bytes.NewReader(edited), options)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +103,7 @@ func TestCompressedOrdinaryReadEditAndPreservation(t *testing.T) {
 
 func TestCompressionSelectionAndLimits(t *testing.T) {
 	fixture := compressedPlaneFixture(t)
-	unmarked, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(0, fixture)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	unmarked, err := bsp.Read(bytes.NewReader(containerBytes(0, fixture)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,7 +116,7 @@ func TestCompressionSelectionAndLimits(t *testing.T) {
 		if _, err := file.Planes(); !errors.Is(err, bsp.ErrLimitExceeded) {
 			t.Fatal(err)
 		}
-		output, err := bsp.NewWriter(file).WriteLump(1)
+		output, err := file.RawLump(1)
 		if err != nil || !bytes.Equal(output, fixture) {
 			t.Fatalf("limit changed raw=%x error=%v", output, err)
 		}
@@ -124,7 +124,7 @@ func TestCompressionSelectionAndLimits(t *testing.T) {
 	requireTwoPlanes(t, readCompressedPlanes(t, bsp.ReadOptions{Profile: bsp.ProfileSDK2013, MaxDecodedLumpBytes: 40, MaxLZMADictionaryBytes: 4096}), 12)
 	for _, options := range []bsp.ReadOptions{{Profile: bsp.ProfileSDK2013, MaxDecodedLumpBytes: -1}, {Profile: bsp.ProfileSDK2013, MaxLZMADictionaryBytes: -1}} {
 		input := bytes.NewReader(containerBytes(0, []byte("unread")))
-		if _, err := bsp.ReadFromStream(input, options); !errors.Is(err, bsp.ErrInvalidOptions) {
+		if _, err := bsp.Read(input, options); !errors.Is(err, bsp.ErrInvalidOptions) {
 			t.Fatal(err)
 		}
 		if input.Len() != bsp.HeaderSize+len("unread") {
@@ -134,7 +134,7 @@ func TestCompressionSelectionAndLimits(t *testing.T) {
 }
 
 func TestCompressedGameLogicalEditPreservesSiblingsAndFlags(t *testing.T) {
-	file, err := bsp.ReadFromStream(bytes.NewReader(containerBytes(-1, nil)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(containerBytes(-1, nil)), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,11 +169,11 @@ func TestCompressedGameLogicalEditPreservesSiblingsAndFlags(t *testing.T) {
 	if err != nil || desc.FourCC != [4]byte{} {
 		t.Fatalf("outer=%+v error=%v", desc, err)
 	}
-	exported, err := bsp.NewWriter(file).Write()
+	exported, err := file.MarshalBinary()
 	if err != nil {
 		t.Fatal(err)
 	}
-	reimport, err := bsp.ReadFromStream(bytes.NewReader(exported), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	reimport, err := bsp.Read(bytes.NewReader(exported), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -222,11 +222,11 @@ func TestDecodedGameEditPreservesNonzeroGapsAndAlignment(t *testing.T) {
 		if string(stored[52:56]) != "HEAD" || string(stored[first+5:first+13]) != "TAILGAP!" || string(stored[second+3:second+8]) != "AFTER" {
 			t.Fatalf("lost leading, compressed trailing or unclaimed sibling gap: %x", stored)
 		}
-		exported, err := bsp.NewWriter(file).Write()
+		exported, err := file.MarshalBinary()
 		if err != nil {
 			t.Fatal(err)
 		}
-		file, err = bsp.ReadFromStream(bytes.NewReader(exported), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+		file, err = bsp.Read(bytes.NewReader(exported), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -385,11 +385,11 @@ func EncodePropHullTriangles(records []lumps.PropHullTriangles, context format.C
 // These temporary registry adapters select dialects from Metadata.Context,
 // never from payload size. Failed decodes leave existing records untouched.
 type WaterOverlays struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.WaterOverlay
 }
 
-func (lump *WaterOverlays) Unmarshall(raw []byte) error {
+func (lump *WaterOverlays) Decode(raw []byte) error {
 	data, err := DecodeWaterOverlays(raw, lump.Context())
 	if err != nil {
 		return err
@@ -398,17 +398,17 @@ func (lump *WaterOverlays) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *WaterOverlays) Marshall() ([]byte, error) {
+func (lump *WaterOverlays) Encode() ([]byte, error) {
 	return EncodeWaterOverlays(lump.data, lump.Context())
 }
 func (lump *WaterOverlays) GetData() []lumps.WaterOverlay { return lump.data }
 
 type OverlaySystemLevels struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.OverlaySystemLevel
 }
 
-func (lump *OverlaySystemLevels) Unmarshall(raw []byte) error {
+func (lump *OverlaySystemLevels) Decode(raw []byte) error {
 	data, err := DecodeOverlaySystemLevels(raw, lump.Context())
 	if err != nil {
 		return err
@@ -417,17 +417,17 @@ func (lump *OverlaySystemLevels) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *OverlaySystemLevels) Marshall() ([]byte, error) {
+func (lump *OverlaySystemLevels) Encode() ([]byte, error) {
 	return EncodeOverlaySystemLevels(lump.data, lump.Context())
 }
 func (lump *OverlaySystemLevels) GetData() []lumps.OverlaySystemLevel { return lump.data }
 
 type DisplacementMultiblends struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.DisplacementMultiblend
 }
 
-func (lump *DisplacementMultiblends) Unmarshall(raw []byte) error {
+func (lump *DisplacementMultiblends) Decode(raw []byte) error {
 	data, err := DecodeDisplacementMultiblends(raw, lump.Context())
 	if err != nil {
 		return err
@@ -436,17 +436,17 @@ func (lump *DisplacementMultiblends) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *DisplacementMultiblends) Marshall() ([]byte, error) {
+func (lump *DisplacementMultiblends) Encode() ([]byte, error) {
 	return EncodeDisplacementMultiblends(lump.data, lump.Context())
 }
 func (lump *DisplacementMultiblends) GetData() []lumps.DisplacementMultiblend { return lump.data }
 
 type PropCollisions struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.PropCollision
 }
 
-func (lump *PropCollisions) Unmarshall(raw []byte) error {
+func (lump *PropCollisions) Decode(raw []byte) error {
 	data, err := DecodePropCollisions(raw, lump.Context())
 	if err != nil {
 		return err
@@ -455,17 +455,17 @@ func (lump *PropCollisions) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *PropCollisions) Marshall() ([]byte, error) {
+func (lump *PropCollisions) Encode() ([]byte, error) {
 	return EncodePropCollisions(lump.data, lump.Context())
 }
 func (lump *PropCollisions) GetData() []lumps.PropCollision { return lump.data }
 
 type PropHulls struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.PropHull
 }
 
-func (lump *PropHulls) Unmarshall(raw []byte) error {
+func (lump *PropHulls) Decode(raw []byte) error {
 	data, err := DecodePropHulls(raw, lump.Context())
 	if err != nil {
 		return err
@@ -474,15 +474,15 @@ func (lump *PropHulls) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *PropHulls) Marshall() ([]byte, error) { return EncodePropHulls(lump.data, lump.Context()) }
+func (lump *PropHulls) Encode() ([]byte, error)   { return EncodePropHulls(lump.data, lump.Context()) }
 func (lump *PropHulls) GetData() []lumps.PropHull { return lump.data }
 
 type PropHullVertices struct {
-	lumps.Metadata
+	Metadata
 	data []mgl32.Vec3
 }
 
-func (lump *PropHullVertices) Unmarshall(raw []byte) error {
+func (lump *PropHullVertices) Decode(raw []byte) error {
 	data, err := DecodePropHullVertices(raw, lump.Context())
 	if err != nil {
 		return err
@@ -491,17 +491,17 @@ func (lump *PropHullVertices) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *PropHullVertices) Marshall() ([]byte, error) {
+func (lump *PropHullVertices) Encode() ([]byte, error) {
 	return EncodePropHullVertices(lump.data, lump.Context())
 }
 func (lump *PropHullVertices) GetData() []mgl32.Vec3 { return lump.data }
 
 type PropHullTriangles struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.PropHullTriangles
 }
 
-func (lump *PropHullTriangles) Unmarshall(raw []byte) error {
+func (lump *PropHullTriangles) Decode(raw []byte) error {
 	data, err := DecodePropHullTriangles(raw, lump.Context())
 	if err != nil {
 		return err
@@ -510,7 +510,7 @@ func (lump *PropHullTriangles) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *PropHullTriangles) Marshall() ([]byte, error) {
+func (lump *PropHullTriangles) Encode() ([]byte, error) {
 	return EncodePropHullTriangles(lump.data, lump.Context())
 }
 func (lump *PropHullTriangles) GetData() []lumps.PropHullTriangles { return lump.data }

@@ -1,47 +1,16 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	"github.com/galaco/bsp/internal/format"
-	primitives "github.com/galaco/bsp/primitives/dispvert"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
-// DispVert is Lump 33: DispVert
-type DispVert struct {
-	Generic
-	data []primitives.DispVert
-}
-
-// Unmarshall Imports this lump from raw byte data
-func (lump *DispVert) Unmarshall(raw []byte) error {
-	count, err := format.FixedRecordCount(len(raw), 20)
-	if err != nil {
-		return err
-	}
-	data := make([]primitives.DispVert, count)
-	if err := binary.Read(bytes.NewReader(raw), binary.LittleEndian, data); err != nil {
-		return err
-	}
-	lump.data = data
-	lump.Metadata.SetLength(len(raw))
-	return nil
-}
-
-// GetData gets internal format structure data
-func (lump *DispVert) GetData() []primitives.DispVert {
-	return lump.data
-}
-
-// Marshall dumps this lump back to raw byte data
-func (lump *DispVert) Marshall() ([]byte, error) {
-	length, err := format.FixedRecordBytes(len(lump.data), 20)
-	if err != nil {
-		return nil, err
-	}
-	buf := bytes.NewBuffer(make([]byte, 0, length))
-	if err := binary.Write(buf, binary.LittleEndian, lump.data); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+// DisplacementVertex represents a single vertex on a displacement face. It defines properties
+// required to compute the correct position of the displacement vertex after transformation.
+type DisplacementVertex struct {
+	// Vec is direction of vertex from its default computed position
+	Vec mgl32.Vec3
+	// Dist is distance of vertex from its default computed position
+	Dist float32
+	// Alpha is the alpha value of this vertex (normally used for blend materials)
+	Alpha float32
 }

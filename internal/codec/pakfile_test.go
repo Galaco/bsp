@@ -23,11 +23,11 @@ func TestPakfileFailedImportNeverExposesPreviousArchive(t *testing.T) {
 	}
 	var pak Pakfile
 	pak.SetContext(visibilityTestContext())
-	if err = pak.Unmarshall(buffer.Bytes()); err != nil {
+	if err = pak.Decode(buffer.Bytes()); err != nil {
 		t.Fatal(err)
 	}
 	malformed := []byte("new corrupt archive")
-	if err = pak.Unmarshall(malformed); !errors.Is(err, zip.ErrFormat) {
+	if err = pak.Decode(malformed); !errors.Is(err, zip.ErrFormat) {
 		t.Fatalf("decode error=%v", err)
 	}
 	if len(pak.Entries()) != 0 {
@@ -36,11 +36,11 @@ func TestPakfileFailedImportNeverExposesPreviousArchive(t *testing.T) {
 	if _, err = pak.ReadFile("old"); !errors.Is(err, zip.ErrFormat) {
 		t.Fatalf("lookup hid corrupt replacement=%v", err)
 	}
-	raw, err := pak.Marshall()
+	raw, err := pak.Encode()
 	if err != nil || !bytes.Equal(raw, malformed) {
 		t.Fatalf("failed import serialized old bytes=%v", err)
 	}
-	if err = pak.Unmarshall(nil); err != nil {
+	if err = pak.Decode(nil); err != nil {
 		t.Fatal(err)
 	}
 	if _, err = pak.ReadFile("old"); !errors.Is(err, fs.ErrNotExist) {

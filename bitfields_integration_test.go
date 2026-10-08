@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/galaco/bsp"
-	facevalue "github.com/galaco/bsp/primitives/face"
+	"github.com/galaco/bsp/lumps"
 )
 
 func TestLeafPackedEditsPersistInBothDescriptorLayouts(t *testing.T) {
@@ -26,7 +26,7 @@ func TestLeafPackedEditsPersistInBothDescriptorLayouts(t *testing.T) {
 			for i := 0; i < 2; i++ {
 				payload[i*stride+stride-2], payload[i*stride+stride-1] = byte(0xa1+i), 0xb2
 			}
-			file, err := bsp.ReadFromStream(bytes.NewReader(profileContainer(pc.profile, pc.version, nil)), bsp.ReadOptions{Profile: pc.profile})
+			file, err := bsp.Read(bytes.NewReader(profileContainer(pc.profile, pc.version, nil)), bsp.ReadOptions{Profile: pc.profile})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -58,7 +58,7 @@ func TestLeafPackedEditsPersistInBothDescriptorLayouts(t *testing.T) {
 	}
 }
 
-func facePackedPayloads() map[bsp.LumpId][]byte {
+func facePackedPayloads() map[bsp.LumpID][]byte {
 	faces := make([]byte, 112)
 	for i := 0; i < 2; i++ {
 		binary.LittleEndian.PutUint16(faces[i*56+8:], 3)
@@ -68,7 +68,7 @@ func facePackedPayloads() map[bsp.LumpId][]byte {
 	primitive := make([]byte, 10)
 	binary.LittleEndian.PutUint16(primitive[4:], 3)
 	indices := []byte{0, 0, 1, 0, 2, 0}
-	return map[bsp.LumpId][]byte{bsp.LumpFaces: append([]byte(nil), faces...), bsp.LumpOriginalFaces: append([]byte(nil), faces...), bsp.LumpFacesHDR: append([]byte(nil), faces...), bsp.LumpPrimitives: primitive, bsp.LumpPrimIndices: indices}
+	return map[bsp.LumpID][]byte{bsp.LumpFaces: append([]byte(nil), faces...), bsp.LumpOriginalFaces: append([]byte(nil), faces...), bsp.LumpFacesHDR: append([]byte(nil), faces...), bsp.LumpPrimitives: primitive, bsp.LumpPrimIndices: indices}
 }
 
 func TestFaceShadowBitNeverEntersPrimitiveCountAndEditsPersist(t *testing.T) {
@@ -76,7 +76,7 @@ func TestFaceShadowBitNeverEntersPrimitiveCountAndEditsPersist(t *testing.T) {
 		for _, revision := range []int32{0, 1} {
 			payloads := facePackedPayloads()
 			file := spatialFixture(t, profile, payloads)
-			for _, id := range []bsp.LumpId{bsp.LumpFaces, bsp.LumpOriginalFaces, bsp.LumpFacesHDR} {
+			for _, id := range []bsp.LumpID{bsp.LumpFaces, bsp.LumpOriginalFaces, bsp.LumpFacesHDR} {
 				desc, _ := file.Descriptor(id)
 				desc.Version = revision
 				if err := file.SetRawLump(id, desc, payloads[id]); err != nil {
@@ -89,9 +89,9 @@ func TestFaceShadowBitNeverEntersPrimitiveCountAndEditsPersist(t *testing.T) {
 				t.Fatalf("flagged primitive consumer=%+v %v", primitives, err)
 			}
 			for _, api := range []struct {
-				id  bsp.LumpId
-				get func() ([]facevalue.Face, error)
-				set func([]facevalue.Face) error
+				id  bsp.LumpID
+				get func() ([]lumps.Face, error)
+				set func([]lumps.Face) error
 			}{{bsp.LumpFaces, file.Faces, file.SetFaces}, {bsp.LumpOriginalFaces, file.OriginalFaces, file.SetOriginalFaces}, {bsp.LumpFacesHDR, file.FacesHDR, file.SetFacesHDR}} {
 				faces, err := api.get()
 				if err != nil || faces[0].PrimitiveCount() != 1 || faces[0].DynamicShadowsEnabled() {
@@ -117,8 +117,8 @@ func TestFaceShadowBitNeverEntersPrimitiveCountAndEditsPersist(t *testing.T) {
 			}
 			next := rereadOrdinary(t, file)
 			for _, api := range []struct {
-				id  bsp.LumpId
-				get func() ([]facevalue.Face, error)
+				id  bsp.LumpID
+				get func() ([]lumps.Face, error)
 			}{{bsp.LumpFaces, next.Faces}, {bsp.LumpOriginalFaces, next.OriginalFaces}, {bsp.LumpFacesHDR, next.FacesHDR}} {
 				raw, _ := next.RawLump(api.id)
 				faces, err := api.get()

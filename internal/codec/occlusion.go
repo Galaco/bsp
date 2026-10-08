@@ -12,11 +12,11 @@ import (
 
 // Occlusion is the version-aware wrapper for lump 9.
 type Occlusion struct {
-	lumps.Metadata
+	Metadata
 	data lumps.Occlusion
 }
 
-func (lump *Occlusion) Unmarshall(raw []byte) error {
+func (lump *Occlusion) Decode(raw []byte) error {
 	value, err := DecodeOcclusion(raw, lump.Context())
 	if err != nil {
 		return err
@@ -26,7 +26,7 @@ func (lump *Occlusion) Unmarshall(raw []byte) error {
 	return nil
 }
 
-func (lump *Occlusion) Marshall() ([]byte, error) {
+func (lump *Occlusion) Encode() ([]byte, error) {
 	return EncodeOcclusion(lump.data, lump.Context())
 }
 

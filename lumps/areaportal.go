@@ -1,47 +1,16 @@
 package lumps
 
-import (
-	"bytes"
-	"encoding/binary"
-	"github.com/galaco/bsp/internal/format"
-	primitives "github.com/galaco/bsp/primitives/areaportal"
-)
-
-// AreaPortal is Lump 21: Areaportals
+// AreaPortal
 type AreaPortal struct {
-	Generic
-	data []primitives.AreaPortal
-}
-
-// Unmarshall Imports this lump from raw byte data
-func (lump *AreaPortal) Unmarshall(raw []byte) error {
-	count, err := format.FixedRecordCount(len(raw), 12)
-	if err != nil {
-		return err
-	}
-	data := make([]primitives.AreaPortal, count)
-	if err := binary.Read(bytes.NewReader(raw), binary.LittleEndian, data); err != nil {
-		return err
-	}
-	lump.data = data
-	lump.Metadata.SetLength(len(raw))
-	return nil
-}
-
-// GetData gets internal format structure data
-func (lump *AreaPortal) GetData() []primitives.AreaPortal {
-	return lump.data
-}
-
-// Marshall dumps this lump back to raw byte data
-func (lump *AreaPortal) Marshall() ([]byte, error) {
-	length, err := format.FixedRecordBytes(len(lump.data), 12)
-	if err != nil {
-		return nil, err
-	}
-	buf := bytes.NewBuffer(make([]byte, 0, length))
-	if err := binary.Write(buf, binary.LittleEndian, lump.data); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	// PortalKey - entities have a key called portal number (and in vbsp a variable called areaportalnum) to bind
+	// them to the area portals by comparing this value
+	PortalKey uint16
+	// OtherArea is the area this portal looks into
+	OtherArea uint16
+	// FirstClipPortalVert Portal geometry
+	FirstClipPortalVert uint16
+	// NumClipPortalVerts number of geometry verts
+	NumClipPortalVerts uint16
+	// PlaneNum
+	PlaneNum int32
 }

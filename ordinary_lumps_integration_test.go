@@ -16,7 +16,7 @@ type ordinaryWire struct {
 	data    []byte
 }
 
-func readOrdinaryFixture(t *testing.T, profile bsp.Profile, payloads map[int]ordinaryWire) *bsp.Bsp {
+func readOrdinaryFixture(t *testing.T, profile bsp.Profile, payloads map[int]ordinaryWire) *bsp.File {
 	t.Helper()
 	raw := make([]byte, bsp.HeaderSize)
 	copy(raw, "VBSP")
@@ -43,19 +43,19 @@ func readOrdinaryFixture(t *testing.T, profile bsp.Profile, payloads map[int]ord
 			binary.LittleEndian.PutUint32(entry[8:], uint32(wire.version))
 		}
 	}
-	file, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
+	file, err := bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: profile})
 	if err != nil {
 		t.Fatal(err)
 	}
 	return file
 }
-func rereadOrdinary(t *testing.T, file *bsp.Bsp) *bsp.Bsp {
+func rereadOrdinary(t *testing.T, file *bsp.File) *bsp.File {
 	t.Helper()
-	raw, err := bsp.NewWriter(file).Write()
+	raw, err := file.MarshalBinary()
 	if err != nil {
 		t.Fatal(err)
 	}
-	next, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: file.Profile()})
+	next, err := bsp.Read(bytes.NewReader(raw), bsp.ReadOptions{Profile: file.Profile()})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -163,7 +163,7 @@ func TestOrdinaryPublicLayoutsSnapshotsAndEdits(t *testing.T) {
 		if err != nil || sides[1].Thin != 21 {
 			t.Fatalf("edited sides=%+v %v", sides, err)
 		}
-		for _, id := range []bsp.LumpId{15, 54} {
+		for _, id := range []bsp.LumpID{15, 54} {
 			desc, err := file.Descriptor(id)
 			if err != nil || desc.Version != 1 || desc.Length != 200 {
 				t.Fatalf("descriptor=%+v %v", desc, err)

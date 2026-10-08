@@ -11,7 +11,7 @@ import (
 	"github.com/galaco/bsp/lumps"
 )
 
-func displacementPayloads() map[bsp.LumpId][]byte {
+func displacementPayloads() map[bsp.LumpID][]byte {
 	info := make([]byte, 2*176)
 	faces := make([]byte, 2*56)
 	for i := 0; i < 2; i++ {
@@ -51,7 +51,7 @@ func displacementPayloads() map[bsp.LumpId][]byte {
 		copy(faces[i*56+16:i*56+20], []byte{0, 1, 2, 3})
 	}
 	samples := []byte{254, 11, 12, 13, 255, 0, 21, 22, 23, 255, 255, 31, 32, 33, 0xde, 0xad, 0xbe, 0, 41, 42, 43, 1, 51, 52, 53, 2, 61, 62, 63, 0xfa, 0xfb}
-	return map[bsp.LumpId][]byte{bsp.LumpDispInfo: info, bsp.LumpFaces: faces, bsp.LumpDispVerts: make([]byte, 578*20), bsp.LumpDispTris: make([]byte, 1024*2), bsp.LumpDispLightmapSamplePositions: samples}
+	return map[bsp.LumpID][]byte{bsp.LumpDispInfo: info, bsp.LumpFaces: faces, bsp.LumpDispVerts: make([]byte, 578*20), bsp.LumpDispTris: make([]byte, 1024*2), bsp.LumpDispLightmapSamplePositions: samples}
 }
 
 func TestCompleteDisplacementFieldsAndGeometryAtomicity(t *testing.T) {
@@ -252,7 +252,7 @@ func TestWaterOverlayLastFaceAndSystemLevelOwnership(t *testing.T) {
 					binary.LittleEndian.PutUint32(record[at:], math.Float32bits(float32(at+i*2000)))
 				}
 			}
-			payloads := map[bsp.LumpId][]byte{bsp.LumpWaterOverlays: water, bsp.LumpFaces: make([]byte, 256*56), bsp.LumpTexInfo: make([]byte, 72)}
+			payloads := map[bsp.LumpID][]byte{bsp.LumpWaterOverlays: water, bsp.LumpFaces: make([]byte, 256*56), bsp.LumpTexInfo: make([]byte, 72)}
 			if profile != bsp.ProfileSDK2013 {
 				payloads[bsp.LumpOverlays] = make([]byte, 2*352)
 				payloads[bsp.LumpOverlaySystemLevels] = []byte{1, 2, 3, 4, 21, 22, 23, 24}
@@ -308,7 +308,7 @@ func TestWaterOverlayLastFaceAndSystemLevelOwnership(t *testing.T) {
 }
 
 func TestReactiveDropCollisionWireEditsWithoutInventedBlobUnits(t *testing.T) {
-	payloads := map[bsp.LumpId][]byte{bsp.LumpPropCollision: make([]byte, 16), bsp.LumpPropHulls: make([]byte, 32), bsp.LumpPropHullVerts: make([]byte, 24), bsp.LumpPropTris: make([]byte, 16), bsp.LumpPropBlob: {0xa1, 0, 0xff}}
+	payloads := map[bsp.LumpID][]byte{bsp.LumpPropCollision: make([]byte, 16), bsp.LumpPropHulls: make([]byte, 32), bsp.LumpPropHullVerts: make([]byte, 24), bsp.LumpPropTris: make([]byte, 16), bsp.LumpPropBlob: {0xa1, 0, 0xff}}
 	for i := 0; i < 2; i++ {
 		binary.LittleEndian.PutUint32(payloads[bsp.LumpPropCollision][i*8:], uint32(3+i))
 		binary.LittleEndian.PutUint32(payloads[bsp.LumpPropCollision][i*8+4:], uint32(7+i))
@@ -399,8 +399,8 @@ func TestReactiveDropCollisionWireEditsWithoutInventedBlobUnits(t *testing.T) {
 func TestTypedDisplacementEditPreservesAllOpaqueNumericIDs(t *testing.T) {
 	for _, profile := range []bsp.Profile{bsp.ProfileSDK2013, bsp.ProfileCSGO, bsp.ProfileL4D2, bsp.ProfileReactiveDrop} {
 		t.Run(string(profile), func(t *testing.T) {
-			payloads := make(map[bsp.LumpId][]byte, 64)
-			for id := bsp.LumpId(0); id < 64; id++ {
+			payloads := make(map[bsp.LumpID][]byte, 64)
+			for id := bsp.LumpID(0); id < 64; id++ {
 				payloads[id] = []byte{byte(id), 0xa5, 0x5a, byte(63 - id)}
 			}
 			payloads[bsp.LumpGame] = []byte{0, 0, 0, 0, 0xc1, 0xc2, 0xc3, 0xc4}
@@ -409,8 +409,8 @@ func TestTypedDisplacementEditPreservesAllOpaqueNumericIDs(t *testing.T) {
 				payloads[id] = raw
 			}
 			file := spatialFixture(t, profile, payloads)
-			descriptors := make(map[bsp.LumpId]bsp.HeaderLump, 64)
-			for id := bsp.LumpId(0); id < 64; id++ {
+			descriptors := make(map[bsp.LumpID]bsp.HeaderLump, 64)
+			for id := bsp.LumpID(0); id < 64; id++ {
 				desc, _ := file.Descriptor(id)
 				if _, known := geometry[id]; !known && id != bsp.LumpGame {
 					desc.Version = 77
@@ -431,7 +431,7 @@ func TestTypedDisplacementEditPreservesAllOpaqueNumericIDs(t *testing.T) {
 			}
 			binary.LittleEndian.PutUint32(payloads[bsp.LumpDispInfo][176+172:], 0x76543210)
 			next := rereadOrdinary(t, file)
-			for id := bsp.LumpId(0); id < 64; id++ {
+			for id := bsp.LumpID(0); id < 64; id++ {
 				raw, err := next.RawLump(id)
 				desc, _ := next.Descriptor(id)
 				expected := descriptors[id]

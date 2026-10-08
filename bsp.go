@@ -1,8 +1,6 @@
 package bsp
 
 import (
-	"bytes"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"math"
@@ -10,12 +8,11 @@ import (
 	"github.com/galaco/bsp/internal/codec"
 	"github.com/galaco/bsp/internal/format"
 	"github.com/galaco/bsp/lumps"
-	"github.com/galaco/bsp/primitives/plane"
 )
 
-// Bsp is the root .bsp filetype container.
-// Consists of a 1036byte header and 64 lump blocks.
-type Bsp struct {
+// File is an owned BSP container with a header and 64 lump payloads.
+// Concurrent access involving edits requires external synchronization.
+type File struct {
 	header  Header
 	lumps   [LumpCount]payload
 	profile Profile
@@ -23,10 +20,10 @@ type Bsp struct {
 	limits  codec.Limits
 }
 
-// Header is the Bsp header. Contains format and lump layout data.
-// Do not trust lump information between import and export
+// Header contains format metadata and current stored lump lengths.
+// Offsets describe historical input locations, not the next export layout.
 type Header struct {
-	Id       int32
+	ID       int32
 	Version  int32
 	Lumps    [64]HeaderLump
 	Revision int32
@@ -41,31 +38,31 @@ type HeaderLump struct {
 }
 
 // Header returns metadata by value. Offsets describe the input, not a future export.
-func (bsp *Bsp) Header() Header { return bsp.header }
+func (bsp *File) Header() Header { return bsp.header }
 
 // Descriptor returns current stored length and original location metadata.
-func (bsp *Bsp) Descriptor(index LumpId) (HeaderLump, error) {
+func (bsp *File) Descriptor(index LumpID) (HeaderLump, error) {
 	if err := validateID(index); err != nil {
 		return HeaderLump{}, err
 	}
 	return bsp.header.Lumps[index], nil
 }
 
-// Lump returns an independent decoded snapshot. Changes require an explicit setter.
-func (bsp *Bsp) Lump(index LumpId) (lumps.ILump, error) {
+// decodeLump returns an independent decoded snapshot for attached typed getters.
+func (bsp *File) decodeLump(index LumpID) (codec.Decoder, error) {
 	if err := validateID(index); err != nil {
 		return nil, err
 	}
 	context := bsp.codecContext(index)
-	decoder, err := getReferenceLumpByIndex(int(index), context)
+	decoder, err := codec.NewDecoder(int(index), context)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %s", ErrUnsupportedLump, err)
 	}
 	raw, err := bsp.decodedLumpView(index)
 	if err != nil {
 		return nil, err
 	}
-	if err := decoder.Unmarshall(raw); err != nil {
+	if err := decoder.Decode(raw); err != nil {
 		if errors.Is(err, codec.ErrUnsupportedPrimitiveType) {
 			return nil, fmt.Errorf("%w: %s", ErrUnsupportedLump, err)
 		}
@@ -78,7 +75,7 @@ func (bsp *Bsp) Lump(index LumpId) (lumps.ILump, error) {
 }
 
 // RawLump returns an independent snapshot of stored bytes.
-func (bsp *Bsp) RawLump(index LumpId) ([]byte, error) {
+func (bsp *File) RawLump(index LumpID) ([]byte, error) {
 	if err := validateID(index); err != nil {
 		return nil, err
 	}
@@ -87,7 +84,7 @@ func (bsp *Bsp) RawLump(index LumpId) ([]byte, error) {
 
 // SetRawLump atomically owns bytes and metadata. Length is derived, not caller supplied.
 // Offset records the encoded input base, particularly for game-directory offsets.
-func (bsp *Bsp) SetRawLump(index LumpId, descriptor HeaderLump, raw []byte) error {
+func (bsp *File) SetRawLump(index LumpID, descriptor HeaderLump, raw []byte) error {
 	if err := validateID(index); err != nil {
 		return err
 	}
@@ -98,19 +95,19 @@ func (bsp *Bsp) SetRawLump(index LumpId, descriptor HeaderLump, raw []byte) erro
 	return nil
 }
 
-func (bsp *Bsp) storeOwned(index LumpId, descriptor HeaderLump, owned []byte) {
+func (bsp *File) storeOwned(index LumpID, descriptor HeaderLump, owned []byte) {
 	descriptor.Length = int32(len(owned))
 	bsp.lumps[index] = payload{raw: owned}
 	bsp.header.Lumps[index] = descriptor
 }
 
 // Entities returns an independent entity-text snapshot.
-func (bsp *Bsp) Entities() (string, error) {
-	data, err := bsp.Lump(LumpEntities)
+func (bsp *File) Entities() (string, error) {
+	data, err := bsp.decodeLump(LumpEntities)
 	if err != nil {
 		return "", err
 	}
-	entities, ok := data.(*lumps.EntData)
+	entities, ok := data.(*codec.EntData)
 	if !ok {
 		return "", ErrUnsupportedLump
 	}
@@ -118,7 +115,7 @@ func (bsp *Bsp) Entities() (string, error) {
 }
 
 // SetEntities commits exact entity bytes.
-func (bsp *Bsp) SetEntities(text string) error {
+func (bsp *File) SetEntities(text string) error {
 	if err := bsp.checkTypedRevision(LumpEntities); err != nil {
 		return err
 	}
@@ -132,12 +129,12 @@ func (bsp *Bsp) SetEntities(text string) error {
 }
 
 // Planes returns an independent plane snapshot.
-func (bsp *Bsp) Planes() ([]plane.Plane, error) {
-	data, err := bsp.Lump(LumpPlanes)
+func (bsp *File) Planes() ([]lumps.Plane, error) {
+	data, err := bsp.decodeLump(LumpPlanes)
 	if err != nil {
 		return nil, err
 	}
-	planes, ok := data.(*lumps.Planes)
+	planes, ok := data.(*codec.Planes)
 	if !ok {
 		return nil, ErrUnsupportedLump
 	}
@@ -145,7 +142,7 @@ func (bsp *Bsp) Planes() ([]plane.Plane, error) {
 }
 
 // SetPlanes validates and commits plane records without retaining caller slices.
-func (bsp *Bsp) SetPlanes(planes []plane.Plane) error {
+func (bsp *File) SetPlanes(planes []lumps.Plane) error {
 	if err := bsp.checkTypedRevision(LumpPlanes); err != nil {
 		return err
 	}
@@ -157,12 +154,9 @@ func (bsp *Bsp) SetPlanes(planes []plane.Plane) error {
 			return fmt.Errorf("%w: plane axis %d", ErrMalformed, p.AxisType)
 		}
 	}
-	var out bytes.Buffer
-	if err := binary.Write(&out, binary.LittleEndian, planes); err != nil {
-		return err
+	raw, err := codec.EncodePlanes(planes)
+	if err != nil {
+		return &FormatError{"encode planes", err}
 	}
-	descriptor := bsp.header.Lumps[LumpPlanes]
-	descriptor.FourCC = [4]byte{}
-	bsp.storeOwned(LumpPlanes, descriptor, out.Bytes())
-	return nil
+	return bsp.commitOrdinary(LumpPlanes, raw, nil)
 }

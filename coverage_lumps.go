@@ -9,8 +9,8 @@ import (
 )
 
 // WaterOverlays returns complete 1120-byte records with checked active faces.
-func (bsp *Bsp) WaterOverlays() ([]lumps.WaterOverlay, error) {
-	decoded, err := bsp.Lump(LumpWaterOverlays)
+func (bsp *File) WaterOverlays() ([]lumps.WaterOverlay, error) {
+	decoded, err := bsp.decodeLump(LumpWaterOverlays)
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +18,7 @@ func (bsp *Bsp) WaterOverlays() ([]lumps.WaterOverlay, error) {
 }
 
 // SetWaterOverlays commits complete records after active reference validation.
-func (bsp *Bsp) SetWaterOverlays(values []lumps.WaterOverlay) error {
+func (bsp *File) SetWaterOverlays(values []lumps.WaterOverlay) error {
 	if err := bsp.checkTypedRevision(LumpWaterOverlays); err != nil {
 		return err
 	}
@@ -28,11 +28,11 @@ func (bsp *Bsp) SetWaterOverlays(values []lumps.WaterOverlay) error {
 	raw, err := codec.EncodeWaterOverlays(values, bsp.codecContext(LumpWaterOverlays))
 	return bsp.commitOrdinary(LumpWaterOverlays, raw, err)
 }
-func (bsp *Bsp) validateWaterOverlayReferences(values []lumps.WaterOverlay) error {
+func (bsp *File) validateWaterOverlayReferences(values []lumps.WaterOverlay) error {
 	if len(values) == 0 {
 		return nil
 	}
-	for _, id := range []LumpId{LumpFaces, LumpTexInfo} {
+	for _, id := range []LumpID{LumpFaces, LumpTexInfo} {
 		if err := bsp.checkTypedRevision(id); err != nil {
 			return err
 		}
@@ -65,8 +65,8 @@ func (bsp *Bsp) validateWaterOverlayReferences(values []lumps.WaterOverlay) erro
 
 // OverlaySystemLevels returns explicit CPU/GPU byte codes; an empty optional
 // channel stays absent rather than synthesizing one default per overlay.
-func (bsp *Bsp) OverlaySystemLevels() ([]lumps.OverlaySystemLevel, error) {
-	decoded, err := bsp.Lump(LumpOverlaySystemLevels)
+func (bsp *File) OverlaySystemLevels() ([]lumps.OverlaySystemLevel, error) {
+	decoded, err := bsp.decodeLump(LumpOverlaySystemLevels)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (bsp *Bsp) OverlaySystemLevels() ([]lumps.OverlaySystemLevel, error) {
 }
 
 // SetOverlaySystemLevels requires one explicit record per overlay, or absence.
-func (bsp *Bsp) SetOverlaySystemLevels(values []lumps.OverlaySystemLevel) error {
+func (bsp *File) SetOverlaySystemLevels(values []lumps.OverlaySystemLevel) error {
 	if err := bsp.checkTypedRevision(LumpOverlaySystemLevels); err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func (bsp *Bsp) SetOverlaySystemLevels(values []lumps.OverlaySystemLevel) error 
 	raw, err := codec.EncodeOverlaySystemLevels(values, bsp.codecContext(LumpOverlaySystemLevels))
 	return bsp.commitOrdinary(LumpOverlaySystemLevels, raw, err)
 }
-func (bsp *Bsp) validateOverlaySystemLevelReferences(values []lumps.OverlaySystemLevel) error {
+func (bsp *File) validateOverlaySystemLevelReferences(values []lumps.OverlaySystemLevel) error {
 	if len(values) == 0 {
 		return nil
 	}
@@ -103,7 +103,7 @@ func (bsp *Bsp) validateOverlaySystemLevelReferences(values []lumps.OverlaySyste
 
 // Existing explicit levels constrain overlay count edits, but absent optional
 // levels do not make otherwise valid overlays unreadable.
-func (bsp *Bsp) validateOverlaySystemLevelCount(overlays int) error {
+func (bsp *File) validateOverlaySystemLevelCount(overlays int) error {
 	if bsp.profile != ProfileCSGO && bsp.profile != ProfileL4D2 && bsp.profile != ProfileReactiveDrop {
 		return nil
 	}
@@ -125,8 +125,8 @@ func (bsp *Bsp) validateOverlaySystemLevelCount(overlays int) error {
 
 // Collision arrays expose verified scalar wire records only. Public sources
 // do not establish model-dictionary linkage or blob triangle index units.
-func (bsp *Bsp) PropCollisions() ([]lumps.PropCollision, error) {
-	decoded, err := bsp.Lump(LumpPropCollision)
+func (bsp *File) PropCollisions() ([]lumps.PropCollision, error) {
+	decoded, err := bsp.decodeLump(LumpPropCollision)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (bsp *Bsp) PropCollisions() ([]lumps.PropCollision, error) {
 }
 
 // SetPropCollisions commits scalar records without guessing dictionary linkage.
-func (bsp *Bsp) SetPropCollisions(values []lumps.PropCollision) error {
+func (bsp *File) SetPropCollisions(values []lumps.PropCollision) error {
 	if err := bsp.checkTypedRevision(LumpPropCollision); err != nil {
 		return err
 	}
@@ -143,8 +143,8 @@ func (bsp *Bsp) SetPropCollisions(values []lumps.PropCollision) error {
 }
 
 // PropHulls returns owned RD hull scalars, including all contents bits.
-func (bsp *Bsp) PropHulls() ([]lumps.PropHull, error) {
-	decoded, err := bsp.Lump(LumpPropHulls)
+func (bsp *File) PropHulls() ([]lumps.PropHull, error) {
+	decoded, err := bsp.decodeLump(LumpPropHulls)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (bsp *Bsp) PropHulls() ([]lumps.PropHull, error) {
 }
 
 // SetPropHulls commits complete wire fields without interpreting surface lookup.
-func (bsp *Bsp) SetPropHulls(values []lumps.PropHull) error {
+func (bsp *File) SetPropHulls(values []lumps.PropHull) error {
 	if err := bsp.checkTypedRevision(LumpPropHulls); err != nil {
 		return err
 	}
@@ -161,8 +161,8 @@ func (bsp *Bsp) SetPropHulls(values []lumps.PropHull) error {
 }
 
 // PropHullVertices returns owned RD float3 values with original float bits.
-func (bsp *Bsp) PropHullVertices() ([]mgl32.Vec3, error) {
-	decoded, err := bsp.Lump(LumpPropHullVerts)
+func (bsp *File) PropHullVertices() ([]mgl32.Vec3, error) {
+	decoded, err := bsp.decodeLump(LumpPropHullVerts)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (bsp *Bsp) PropHullVertices() ([]mgl32.Vec3, error) {
 }
 
 // SetPropHullVertices commits the verified RD vertex array.
-func (bsp *Bsp) SetPropHullVertices(values []mgl32.Vec3) error {
+func (bsp *File) SetPropHullVertices(values []mgl32.Vec3) error {
 	if err := bsp.checkTypedRevision(LumpPropHullVerts); err != nil {
 		return err
 	}
@@ -179,8 +179,8 @@ func (bsp *Bsp) SetPropHullVertices(values []mgl32.Vec3) error {
 }
 
 // PropHullTriangles returns signed index span scalars; index units remain opaque.
-func (bsp *Bsp) PropHullTriangles() ([]lumps.PropHullTriangles, error) {
-	decoded, err := bsp.Lump(LumpPropTris)
+func (bsp *File) PropHullTriangles() ([]lumps.PropHullTriangles, error) {
+	decoded, err := bsp.decodeLump(LumpPropTris)
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (bsp *Bsp) PropHullTriangles() ([]lumps.PropHullTriangles, error) {
 }
 
 // SetPropHullTriangles commits scalars without inventing blob-relative bounds.
-func (bsp *Bsp) SetPropHullTriangles(values []lumps.PropHullTriangles) error {
+func (bsp *File) SetPropHullTriangles(values []lumps.PropHullTriangles) error {
 	if err := bsp.checkTypedRevision(LumpPropTris); err != nil {
 		return err
 	}
@@ -197,7 +197,7 @@ func (bsp *Bsp) SetPropHullTriangles(values []lumps.PropHullTriangles) error {
 }
 
 // PropBlob exposes RD's defined byte vector without interpreting its interior.
-func (bsp *Bsp) PropBlob() ([]byte, error) {
+func (bsp *File) PropBlob() ([]byte, error) {
 	if err := bsp.checkTypedRevision(LumpPropBlob); err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (bsp *Bsp) PropBlob() ([]byte, error) {
 }
 
 // SetPropBlob commits owned uncompressed bytes without inspecting its interior.
-func (bsp *Bsp) SetPropBlob(raw []byte) error {
+func (bsp *File) SetPropBlob(raw []byte) error {
 	if err := bsp.checkTypedRevision(LumpPropBlob); err != nil {
 		return err
 	}

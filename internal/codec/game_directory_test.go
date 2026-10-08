@@ -380,3 +380,69 @@ func FuzzParseGameDirectory(f *testing.F) {
 		}
 	})
 }
+
+type gameLimitedWriter struct {
+	bytes.Buffer
+	remaining int
+	err       error
+}
+
+func (writer *gameLimitedWriter) Write(raw []byte) (int, error) {
+	if len(raw) > writer.remaining {
+		n, _ := writer.Buffer.Write(raw[:writer.remaining])
+		writer.remaining = 0
+		return n, writer.err
+	}
+	n, err := writer.Buffer.Write(raw)
+	writer.remaining -= n
+	return n, err
+}
+
+func TestGameRelocationWriteTo(t *testing.T) {
+	const base int32 = 100
+	raw := authoredGameWire([]wireGameEntry{
+		{1, 0, 0, base + 52, 4},
+		{2, 0, 0, 0, 0},
+		{3, 0, 0, base + 56, 3},
+	}, []byte("ABCDxyz"))
+	before := append([]byte(nil), raw...)
+	directory, err := ParseGameDirectory(raw, base)
+	if err != nil {
+		t.Fatal(err)
+	}
+	writeErr := errors.New("writer failure")
+	for _, newBase := range []int32{base, 800} {
+		plan, err := PlanGameRelocation(directory, newBase)
+		if err != nil {
+			t.Fatal(err)
+		}
+		wantEntries := []wireGameEntry{
+			{1, 0, 0, newBase + 52, 4},
+			{2, 0, 0, 0, 0},
+			{3, 0, 0, newBase + 56, 3},
+		}
+		want := authoredGameWire(wantEntries, []byte("ABCDxyz"))
+		var output bytes.Buffer
+		n, err := plan.WriteTo(&output)
+		if err != nil || n != int64(len(want)) || !bytes.Equal(output.Bytes(), want) {
+			t.Fatalf("full stream at %d: count=%d bytes=%x error=%v", newBase, n, output.Bytes(), err)
+		}
+		// Cuts cover ordinary spans, patched offset words and the final payload.
+		for _, limit := range []int{0, 11, 12, 13, 15, 16, 43, 45, 48, 55, 58} {
+			for _, injected := range []error{nil, writeErr} {
+				writer := &gameLimitedWriter{remaining: limit, err: injected}
+				n, err := plan.WriteTo(writer)
+				expectedErr := injected
+				if expectedErr == nil {
+					expectedErr = io.ErrShortWrite
+				}
+				if n != int64(limit) || !errors.Is(err, expectedErr) || !bytes.Equal(writer.Bytes(), want[:limit]) {
+					t.Fatalf("partial stream at %d/%d: count=%d bytes=%x error=%v", newBase, limit, n, writer.Bytes(), err)
+				}
+			}
+		}
+	}
+	if !bytes.Equal(raw, before) {
+		t.Fatal("streaming relocation mutated input")
+	}
+}

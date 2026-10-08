@@ -6,12 +6,11 @@ import (
 
 	"github.com/galaco/bsp/internal/codec"
 	"github.com/galaco/bsp/lumps"
-	facevalue "github.com/galaco/bsp/primitives/face"
 )
 
 // Overlays returns complete owned records, checking active faces and materials.
-func (bsp *Bsp) Overlays() ([]lumps.Overlay, error) {
-	decoded, err := bsp.Lump(LumpOverlays)
+func (bsp *File) Overlays() ([]lumps.Overlay, error) {
+	decoded, err := bsp.decodeLump(LumpOverlays)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +18,7 @@ func (bsp *Bsp) Overlays() ([]lumps.Overlay, error) {
 }
 
 // SetOverlays preserves inactive slots and commits only representable references.
-func (bsp *Bsp) SetOverlays(records []lumps.Overlay) error {
+func (bsp *File) SetOverlays(records []lumps.Overlay) error {
 	if err := bsp.checkTypedRevision(LumpOverlays); err != nil {
 		return err
 	}
@@ -31,8 +30,8 @@ func (bsp *Bsp) SetOverlays(records []lumps.Overlay) error {
 }
 
 // Cubemaps returns snapped integer origins and unchanged wire size/padding codes.
-func (bsp *Bsp) Cubemaps() ([]lumps.Cubemap, error) {
-	decoded, err := bsp.Lump(LumpCubemaps)
+func (bsp *File) Cubemaps() ([]lumps.Cubemap, error) {
+	decoded, err := bsp.decodeLump(LumpCubemaps)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +39,7 @@ func (bsp *Bsp) Cubemaps() ([]lumps.Cubemap, error) {
 }
 
 // SetCubemaps atomically commits signed coordinates and preserved padding.
-func (bsp *Bsp) SetCubemaps(records []lumps.Cubemap) error {
+func (bsp *File) SetCubemaps(records []lumps.Cubemap) error {
 	if err := bsp.checkTypedRevision(LumpCubemaps); err != nil {
 		return err
 	}
@@ -49,8 +48,8 @@ func (bsp *Bsp) SetCubemaps(records []lumps.Cubemap) error {
 }
 
 // Primitives returns ten-byte records with checked index and vertex spans.
-func (bsp *Bsp) Primitives() ([]lumps.Primitive, error) {
-	decoded, err := bsp.Lump(LumpPrimitives)
+func (bsp *File) Primitives() ([]lumps.Primitive, error) {
+	decoded, err := bsp.decodeLump(LumpPrimitives)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +57,7 @@ func (bsp *Bsp) Primitives() ([]lumps.Primitive, error) {
 }
 
 // SetPrimitives preserves descriptor revision and validates companion geometry.
-func (bsp *Bsp) SetPrimitives(records []lumps.Primitive) error {
+func (bsp *File) SetPrimitives(records []lumps.Primitive) error {
 	if err := bsp.checkTypedRevision(LumpPrimitives); err != nil {
 		return err
 	}
@@ -74,14 +73,14 @@ func (bsp *Bsp) SetPrimitives(records []lumps.Primitive) error {
 	return bsp.commitOrdinary(LumpPrimitives, raw, err)
 }
 
-func (bsp *Bsp) validateOverlayReferences(records []lumps.Overlay) error {
+func (bsp *File) validateOverlayReferences(records []lumps.Overlay) error {
 	if err := bsp.validateOverlaySystemLevelCount(len(records)); err != nil {
 		return err
 	}
 	if len(records) == 0 {
 		return nil
 	}
-	for _, id := range []LumpId{LumpFaces, LumpTexInfo} {
+	for _, id := range []LumpID{LumpFaces, LumpTexInfo} {
 		if err := bsp.checkTypedRevision(id); err != nil {
 			return err
 		}
@@ -114,11 +113,11 @@ func (bsp *Bsp) validateOverlayReferences(records []lumps.Overlay) error {
 	return nil
 }
 
-func (bsp *Bsp) validatePrimitiveReferences(records []lumps.Primitive) error {
+func (bsp *File) validatePrimitiveReferences(records []lumps.Primitive) error {
 	if len(records) == 0 {
 		return nil
 	}
-	for _, id := range []LumpId{LumpPrimVerts, LumpPrimIndices} {
+	for _, id := range []LumpID{LumpPrimVerts, LumpPrimIndices} {
 		if err := bsp.checkTypedRevision(id); err != nil {
 			return err
 		}
@@ -177,7 +176,7 @@ func (bsp *Bsp) validatePrimitiveReferences(records []lumps.Primitive) error {
 	for i := 0; i < len(faces)/56; i++ {
 		face := faces[i*56 : (i+1)*56]
 		first := int(binary.LittleEndian.Uint16(face[50:]))
-		owner := facevalue.Face{NumPrims: binary.LittleEndian.Uint16(face[48:])}
+		owner := lumps.Face{NumPrims: binary.LittleEndian.Uint16(face[48:])}
 		count := int(owner.PrimitiveCount())
 		if count == 0 {
 			continue

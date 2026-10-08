@@ -11,11 +11,11 @@ import (
 
 // Visibility is the context-aware private adapter for lump 4.
 type Visibility struct {
-	lumps.Metadata
+	Metadata
 	data lumps.Visibility
 }
 
-func (lump *Visibility) Unmarshall(raw []byte) error {
+func (lump *Visibility) Decode(raw []byte) error {
 	value, err := DecodeVisibility(raw, lump.Context())
 	if err != nil {
 		return err
@@ -25,7 +25,7 @@ func (lump *Visibility) Unmarshall(raw []byte) error {
 	return nil
 }
 
-func (lump *Visibility) Marshall() ([]byte, error) {
+func (lump *Visibility) Encode() ([]byte, error) {
 	return EncodeVisibility(lump.data, lump.Context())
 }
 

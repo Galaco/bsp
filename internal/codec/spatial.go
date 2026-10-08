@@ -202,11 +202,11 @@ func EncodePrimitives(records []lumps.Primitive, context format.Context) ([]byte
 // Overlays, Cubemaps and Primitives are temporary registry adapters. Their
 // metadata context, not payload size, selects the verified wire dialect.
 type Overlays struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.Overlay
 }
 
-func (lump *Overlays) Unmarshall(raw []byte) error {
+func (lump *Overlays) Decode(raw []byte) error {
 	data, err := DecodeOverlays(raw, lump.Context())
 	if err != nil {
 		return err
@@ -215,15 +215,15 @@ func (lump *Overlays) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *Overlays) Marshall() ([]byte, error) { return EncodeOverlays(lump.data, lump.Context()) }
-func (lump *Overlays) GetData() []lumps.Overlay  { return lump.data }
+func (lump *Overlays) Encode() ([]byte, error)  { return EncodeOverlays(lump.data, lump.Context()) }
+func (lump *Overlays) GetData() []lumps.Overlay { return lump.data }
 
 type Cubemaps struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.Cubemap
 }
 
-func (lump *Cubemaps) Unmarshall(raw []byte) error {
+func (lump *Cubemaps) Decode(raw []byte) error {
 	data, err := DecodeCubemaps(raw, lump.Context())
 	if err != nil {
 		return err
@@ -232,15 +232,15 @@ func (lump *Cubemaps) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *Cubemaps) Marshall() ([]byte, error) { return EncodeCubemaps(lump.data, lump.Context()) }
-func (lump *Cubemaps) GetData() []lumps.Cubemap  { return lump.data }
+func (lump *Cubemaps) Encode() ([]byte, error)  { return EncodeCubemaps(lump.data, lump.Context()) }
+func (lump *Cubemaps) GetData() []lumps.Cubemap { return lump.data }
 
 type Primitives struct {
-	lumps.Metadata
+	Metadata
 	data []lumps.Primitive
 }
 
-func (lump *Primitives) Unmarshall(raw []byte) error {
+func (lump *Primitives) Decode(raw []byte) error {
 	data, err := DecodePrimitives(raw, lump.Context())
 	if err != nil {
 		return err
@@ -249,7 +249,7 @@ func (lump *Primitives) Unmarshall(raw []byte) error {
 	lump.SetLength(len(raw))
 	return nil
 }
-func (lump *Primitives) Marshall() ([]byte, error) {
+func (lump *Primitives) Encode() ([]byte, error) {
 	return EncodePrimitives(lump.data, lump.Context())
 }
 func (lump *Primitives) GetData() []lumps.Primitive { return lump.data }

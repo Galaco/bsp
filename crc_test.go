@@ -32,9 +32,9 @@ func controlledCRCWire(reverse bool) []byte {
 	copy(raw[last:last+4], "BBBB")
 	return raw
 }
-func requireMapCRC(t *testing.T, file *bsp.Bsp, want uint32) {
+func requireMapCRC(t *testing.T, file *bsp.File, want uint32) {
 	t.Helper()
-	got, err := file.CRC32()
+	got, err := file.MapCRC32()
 	if err != nil || got != want {
 		t.Fatalf("map CRC=%d error=%v want=%d", got, err, want)
 	}
@@ -42,7 +42,7 @@ func requireMapCRC(t *testing.T, file *bsp.Bsp, want uint32) {
 func TestMapCRCNumericOrderOpaqueLateIDAndExcludedBytes(t *testing.T) {
 	for _, reverse := range []bool{false, true} {
 		wire := controlledCRCWire(reverse)
-		file, err := bsp.ReadFromStream(bytes.NewReader(wire), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+		file, err := bsp.Read(bytes.NewReader(wire), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -53,7 +53,7 @@ func TestMapCRCNumericOrderOpaqueLateIDAndExcludedBytes(t *testing.T) {
 		requireMapCRC(t, file, 614461499)
 		binary.LittleEndian.PutUint32(wire[bsp.HeaderSize-4:], 999)
 		wire = append(wire, []byte("ignored trailing bytes")...)
-		other, err := bsp.ReadFromStream(bytes.NewReader(wire), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+		other, err := bsp.Read(bytes.NewReader(wire), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -88,7 +88,7 @@ func TestMapCRCNumericOrderOpaqueLateIDAndExcludedBytes(t *testing.T) {
 	}
 	binary.LittleEndian.PutUint32(padded[8+63*16:], 1052)
 	copy(padded[1052:], "BBBB")
-	file, err := bsp.ReadFromStream(bytes.NewReader(padded), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(padded), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func TestMapCRCRelocatedGamePayloadAndPurity(t *testing.T) {
 	binary.LittleEndian.PutUint32(game[12:], 2020)
 	binary.LittleEndian.PutUint32(game[16:], 4)
 	copy(game[20:], "GAME")
-	file, err := bsp.ReadFromStream(bytes.NewReader(wire), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
+	file, err := bsp.Read(bytes.NewReader(wire), bsp.ReadOptions{Profile: bsp.ProfileSDK2013})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,10 +171,10 @@ func TestMapCRCRelocatedGamePayloadAndPurity(t *testing.T) {
 	if err := file.SetRawLump(bsp.LumpGame, bsp.HeaderLump{Offset: 2000}, []byte{255, 255, 255, 255}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := file.CRC32(); !errors.Is(err, bsp.ErrMalformed) {
+	if _, err := file.MapCRC32(); !errors.Is(err, bsp.ErrMalformed) {
 		t.Fatalf("CRC hid invalid export state=%v", err)
 	}
-	if _, err := bsp.NewWriter(file).Write(); !errors.Is(err, bsp.ErrMalformed) {
+	if _, err := file.MarshalBinary(); !errors.Is(err, bsp.ErrMalformed) {
 		t.Fatalf("writer accepted invalid export state=%v", err)
 	}
 }
@@ -190,7 +190,7 @@ func TestBundledMapCRCMatchesIndependentPlannedSDKReference(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer stream.Close()
-	file, err := bsp.ReadFromStream(stream, bsp.ReadOptions{Profile: bsp.ProfileCSGO})
+	file, err := bsp.Read(stream, bsp.ReadOptions{Profile: bsp.ProfileCSGO})
 	if err != nil {
 		t.Fatal(err)
 	}

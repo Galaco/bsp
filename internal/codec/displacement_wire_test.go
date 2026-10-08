@@ -227,16 +227,16 @@ func TestDisplacementContextAndAdapter(t *testing.T) {
 	adapter := new(Displacements)
 	adapter.SetContext(format.Context{Profile: "sdk2013", BSPVersion: 20})
 	raw := displacementWireFixture()
-	if err := adapter.Unmarshall(raw); err != nil {
+	if err := adapter.Decode(raw); err != nil {
 		t.Fatal(err)
 	}
 	if adapter.Length() != 352 || len(adapter.GetData()) != 2 {
 		t.Fatal("adapter metadata/data incorrect")
 	}
-	if err := adapter.Unmarshall(raw[:351]); err == nil {
+	if err := adapter.Decode(raw[:351]); err == nil {
 		t.Fatal("adapter accepted partial record")
 	}
-	encoded, err := adapter.Marshall()
+	encoded, err := adapter.Encode()
 	if err != nil || !bytes.Equal(encoded, raw) || adapter.Length() != 352 {
 		t.Fatalf("failed adapter decode changed previous state: %v", err)
 	}

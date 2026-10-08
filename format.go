@@ -69,7 +69,7 @@ func profileLayout(profile Profile, version int32) (format.HeaderLayout, error) 
 func decodeHeader(raw []byte, layout format.HeaderLayout) Header {
 	var header Header
 	order := binary.LittleEndian
-	header.Id = int32(order.Uint32(raw))
+	header.ID = int32(order.Uint32(raw))
 	header.Version = int32(order.Uint32(raw[4:]))
 	for i := 0; i < LumpCount; i++ {
 		entry := raw[8+i*16 : 8+(i+1)*16]
@@ -91,7 +91,7 @@ func decodeHeader(raw []byte, layout format.HeaderLayout) Header {
 
 func encodeHeader(raw []byte, header *Header, layout format.HeaderLayout) {
 	order := binary.LittleEndian
-	order.PutUint32(raw[:], uint32(header.Id))
+	order.PutUint32(raw[:], uint32(header.ID))
 	order.PutUint32(raw[4:], uint32(header.Version))
 	for i := range header.Lumps {
 		desc := &header.Lumps[i]
@@ -110,7 +110,7 @@ func encodeHeader(raw []byte, header *Header, layout format.HeaderLayout) {
 	order.PutUint32(raw[1032:], uint32(header.Revision))
 }
 
-func (bsp *Bsp) codecContext(index LumpId) format.Context {
+func (bsp *File) codecContext(index LumpID) format.Context {
 	return format.Context{
 		Profile: string(bsp.profile), BSPVersion: bsp.header.Version,
 		LumpVersion: bsp.header.Lumps[index].Version,
@@ -123,4 +123,4 @@ func (bsp *Bsp) codecContext(index LumpId) format.Context {
 }
 
 // Profile returns the explicit dialect used to interpret this file.
-func (bsp *Bsp) Profile() Profile { return bsp.profile }
+func (bsp *File) Profile() Profile { return bsp.profile }
