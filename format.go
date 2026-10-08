@@ -3,6 +3,7 @@ package bsp
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/galaco/bsp/internal/codec"
 	"github.com/galaco/bsp/internal/format"
 )
 
@@ -15,8 +16,32 @@ const (
 	ProfileL4D2    Profile = "l4d2"
 )
 
-// ReadOptions requires an explicit engine profile; zero does not guess a branch.
-type ReadOptions struct{ Profile Profile }
+// ReadOptions selects a dialect and overridable lazy-decode safety limits.
+// Zero limits select defaults; they are library policy, not format maxima.
+type ReadOptions struct {
+	Profile                Profile
+	MaxDecodedLumpBytes    int64
+	MaxLZMADictionaryBytes int64
+}
+
+const (
+	DefaultMaxDecodedLumpBytes    = codec.DefaultMaxDecodedLumpBytes
+	DefaultMaxLZMADictionaryBytes = codec.DefaultMaxLZMADictionaryBytes
+)
+
+func (options ReadOptions) limits() (codec.Limits, error) {
+	if options.MaxDecodedLumpBytes < 0 || options.MaxLZMADictionaryBytes < 0 {
+		return codec.Limits{}, fmt.Errorf("%w: negative decode limit", ErrInvalidOptions)
+	}
+	output, dictionary := uint64(options.MaxDecodedLumpBytes), uint64(options.MaxLZMADictionaryBytes)
+	if output == 0 {
+		output = DefaultMaxDecodedLumpBytes
+	}
+	if dictionary == 0 {
+		dictionary = DefaultMaxLZMADictionaryBytes
+	}
+	return codec.Limits{MaxDecodedLumpBytes: output, MaxLZMADictionaryBytes: dictionary}, nil
+}
 
 func profileLayout(profile Profile, version int32) (format.HeaderLayout, error) {
 	switch profile {

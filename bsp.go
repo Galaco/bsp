@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/galaco/bsp/internal/codec"
 	"github.com/galaco/bsp/internal/format"
 	"github.com/galaco/bsp/lumps"
 	"github.com/galaco/bsp/primitives/plane"
@@ -18,6 +19,7 @@ type Bsp struct {
 	lumps   [LumpCount]payload
 	profile Profile
 	layout  format.HeaderLayout
+	limits  codec.Limits
 }
 
 // Header is the Bsp header. Contains format and lump layout data.
@@ -58,11 +60,11 @@ func (bsp *Bsp) Lump(index LumpId) (lumps.ILump, error) {
 	if err != nil {
 		return nil, err
 	}
-	if context.CompressionSize != 0 {
-		return nil, fmt.Errorf("%w: compressed lump %d", ErrUnsupportedLump, index)
+	raw, err := bsp.decodedLumpView(index)
+	if err != nil {
+		return nil, err
 	}
-	raw := bsp.lumps[index].raw
-	if _, ok := decoder.(*lumps.Visibility); ok {
+	if _, ok := decoder.(*lumps.Visibility); ok && context.CompressionSize == 0 {
 		raw = cloneBytes(raw)
 	}
 	if err := decoder.Unmarshall(raw); err != nil {

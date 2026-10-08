@@ -389,22 +389,28 @@ func TestGameLumpCompressedStoredSpansAndTerminalConventions(t *testing.T) {
 			if err := file.SetGameLumps(want); err != nil {
 				t.Fatal(err)
 			}
-			canonical := make([]byte, 52+len(want[0].StoredData)+len(want[1].StoredData))
-			binary.LittleEndian.PutUint32(canonical, 3)
-			putGameEntry(canonical, 0, want[0].ID, want[0].Flags, want[0].Version, 52, 100000)
-			putGameEntry(canonical, 1, want[1].ID, want[1].Flags, want[1].Version, 57, 500)
-			canonicalEnd := int32(0)
-			if explicit {
-				canonicalEnd = int32(len(canonical))
-			}
-			putGameEntry(canonical, 2, 0, 0, 0, canonicalEnd, 0)
-			copy(canonical[52:], want[0].StoredData)
-			copy(canonical[57:], want[1].StoredData)
-			requireStoredGame(t, file, canonical)
 			current := requireGameEntries(t, file, 3)
-			for i := range want {
-				want[i].Offset = current[i].Offset
-				requireGameEntry(t, current[i], want[i])
+			for i := 0; i < 2; i++ {
+				got := current[i]
+				if got.ID != want[i].ID || got.Flags != want[i].Flags || got.Version != want[i].Version || got.LogicalLength != want[i].LogicalLength || got.Offset%4 != 0 || !bytes.HasPrefix(got.StoredData, want[i].StoredData) {
+					t.Fatalf("reconstructed entry=%+v, source=%+v", got, want[i])
+				}
+				for _, padding := range got.StoredData[len(want[i].StoredData):] {
+					if padding != 0 {
+						t.Fatal("reconstruction altered an opaque stream")
+					}
+				}
+			}
+			desc, err := file.Descriptor(35)
+			if err != nil {
+				t.Fatal(err)
+			}
+			wantTerminal := int32(0)
+			if explicit {
+				wantTerminal = desc.Offset + desc.Length
+			}
+			if current[2].Offset != wantTerminal || current[2].LogicalLength != 0 || len(current[2].StoredData) != 0 {
+				t.Fatalf("terminal=%+v, want boundary %d", current[2], wantTerminal)
 			}
 		})
 	}

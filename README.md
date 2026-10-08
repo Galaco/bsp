@@ -14,11 +14,12 @@ Go library for handling Source Engine .bsp map files.
 * Owned raw replacement and independent typed snapshots; edits require setters.
 * Canonical full-file export covering all 64 IDs, preserving opaque bytes and metadata.
 * Bounded game directories and pure absolute-offset relocation, including unknown children.
+* Native Source LZMA decoding with bounded output/dictionary allocations; unchanged streams stay stored.
 
 Container/raw support and typed record support are separate. See the profile
-matrix below. Branch-specific ordinary records, compression and static-prop
-codecs are tracked by the ordered implementation tasks; directory acceptance
-does not establish a correct typed layout for every payload.
+matrix below. Branch-specific ordinary records and static-prop codecs are tracked
+by the ordered implementation tasks; directory acceptance does not establish a
+correct typed layout for every payload.
 
 Canonical export intentionally uses numeric ID order, four-byte alignment and
 zero locations for empty descriptors. It does not preserve original physical
@@ -64,7 +65,7 @@ game bytes. Input descriptor offsets remain historical, not planned output locat
 Pass `ReadOptions{Profile: ...}` explicitly. File version alone cannot identify an
 engine dialect; zero options do not guess. Header identity/profile checks happen
 before payload buffering. `HeaderLump.FourCC` preserves the fourth wire word
-(ordinary compressed size metadata), not a lump ID. Revision is map metadata,
+(ordinary decoded-size metadata), not a lump ID. Revision is map metadata,
 not a decoder selector.
 
 | Profile | BSP versions | Descriptor order | Exercised container/record baseline |
@@ -78,9 +79,9 @@ Codec selection uses the actual descriptor revision and retained engine context
 for both decode and encode. Leaf revisions 0/1 have explicit 56/32-byte layouts.
 Unknown revisions and opaque IDs return `ErrUnsupportedLump` on typed access;
 `RawLump`/`SetRawLump` still preserve their bytes and metadata. Branch-specific
-ordinary records, static-prop decoding and compression are completed by the
-corresponding ordered tasks; container acceptance does not assert every codec's
-correctness. Big-endian/console files are rejected deliberately.
+ordinary records and static-prop decoding are completed by the corresponding
+ordered tasks; container acceptance does not assert every codec's correctness.
+Big-endian/console files are rejected deliberately.
 
 Pinned evidence: [Valve SDK header](https://github.com/ValveSoftware/source-sdk-2013/blob/b8cfb12c0e083a2ef5b2f9f9b50f3902fa034474/src/public/bspfile.h),
 [Valve game records](https://github.com/ValveSoftware/source-sdk-2013/blob/b8cfb12c0e083a2ef5b2f9f9b50f3902fa034474/src/public/gamebspfile.h),
@@ -97,11 +98,33 @@ terminal boundary when present. Use directory indices for duplicates;
 differ. Decompression/static-prop record decoding is separate from the directory.
 
 `SetGameLump(index, entry)` or `SetGameLumps(entries)` commits atomically, derives
-uncompressed lengths and keeps sibling metadata/payloads. Canonical replacement
-uses exactly one count, one 16-byte-entry directory and payload bytes—no extra
+uncompressed lengths and keeps sibling metadata/payloads. Indexed edits preserve
+unclaimed game gaps; rebuilding aligns payload starts to four bytes. Whole-directory
+replacement uses one count, one 16-byte-entry directory and payloads—no extra
 length prefixes. `MarshalGameLump(base)` relocates an unchanged container by
 patching checked nonzero absolute offsets; gaps, trailing bytes, shared views,
 unknown flags and zero-offset terminal conventions remain unchanged.
+
+## Native lump compression
+
+`RawLump` and game `StoredData` return owned exact stored bytes. `DecodedLump`,
+`DecodedGameLump` and typed getters decode only explicitly marked Source LZMA
+envelopes; unmarked `LZMA` prefixes are ordinary data. Game compression belongs to
+individual children, not the outer lump. Known-size streams with or without EOS
+are supported; game alignment/trailer bytes are retained but never decoded.
+
+`ReadOptions.MaxDecodedLumpBytes` defaults to 256 MiB and
+`MaxLZMADictionaryBytes` to 64 MiB. Zero selects defaults; negative options return
+`ErrInvalidOptions`. Limits are overridable safety policy, not format limits.
+Logical access above a limit returns `ErrLimitExceeded` before decoder allocation.
+Malformed frames return contextual errors; raw reads/export retain opaque bytes.
+
+Typed setters emit uncompressed data atomically and clear only applicable
+compression metadata. `SetDecodedGameLump(index, bytes)` retains ID/version, other
+flags and stream trailer/gaps. Unchanged compressed siblings remain stored; no
+recompression or external executable/cgo is required. The Go decoder is pinned
+to `github.com/ulikunitz/xz` v0.5.11.
+
 
 ## Real World examples
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)

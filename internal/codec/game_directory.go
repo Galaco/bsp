@@ -118,6 +118,10 @@ func RelocateGameDirectory(directory GameDirectory, newBase int32) ([]byte, erro
 // for zero-offset empty entries and the terminal sentinel's zero convention.
 // No caller data is modified, including on validation failure.
 func EncodeGameDirectory(entries []lumps.GameLump, base int32) ([]byte, error) {
+	return encodeGameDirectory(entries, base, nil, nil)
+}
+
+func encodeGameDirectory(entries []lumps.GameLump, base int32, leading []byte, gaps []gameGap) ([]byte, error) {
 	if base < 0 {
 		return nil, fmt.Errorf("game directory: negative base %d", base)
 	}
@@ -126,6 +130,7 @@ func EncodeGameDirectory(entries []lumps.GameLump, base int32) ([]byte, error) {
 		return nil, fmt.Errorf("game directory: count %d exceeds signed 32-bit directory size", count)
 	}
 	total := int64(4) + count*gameEntrySize
+	total += int64(len(leading))
 	for index, entry := range entries {
 		if entry.Offset < 0 {
 			return nil, fmt.Errorf("game entry %d: negative offset", index)
@@ -143,10 +148,17 @@ func EncodeGameDirectory(entries []lumps.GameLump, base int32) ([]byte, error) {
 			}
 		}
 		storedLength := int64(len(entry.StoredData))
+		total += (4 - (int64(base)+total)%4) % 4
 		if storedLength > gameMaxInt32 || total+storedLength > gameMaxInt32 {
 			return nil, fmt.Errorf("game entry %d: stored length or container size exceeds signed 32-bit range", index)
 		}
 		total += storedLength
+		if gaps != nil {
+			total += int64(len(gaps[index].tail)) + int64(len(gaps[index].after))
+			if total > gameMaxInt32 {
+				return nil, fmt.Errorf("game entry %d: retained gaps exceed signed 32-bit range", index)
+			}
+		}
 	}
 	if int64(base)+total > gameMaxInt32 {
 		return nil, fmt.Errorf("game directory: absolute end exceeds signed 32-bit range")
@@ -155,8 +167,11 @@ func EncodeGameDirectory(entries []lumps.GameLump, base int32) ([]byte, error) {
 	raw := make([]byte, int(total))
 	binary.LittleEndian.PutUint32(raw[:4], uint32(count))
 	cursor := 4 + len(entries)*gameEntrySize
+	copy(raw[cursor:], leading)
+	cursor += len(leading)
 	for index, entry := range entries {
 		position := 4 + index*gameEntrySize
+		cursor += int((4 - (int64(base)+int64(cursor))%4) % 4)
 		offset := int32(int64(base) + int64(cursor))
 		logicalLength := entry.LogicalLength
 		sentinel := index == len(entries)-1 && isGameSentinel(entry)
@@ -179,6 +194,12 @@ func EncodeGameDirectory(entries []lumps.GameLump, base int32) ([]byte, error) {
 		binary.LittleEndian.PutUint32(raw[position+12:position+16], uint32(logicalLength))
 		copy(raw[cursor:], entry.StoredData)
 		cursor += len(entry.StoredData)
+		if gaps != nil {
+			copy(raw[cursor:], gaps[index].tail)
+			cursor += len(gaps[index].tail)
+			copy(raw[cursor:], gaps[index].after)
+			cursor += len(gaps[index].after)
+		}
 	}
 	return raw, nil
 }

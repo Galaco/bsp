@@ -207,10 +207,10 @@ func TestEncodeGameDirectoryCanonicalPayloads(t *testing.T) {
 		}
 		want := authoredGameWire([]wireGameEntry{
 			{0xabcdef01, 0x8002, 12, base + 52, 3},
-			{0xabcdef01, 0, 13, base + 55, 2},
+			{0xabcdef01, 0, 13, base + 56, 2},
 			{9, 0, 99, 0, 0},
-		}, []byte("abcXY"))
-		if !bytes.Equal(raw, want) || len(raw) != 57 {
+		}, []byte("abc\x00XY\x00\x00"))
+		if !bytes.Equal(raw, want) {
 			t.Fatalf("canonical bytes = %x, want %x", raw, want)
 		}
 		parsed, err := ParseGameDirectory(raw, base)
@@ -228,7 +228,7 @@ func TestEncodeGameDirectoryCanonicalPayloads(t *testing.T) {
 	// Empty real entries still delimit their compressed predecessor.
 	compressed := []lumps.GameLump{{ID: 1, Flags: 1, LogicalLength: 200, StoredData: []byte("zip")}, {ID: 2}}
 	raw, err := EncodeGameDirectory(compressed, 2000)
-	want := authoredGameWire([]wireGameEntry{{1, 1, 0, 2036, 200}, {2, 0, 0, 2039, 0}}, []byte("zip"))
+	want := authoredGameWire([]wireGameEntry{{1, 1, 0, 2036, 200}, {2, 0, 0, 2040, 0}}, []byte("zip\x00"))
 	if err != nil || !bytes.Equal(raw, want) {
 		t.Fatalf("real empty boundary: %x, %v", raw, err)
 	}

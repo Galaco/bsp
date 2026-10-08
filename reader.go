@@ -19,6 +19,10 @@ func (r *Reader) Read() (*Bsp, error) {
 	if r.stream == nil {
 		return nil, fmt.Errorf("%w: nil reader", ErrMalformed)
 	}
+	limits, err := r.options.limits()
+	if err != nil {
+		return nil, err
+	}
 	var headerBytes [HeaderSize]byte
 	if _, err := io.ReadFull(r.stream, headerBytes[:]); err != nil {
 		if err == io.EOF {
@@ -38,7 +42,7 @@ func (r *Reader) Read() (*Bsp, error) {
 	if err != nil {
 		return nil, err
 	}
-	file := &Bsp{header: decodeHeader(headerBytes[:], layout), profile: r.options.Profile, layout: layout}
+	file := &Bsp{header: decodeHeader(headerBytes[:], layout), profile: r.options.Profile, layout: layout, limits: limits}
 	var input bytes.Buffer
 	input.Grow(HeaderSize)
 	input.Write(headerBytes[:])

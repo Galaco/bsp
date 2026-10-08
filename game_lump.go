@@ -100,18 +100,31 @@ func (bsp *Bsp) SetGameLump(index int, entry lumps.GameLump) error {
 		return fmt.Errorf("%w: %d", ErrInvalidGameLumpIndex, index)
 	}
 	directory.Entries[index] = entry
-	return bsp.commitGameEntries(directory.Entries)
+	return bsp.commitGameDirectoryEdit(directory, index, nil)
 }
 func (bsp *Bsp) commitGameEntries(entries []lumps.GameLump) error {
 	raw, err := codec.EncodeGameDirectory(entries, 0)
 	if err != nil {
 		return &FormatError{"encode game directory", err}
 	}
+	bsp.storeGameDirectory(raw)
+	return nil
+}
+
+func (bsp *Bsp) commitGameDirectoryEdit(directory codec.GameDirectory, index int, tail []byte) error {
+	raw, err := codec.EncodeGameDirectoryEdit(directory, index, tail, 0)
+	if err != nil {
+		return &FormatError{"encode game directory edit", err}
+	}
+	bsp.storeGameDirectory(raw)
+	return nil
+}
+
+func (bsp *Bsp) storeGameDirectory(raw []byte) {
 	desc := bsp.header.Lumps[LumpGame]
 	desc.Offset = 0
 	desc.FourCC = [4]byte{}
 	bsp.storeOwned(LumpGame, desc, raw)
-	return nil
 }
 
 // MarshalGameLump relocates an unchanged stored directory without mutating the file.

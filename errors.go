@@ -3,6 +3,7 @@ package bsp
 import (
 	"errors"
 	"fmt"
+	"github.com/galaco/bsp/internal/codec"
 	"github.com/galaco/bsp/internal/format"
 )
 
@@ -14,6 +15,8 @@ var (
 	ErrLumpNotFound         = errors.New("lump not found")
 	ErrAmbiguousGameLumpID  = errors.New("ambiguous game lump ID")
 	ErrInvalidGameLumpIndex = errors.New("invalid game lump index")
+	ErrInvalidOptions       = errors.New("invalid read options")
+	ErrLimitExceeded        = codec.ErrLimitExceeded
 )
 
 // FormatError identifies malformed data while retaining its underlying error.
