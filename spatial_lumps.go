@@ -6,6 +6,7 @@ import (
 
 	"github.com/galaco/bsp/internal/codec"
 	"github.com/galaco/bsp/lumps"
+	facevalue "github.com/galaco/bsp/primitives/face"
 )
 
 // Overlays returns complete owned records, checking active faces and materials.
@@ -176,7 +177,8 @@ func (bsp *Bsp) validatePrimitiveReferences(records []lumps.Primitive) error {
 	for i := 0; i < len(faces)/56; i++ {
 		face := faces[i*56 : (i+1)*56]
 		first := int(binary.LittleEndian.Uint16(face[50:]))
-		count := int(binary.LittleEndian.Uint16(face[48:]) & 0x7fff)
+		owner := facevalue.Face{NumPrims: binary.LittleEndian.Uint16(face[48:])}
+		count := int(owner.PrimitiveCount())
 		if count == 0 {
 			continue
 		}

@@ -151,7 +151,7 @@ func TestSupportRevisionWidthsAndConsumerLimits(t *testing.T) {
 		}
 	}
 	file := supportFixture(t, bsp.ProfileSDK2013, 20)
-	for _, id := range []bsp.LumpId{2, 3, 5, 7, 33, 58, 60} {
+	for _, id := range []bsp.LumpId{2, 3, 5, 33, 60} {
 		info, err := file.Support(id)
 		if err != nil || info.Status != bsp.SupportTyped || !info.Readable || info.Editable {
 			t.Fatalf("legacy getter ID%d=%+v error=%v", id, info, err)

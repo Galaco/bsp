@@ -175,6 +175,20 @@ Explicit widths and genuine consumer evidence are in
 [task09](09-overlay-cubemap-and-primitive-layouts.md).
 
 
+## Packed leaf and face fields
+
+Leaf `Area()` reads the low nine bits (`0x01ff`); `Flags()` reads the high seven.
+`SetArea(uint16)` and `SetFlags(uint16)` mask oversized inputs and preserve the
+other subfield. Both 56-byte leaf0 and 32-byte leaf1 retain the exact wire word.
+
+Face `PrimitiveCount()` masks `NumPrims` with `0x7fff`. The high bit **disables**
+dynamic shadows: `DynamicShadowsEnabled()` tests it for zero, and
+`SetDynamicShadowsEnabled(true)` clears it without changing the count.
+`SetPrimitiveCount(uint16)` masks inputs and preserves shadow state.
+Use `Faces`/`SetFaces`, `OriginalFaces`/`SetOriginalFaces` or `FacesHDR`/`SetFacesHDR`
+to commit owned snapshots; all use the explicit 56-byte revision0/1 codec.
+Primitive consumers use the logical count, including packed `0x8001` = one.
+
 ## Displacements and defined supplementary data
 
 `Displacements`/`SetDisplacements` expose the complete176-byte record: all edge
@@ -268,7 +282,7 @@ Evidence: [pinned SDK header](https://github.com/ValveSoftware/source-sdk-2013/b
 | 4 | visibility | O | O | O | O | 0 | raw only | Legacy visibility decoder trusts signed cluster counts and offsets; bounded PVS/PAS contract pending task12. Use raw bytes, not the legacy decoder for untrusted data. |
 | 5 | nodes | T0r | T0r | T0r | T0r | 32 | `Lump -> lumps.Node.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
 | 6 | texinfo | T0r | T0r | T0r | T0r | 72 | `Lump -> lumps.TexInfo.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 7 | faces | T0,1r | T0,1r | T0,1r | T0,1r | 56 | `Lump -> lumps.Face.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 7 | faces | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 56 | `Faces`, `SetFaces` | Masked primitive spans and local winding references checked; high bit disables dynamic shadows. No topology regeneration. |
 | 8 | lighting | T0,1r | T0,1r | T0,1r | T0,1r | 4 | `Lump -> lumps.Lighting.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
 | 9 | occlusion | T1,2rw | T1,2rw | T1,2rw | T2rw | 0 | `Occlusion`, `SetOcclusion` | Counted occluders/polygons/indices, not a uniform array; plane/vertex references checked; v1 cannot encode area edits. Reactive Drop accepts only v2. |
 | 10 | leafs | T0,1rw | T0,1rw | T0,1rw | T0,1rw | v0:56; v1:32 | `Leaves`, `SetLeaves` | Leaf descriptor selects inline lighting (v0) or compact layout (v1); no inferred conversion. |
@@ -288,7 +302,7 @@ Evidence: [pinned SDK header](https://github.com/ValveSoftware/source-sdk-2013/b
 | 24 | portalverts / unused2, prophullverts (R uses last alias) | U | U | U | T0rw | 12 | `PropHullVertices`, `SetPropHullVertices` | Reactive Drop only; raw float bits preserved; no guessed collision dictionary association. |
 | 25 | clusterportals / unused3, proptris (R uses last alias) | U | U | U | T0rw | 8 | `PropHullTriangles`, `SetPropHullTriangles` | Reactive Drop only; index units and cross-blob association are unproven; no semantic collision interpretation. |
 | 26 | dispinfo | T0rw | T0rw | T0rw | T0rw | 176 | `Displacements`, `SetDisplacements` | Power and active neighbors checked; sibling face/vertex/triangle spans validated; no topology regeneration. |
-| 27 | originalfaces | T0,1r | T0,1r | T0,1r | T0,1r | 56 | `Lump -> lumps.Face.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 27 | originalfaces | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 56 | `OriginalFaces`, `SetOriginalFaces` | Independent original-face channel with exact packed words; no automatic split-face rebuild. |
 | 28 | physdisp | O | O | O | O | 0 | raw only | Physics displacement interior is opaque; no proprietary physics codec. |
 | 29 | physcollide | O | O | O | O | 0 | raw only | Physics collision interior is opaque; no proprietary physics codec. |
 | 30 | vertnormals | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.VertNormal.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
@@ -319,7 +333,7 @@ Evidence: [pinned SDK header](https://github.com/ValveSoftware/source-sdk-2013/b
 | 55 | leafambientlightinghdr | T0,1rw | T0,1rw | T0,1rw | T0,1rw | inline:0; legacy:24; indexed:28 | `AmbientSamplesHDR`, `SetAmbientSamplesHDR` | Leaf-v0 supplies inline lighting; legacy mode uses 24-byte cubes, indexed mode 28-byte samples; no implicit HDR fallback. |
 | 56 | leafambientlighting | T0,1rw | T0,1rw | T0,1rw | T0,1rw | inline:0; legacy:24; indexed:28 | `AmbientSamples`, `SetAmbientSamples` | Leaf-v0 supplies inline lighting; legacy mode uses 24-byte cubes, indexed mode 28-byte samples; no implicit HDR fallback. |
 | 57 | xzippakfile | O | O | O | O | 0 | raw only | Deprecated console XZIP payload; PC profiles preserve raw bytes only. |
-| 58 | faceshdr | T0,1r | T0,1r | T0,1r | T0,1r | 56 | `Lump -> lumps.FaceHDR.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
+| 58 | faceshdr | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 56 | `FacesHDR`, `SetFacesHDR` | Independent HDR channel; no fallback to ordinary faces. |
 | 59 | mapflags | T0r | T0r | T0r | T0r | 4 | `Lump -> lumps.MapFlags.GetData` | Legacy getter accepts absent data as zero and does not enforce exactly four bytes; absence/presence contract pending task12. No persistent typed setter. |
 | 60 | overlayfades | T0r | T0r | T0r | T0r | 8 | `Lump -> lumps.OverlayFade.GetData` | Getter-only fade distances; no attached setter or overlay-reference-aware mutation. |
 | 61 | overlaysystemlevels | U | T0rw | T0rw | T0rw | 4 | `OverlaySystemLevels`, `SetOverlaySystemLevels` | Only L4D2/CS:GO/Reactive Drop; four CPU/GPU level bytes preserved without guessing engine policy. |

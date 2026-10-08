@@ -29,7 +29,7 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 6:
 		ret = new(lumps.TexInfo)
 	case 7:
-		ret = new(lumps.Face)
+		ret = new(codec.Faces)
 	case 8:
 		ret = new(lumps.Lighting)
 	case 9:
@@ -69,7 +69,7 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 26:
 		ret = new(codec.Displacements)
 	case 27:
-		ret = new(lumps.Face)
+		ret = new(codec.Faces)
 	case 28, 29:
 		return nil, fmt.Errorf("opaque lump %d", index)
 	case 30:
@@ -127,7 +127,7 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 57:
 		return nil, fmt.Errorf("opaque lump %d", index)
 	case 58:
-		ret = new(lumps.FaceHDR)
+		ret = new(codec.Faces)
 	case 59:
 		ret = new(lumps.MapFlags)
 	case 60:

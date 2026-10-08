@@ -60,14 +60,6 @@ func TestRetainedFixedArrayWireLayouts(t *testing.T) {
 			}
 			return values
 		}},
-		{7, "face", 56, 52, 4, func() ILump { return new(Face) }, func(c ILump) []uint32 {
-			data := c.(*Face).GetData()
-			values := make([]uint32, len(data))
-			for i, record := range data {
-				values[i] = uint32(record.SmoothingGroups)
-			}
-			return values
-		}},
 		{8, "lighting", 4, 3, 1, func() ILump { return new(Lighting) }, func(c ILump) []uint32 {
 			data := c.(*Lighting).GetData()
 			values := make([]uint32, len(data))
@@ -236,27 +228,11 @@ func TestRetainedFixedArrayWireLayouts(t *testing.T) {
 			}
 			return values
 		}},
-		{58, "facehdr", 56, 52, 4, func() ILump { return new(FaceHDR) }, func(c ILump) []uint32 {
-			data := c.(*FaceHDR).GetData()
-			values := make([]uint32, len(data))
-			for i, record := range data {
-				values[i] = uint32(record.SmoothingGroups)
-			}
-			return values
-		}},
 		{60, "overlayfade", 8, 4, 4, func() ILump { return new(OverlayFade) }, func(c ILump) []uint32 {
 			data := c.(*OverlayFade).GetData()
 			values := make([]uint32, len(data))
 			for i, record := range data {
 				values[i] = math.Float32bits(record.FadeDistMaxSq)
-			}
-			return values
-		}},
-		{27, "face", 56, 52, 4, func() ILump { return new(Face) }, func(c ILump) []uint32 {
-			data := c.(*Face).GetData()
-			values := make([]uint32, len(data))
-			for i, record := range data {
-				values[i] = uint32(record.SmoothingGroups)
 			}
 			return values
 		}},

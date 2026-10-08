@@ -28,3 +28,19 @@ type Leaf struct {
 	HasInlineLighting bool
 	Padding           [2]byte
 }
+
+// Area is the unsigned nine-bit area stored in BitField.
+func (leaf *Leaf) Area() uint16 { return leaf.BitField & 0x01ff }
+
+// Flags is the unsigned seven-bit flag value, never an arithmetic signed shift.
+func (leaf *Leaf) Flags() uint16 { return leaf.BitField >> 9 }
+
+// SetArea masks to nine bits and preserves every flag bit.
+func (leaf *Leaf) SetArea(area uint16) {
+	leaf.BitField = leaf.BitField&0xfe00 | area&0x01ff
+}
+
+// SetFlags masks to seven bits and preserves every area bit.
+func (leaf *Leaf) SetFlags(flags uint16) {
+	leaf.BitField = leaf.BitField&0x01ff | (flags&0x007f)<<9
+}

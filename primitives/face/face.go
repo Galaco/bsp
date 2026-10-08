@@ -30,10 +30,30 @@ type Face struct {
 	LightmapTextureSizeInLuxels [2]int32
 	// OrigFace
 	OrigFace int32
-	// NumPrims
+	// NumPrims retains the low15-bit count and high-bit dynamic-shadow disable.
 	NumPrims uint16
 	// FirstPrimID
 	FirstPrimID uint16
 	// SmoothingGroups
 	SmoothingGroups uint32
+}
+
+// PrimitiveCount excludes the dynamic-shadow disable bit.
+func (face *Face) PrimitiveCount() uint16 { return face.NumPrims & 0x7fff }
+
+// SetPrimitiveCount masks to fifteen bits and preserves shadow state.
+func (face *Face) SetPrimitiveCount(count uint16) {
+	face.NumPrims = face.NumPrims&0x8000 | count&0x7fff
+}
+
+// DynamicShadowsEnabled reports the inverted high-bit convention.
+func (face *Face) DynamicShadowsEnabled() bool { return face.NumPrims&0x8000 == 0 }
+
+// SetDynamicShadowsEnabled changes only the high disable bit.
+func (face *Face) SetDynamicShadowsEnabled(enabled bool) {
+	if enabled {
+		face.NumPrims &= 0x7fff
+	} else {
+		face.NumPrims |= 0x8000
+	}
 }
