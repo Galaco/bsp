@@ -6,11 +6,13 @@ import (
 )
 
 var (
-	ErrMalformed         = errors.New("malformed BSP data")
-	ErrInvalidLumpID     = errors.New("invalid lump ID")
-	ErrUnsupportedFormat = errors.New("unsupported BSP format")
-	ErrUnsupportedLump   = errors.New("unsupported lump layout")
-	ErrLumpNotFound      = errors.New("lump not found")
+	ErrMalformed            = errors.New("malformed BSP data")
+	ErrInvalidLumpID        = errors.New("invalid lump ID")
+	ErrUnsupportedFormat    = errors.New("unsupported BSP format")
+	ErrUnsupportedLump      = errors.New("unsupported lump layout")
+	ErrLumpNotFound         = errors.New("lump not found")
+	ErrAmbiguousGameLumpID  = errors.New("ambiguous game lump ID")
+	ErrInvalidGameLumpIndex = errors.New("invalid game lump index")
 )
 
 // FormatError identifies malformed data while retaining its underlying error.

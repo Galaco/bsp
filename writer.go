@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"math"
 )
 
 // Writer binds a file explicitly; export never mutates its authoritative payloads.
@@ -22,7 +23,16 @@ func (w *Writer) Write() ([]byte, error) {
 
 	for _, index := range getDefaultLumpOrdering() {
 		// Plan locally; never decode or mutate authoritative payloads during export.
-		exportBytes, err := w.WriteLump(index)
+		if currentOffset > math.MaxInt32 {
+			return nil, fmt.Errorf("%w: output offset exceeds int32", ErrMalformed)
+		}
+		var exportBytes []byte
+		var err error
+		if index == LumpGame {
+			exportBytes, err = w.data.MarshalGameLump(int32(currentOffset))
+		} else {
+			exportBytes, err = w.WriteLump(index)
+		}
 		if err != nil {
 			return nil, err
 		}

@@ -126,7 +126,7 @@ Codec selection uses the actual descriptor revision and retained engine context
 for both decode and encode. Leaf revisions 0/1 have explicit 56/32-byte layouts.
 Unknown revisions and opaque IDs return `ErrUnsupportedLump` on typed access;
 `RawLump`/`SetRawLump` still preserve their bytes and metadata. Branch-specific
-ordinary records, game/static-prop decoding and compression are completed by the
+ordinary records, static-prop decoding and compression are completed by the
 corresponding ordered tasks; container acceptance does not assert every codec's
 correctness. Big-endian/console files are rejected deliberately.
 
@@ -135,6 +135,21 @@ Pinned evidence: [Valve SDK header](https://github.com/ValveSoftware/source-sdk-
 [L4D2 directory definitions](https://github.com/snake-biscuits/bsp_tool/blob/655627ea8704353ac14bd753df8ca05c15838eda/bsp_tool/branches/valve/left4dead2.py),
 [BSPSource compiler-fixture provenance](https://github.com/ata4/bspsrc/blob/eaac417f16d3a4d8ef55bb637ecd7bff28740209/bspsrc-decompiler/src/test/java/info/ata4/bspsrc/decompiler/modules/texture/ToolTextureMatcherTestHelper.java),
 and [Reactive Drop source definitions](https://github.com/ReactiveDrop/reactivedrop_public_src/blob/af3be02c1d7db2cd07c41105e7519cf8edd66ce3/src/public/bspfile.h).
+
+## Game directory ownership
+
+`GameLumps()` returns ordered owned entry snapshots, including unknown IDs and a
+terminal boundary when present. Use directory indices for duplicates;
+`GameLumpByID` returns `ErrAmbiguousGameLumpID` rather than dropping entries.
+`StoredData` is opaque physical bytes; compressed entries' `LogicalLength` can
+differ. Decompression/static-prop record decoding is separate from the directory.
+
+`SetGameLump(index, entry)` or `SetGameLumps(entries)` commits atomically, derives
+uncompressed lengths and keeps sibling metadata/payloads. Canonical replacement
+uses exactly one count, one 16-byte-entry directory and payload bytes—no extra
+length prefixes. `MarshalGameLump(base)` relocates an unchanged container by
+patching checked nonzero absolute offsets; gaps, trailing bytes, shared views,
+unknown flags and zero-offset terminal conventions remain unchanged.
 
 ## Real World examples
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)
