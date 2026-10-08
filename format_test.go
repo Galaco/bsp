@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"github.com/galaco/bsp"
-	"github.com/galaco/bsp/lumps"
 	"testing"
 )
 
@@ -70,18 +69,20 @@ func TestDescriptorRevisionSelectsLeafLayout(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		decoded, err := file.Lump(bsp.LumpLeafs)
+		records, err := file.Leaves()
 		if err != nil {
 			t.Fatal(err)
 		}
-		records := decoded.(*lumps.Leaf).GetData()
 		if len(records) != 2 || records[1].Contents != 101 || records[1].Cluster != 6 || records[1].LeafWaterDataID != 20 {
 			t.Fatalf("records=%+v", records)
 		}
 		if tc.leafVersion == 0 && records[1].LightSample.Color[0].R != 32 {
 			t.Fatalf("light sample=%+v", records[1].LightSample)
 		}
-		encoded, err := decoded.Marshall()
+		if err := file.SetLeaves(records); err != nil {
+			t.Fatal(err)
+		}
+		encoded, err := file.RawLump(bsp.LumpLeafs)
 		if err != nil || !bytes.Equal(encoded, payload) {
 			t.Fatalf("encoded=%x error=%v", encoded, err)
 		}
@@ -119,22 +120,5 @@ func TestUnsupportedProfileStopsAtHeader(t *testing.T) {
 		if stream.Len() != len("unread payload") {
 			t.Fatalf("unsupported profile consumed payload: remaining=%d", stream.Len())
 		}
-	}
-}
-
-func TestEqualSizedBranchDoesNotFallback(t *testing.T) {
-	wire := []byte{1, 0, 2, 0, 3, 0, 1, 1} // Last bytes are independent bevel/thin fields.
-	raw := containerBytes(19, wire)
-	binary.LittleEndian.PutUint32(raw[4:], 21)
-	file, err := bsp.ReadFromStream(bytes.NewReader(raw), bsp.ReadOptions{Profile: bsp.ProfileCSGO})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := file.Lump(19); !errors.Is(err, bsp.ErrUnsupportedLump) {
-		t.Fatalf("unimplemented branch silently selected old short-bevel codec: %v", err)
-	}
-	stored, err := file.RawLump(19)
-	if err != nil || !bytes.Equal(stored, wire) {
-		t.Fatalf("opaque bytes=%x error=%v", stored, err)
 	}
 }

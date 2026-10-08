@@ -2,6 +2,7 @@ package versions
 
 import (
 	"fmt"
+	"github.com/galaco/bsp/internal/codec"
 	"github.com/galaco/bsp/internal/format"
 	"github.com/galaco/bsp/lumps"
 )
@@ -32,9 +33,9 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 8:
 		ret = new(lumps.Lighting)
 	case 9:
-		ret = new(lumps.Occlusion)
+		ret = new(codec.Occlusion)
 	case 10:
-		ret = new(lumps.Leaf)
+		ret = new(codec.Leaf)
 	case 11:
 		ret = new(lumps.FaceId)
 	case 12:
@@ -44,7 +45,7 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 14:
 		ret = new(lumps.Model)
 	case 15:
-		ret = new(lumps.WorldLight)
+		ret = new(codec.WorldLight)
 	case 16:
 		ret = new(lumps.LeafFace)
 	case 17:
@@ -52,7 +53,7 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 18:
 		ret = new(lumps.Brush)
 	case 19:
-		ret = new(lumps.BrushSide)
+		ret = new(codec.BrushSide)
 	case 20:
 		ret = new(lumps.Area)
 	case 21:
@@ -104,17 +105,17 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 49, 50:
 		return nil, fmt.Errorf("opaque lump %d", index)
 	case 51:
-		ret = new(lumps.LeafAmbientIndexHDR)
+		ret = new(codec.LeafAmbientIndexHDR)
 	case 52:
-		ret = new(lumps.LeafAmbientIndex)
+		ret = new(codec.LeafAmbientIndex)
 	case 53:
 		ret = new(lumps.Lighting) //lighting hdr
 	case 54:
-		ret = new(lumps.WorldLightHDR) //worldlights hdr
+		ret = new(codec.WorldLightHDR)
 	case 55:
-		ret = new(lumps.LeafAmbientLightingHDR)
+		ret = new(codec.LeafAmbientLightingHDR)
 	case 56:
-		ret = new(lumps.LeafAmbientLighting) //leaf ambient lighting
+		ret = new(codec.LeafAmbientLighting)
 	case 57:
 		return nil, fmt.Errorf("opaque lump %d", index)
 	case 58:

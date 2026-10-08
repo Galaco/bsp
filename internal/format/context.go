@@ -24,6 +24,7 @@ type Context struct {
 	Profile         string
 	BSPVersion      int32
 	LumpVersion     int32
+	LeafVersion     int32
 	LegacyAmbient   bool
 	ByteOrder       binary.ByteOrder
 	HeaderLayout    HeaderLayout

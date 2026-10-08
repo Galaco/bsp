@@ -70,6 +70,9 @@ func (bsp *Bsp) Lump(index LumpId) (lumps.ILump, error) {
 	if err := decoder.Unmarshall(raw); err != nil {
 		return nil, &FormatError{fmt.Sprintf("decode lump %d", index), err}
 	}
+	if err := bsp.validateOrdinarySnapshot(index, decoder); err != nil {
+		return nil, err
+	}
 	return decoder, nil
 }
 

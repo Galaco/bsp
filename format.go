@@ -109,6 +109,7 @@ func (bsp *Bsp) codecContext(index LumpId) format.Context {
 	return format.Context{
 		Profile: string(bsp.profile), BSPVersion: bsp.header.Version,
 		LumpVersion: bsp.header.Lumps[index].Version,
+		LeafVersion: bsp.header.Lumps[LumpLeafs].Version,
 		ByteOrder:   binary.LittleEndian, HeaderLayout: bsp.layout,
 		GameOffsets:     format.AbsoluteGameOffsets,
 		CompressionSize: binary.LittleEndian.Uint32(bsp.header.Lumps[index].FourCC[:]),

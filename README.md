@@ -78,10 +78,9 @@ not a decoder selector.
 Codec selection uses the actual descriptor revision and retained engine context
 for both decode and encode. Leaf revisions 0/1 have explicit 56/32-byte layouts.
 Unknown revisions and opaque IDs return `ErrUnsupportedLump` on typed access;
-`RawLump`/`SetRawLump` still preserve their bytes and metadata. Branch-specific
-ordinary records and static-prop decoding are completed by the corresponding
-ordered tasks; container acceptance does not assert every codec's correctness.
-Big-endian/console files are rejected deliberately.
+`RawLump`/`SetRawLump` still preserve their bytes and metadata. Container acceptance
+does not assert every codec's correctness. Big-endian/console files are rejected
+deliberately; unproven branch layouts stay opaque.
 
 Pinned evidence: [Valve SDK header](https://github.com/ValveSoftware/source-sdk-2013/blob/b8cfb12c0e083a2ef5b2f9f9b50f3902fa034474/src/public/bspfile.h),
 [Valve game records](https://github.com/ValveSoftware/source-sdk-2013/blob/b8cfb12c0e083a2ef5b2f9f9b50f3902fa034474/src/public/gamebspfile.h),
@@ -125,6 +124,33 @@ flags and stream trailer/gaps. Unchanged compressed siblings remain stored; no
 recompression or external executable/cgo is required. The Go decoder is pinned
 to `github.com/ulikunitz/xz` v0.5.11.
 
+
+## Versioned ordinary records
+
+Public records live in `lumps`; private stateless wire codecs live in
+`internal/codec`. Use attached `Leaves`, `WorldLights`/`WorldLightsHDR`,
+`BrushSides`, `AmbientIndices`/`AmbientSamples` (and HDR counterparts), and
+`Occlusion` getters/setters rather than decoder objects.
+
+| Records | Supported wire layouts |
+| --- | --- |
+| Leaves | descriptor0:56 bytes with inline LDR cube; descriptor1:32 bytes |
+| Worldlights | revision0:88 bytes; CS:GO revision1:100 bytes with shadow offset; SDK/L4D2 revision1 remains opaque |
+| Brush sides | eight bytes; SDK/L4D2 signed16 bevel, CS:GO byte bevel/thin |
+| Ambient | index4 bytes; legacy cube24, indexed positioned sample28 |
+| Occlusion | revision1 object36/revision2 object40; counted polygon12 and vertex-index4 arrays |
+
+Leaf/sample records expose layout presence and padding. Setters reject fields
+absent from the selected layout; they never silently upgrade versions or discard
+data. Worldlight emission enums retain the complete signed32-bit value.
+
+Ambient selection follows sibling context, not divisibility: leaf0 uses inline
+LDR lighting and rejects nonempty ignored standalone channels on typed access;
+compact leaves with absent LDR index52 use legacy cubes for both channels,
+regardless unreliable sample revisions. Available indices/cubes must match
+leaves; positive spans address samples, zero-count indices reference leaves.
+Absent channels stay absent, with no fallback or implicit layout migration.
+Occlusion getters/setters validate polygon spans and actual plane/vertex references.
 
 ## Real World examples
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)

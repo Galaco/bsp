@@ -2,6 +2,7 @@ package versions
 
 import (
 	"fmt"
+	"github.com/galaco/bsp/internal/codec"
 	"github.com/galaco/bsp/internal/format"
 )
 
@@ -12,11 +13,16 @@ func supportedRevision(index int, context format.Context) bool {
 	case 10, 7, 8, 27, 53, 58:
 		return context.LumpVersion == 0 || context.LumpVersion == 1
 	case 9:
-		return context.LumpVersion == 2
+		return context.LumpVersion == 1 || context.LumpVersion == 2
 	case 55, 56:
-		return (context.LumpVersion == 0 || context.LumpVersion == 1) && !context.LegacyAmbient
+		return context.LeafVersion == 0 || context.LegacyAmbient || context.LumpVersion == 0 || context.LumpVersion == 1
+	case 51, 52:
+		return context.LeafVersion == 0 || context.LegacyAmbient || context.LumpVersion == 0
+	case 15, 54:
+		_, err := codec.WorldLightRecordSize(context)
+		return err == nil
 	case 19:
-		return context.Profile == "sdk2013" && context.LumpVersion == 0
+		return context.LumpVersion == 0
 	default:
 		return context.LumpVersion == 0
 	}
