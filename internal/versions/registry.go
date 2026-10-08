@@ -23,7 +23,7 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 3:
 		ret = new(lumps.Vertex)
 	case 4:
-		ret = new(lumps.Visibility)
+		ret = new(codec.Visibility)
 	case 5:
 		ret = new(lumps.Node)
 	case 6:
@@ -129,7 +129,7 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 58:
 		ret = new(codec.Faces)
 	case 59:
-		ret = new(lumps.MapFlags)
+		ret = new(codec.MapFlags)
 	case 60:
 		ret = new(lumps.OverlayFade)
 	case 61:

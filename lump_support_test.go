@@ -129,7 +129,7 @@ func TestSupportRevisionWidthsAndConsumerLimits(t *testing.T) {
 		{bsp.ProfileL4D2, 15, 1, bsp.SupportOpaque, 0},
 		{bsp.ProfileReactiveDrop, 9, 1, bsp.SupportOpaque, 0},
 		{bsp.ProfileReactiveDrop, 9, 2, bsp.SupportTyped, 0},
-		{bsp.ProfileCSGO, 4, 0, bsp.SupportOpaque, 0},
+		{bsp.ProfileCSGO, 4, 0, bsp.SupportTyped, 0},
 		{bsp.ProfileCSGO, 40, 0, bsp.SupportByteStream, 0},
 		{bsp.ProfileCSGO, 59, 0, bsp.SupportTyped, 4},
 		{bsp.ProfileCSGO, 32, 0, bsp.SupportOpaque, 0},
@@ -143,11 +143,8 @@ func TestSupportRevisionWidthsAndConsumerLimits(t *testing.T) {
 		if err != nil || info.Status != tc.status || info.RecordWidth != tc.width || info.Limitations == "" || info.Evidence == "" {
 			t.Fatalf("%s ID%d revision%d=%+v error=%v", tc.profile, tc.id, tc.revision, info, err)
 		}
-		if (tc.id == 4 || tc.id == 40) && (info.Readable || info.Editable || len(info.Accessors) != 0) {
+		if tc.id == 40 && (info.Readable || info.Editable || len(info.Accessors) != 0) {
 			t.Fatalf("unrepaired consumer advertised=%+v", info)
-		}
-		if tc.id == 59 && info.Editable {
-			t.Fatalf("getter-only map flags advertised editable=%+v", info)
 		}
 	}
 	file := supportFixture(t, bsp.ProfileSDK2013, 20)

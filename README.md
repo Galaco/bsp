@@ -175,6 +175,23 @@ Explicit widths and genuine consumer evidence are in
 [task09](09-overlay-cubemap-and-primitive-layouts.md).
 
 
+## Visibility and optional map flags
+
+`Visibility()` returns owned `lumps.Visibility{Offsets, Data}`. Cluster count is
+`len(Offsets)` (maximum65536); `Data` excludes the count/offset table.
+Offsets remain **lump-relative**, so resizing the table requires explicit rebasing.
+`Row(cluster, lumps.PVS)` / `VisibleClusters(cluster, lumps.PAS)` return
+`(value, present, error)`: `-1` means missing, not all-visible/all-hidden.
+Shared offsets are valid; integer cluster IDs include65535. Row decoding bounds
+every literal/run and visible IDs ignore unused final-byte bits.
+`SetVisibility` validates both columns/rows before committing. Absent visibility
+returns `ErrLumpNotFound`; a present zero-count record is four bytes.
+
+`MapFlags()` returns `(lumps.MapFlags, present, error)`: absent is zero bytes,
+present zero is four zero bytes. `SetMapFlags(lumps.MapFlags{})` deliberately
+stores zero; `RemoveMapFlags()` deliberately removes it. Malformed lengths fail
+typed access while raw preservation remains available.
+
 ## Packed leaf and face fields
 
 Leaf `Area()` reads the low nine bits (`0x01ff`); `Flags()` reads the high seven.
@@ -279,7 +296,7 @@ Evidence: [pinned SDK header](https://github.com/ValveSoftware/source-sdk-2013/b
 | 1 | planes | T0rw | T0rw | T0rw | T0rw | 20 | `Planes`, `SetPlanes` | Setter checks plane axis and count; no automatic geometry rebuild. |
 | 2 | texdata | T0r | T0r | T0r | T0r | 32 | `Lump -> lumps.TexData.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
 | 3 | vertexes | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.Vertex.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 4 | visibility | O | O | O | O | 0 | raw only | Legacy visibility decoder trusts signed cluster counts and offsets; bounded PVS/PAS contract pending task12. Use raw bytes, not the legacy decoder for untrusted data. |
+| 4 | visibility | T0rw | T0rw | T0rw | T0rw | 0 | `Visibility`, `SetVisibility` | Derived count <=65536; lump-relative shared PVS/PAS offsets, bounded RLE, explicit missing rows; no recomputation. |
 | 5 | nodes | T0r | T0r | T0r | T0r | 32 | `Lump -> lumps.Node.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
 | 6 | texinfo | T0r | T0r | T0r | T0r | 72 | `Lump -> lumps.TexInfo.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
 | 7 | faces | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 56 | `Faces`, `SetFaces` | Masked primitive spans and local winding references checked; high bit disables dynamic shadows. No topology regeneration. |
@@ -334,7 +351,7 @@ Evidence: [pinned SDK header](https://github.com/ValveSoftware/source-sdk-2013/b
 | 56 | leafambientlighting | T0,1rw | T0,1rw | T0,1rw | T0,1rw | inline:0; legacy:24; indexed:28 | `AmbientSamples`, `SetAmbientSamples` | Leaf-v0 supplies inline lighting; legacy mode uses 24-byte cubes, indexed mode 28-byte samples; no implicit HDR fallback. |
 | 57 | xzippakfile | O | O | O | O | 0 | raw only | Deprecated console XZIP payload; PC profiles preserve raw bytes only. |
 | 58 | faceshdr | T0,1rw | T0,1rw | T0,1rw | T0,1rw | 56 | `FacesHDR`, `SetFacesHDR` | Independent HDR channel; no fallback to ordinary faces. |
-| 59 | mapflags | T0r | T0r | T0r | T0r | 4 | `Lump -> lumps.MapFlags.GetData` | Legacy getter accepts absent data as zero and does not enforce exactly four bytes; absence/presence contract pending task12. No persistent typed setter. |
+| 59 | mapflags | T0rw | T0rw | T0rw | T0rw | 4 | `MapFlags`, `SetMapFlags`, `RemoveMapFlags` | Explicit presence: absent0 bytes versus present4 bytes, including zero; other lengths malformed. |
 | 60 | overlayfades | T0r | T0r | T0r | T0r | 8 | `Lump -> lumps.OverlayFade.GetData` | Getter-only fade distances; no attached setter or overlay-reference-aware mutation. |
 | 61 | overlaysystemlevels | U | T0rw | T0rw | T0rw | 4 | `OverlaySystemLevels`, `SetOverlaySystemLevels` | Only L4D2/CS:GO/Reactive Drop; four CPU/GPU level bytes preserved without guessing engine policy. |
 | 62 | physlevel | O | O | O | O | 0 | raw only | Physics level interior opaque; no proprietary physics codec. |

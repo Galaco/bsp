@@ -65,9 +65,6 @@ func (bsp *Bsp) Lump(index LumpId) (lumps.ILump, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, ok := decoder.(*lumps.Visibility); ok && context.CompressionSize == 0 {
-		raw = cloneBytes(raw)
-	}
 	if err := decoder.Unmarshall(raw); err != nil {
 		if errors.Is(err, codec.ErrUnsupportedPrimitiveType) {
 			return nil, fmt.Errorf("%w: %s", ErrUnsupportedLump, err)
