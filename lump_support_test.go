@@ -143,9 +143,6 @@ func TestSupportRevisionWidthsAndConsumerLimits(t *testing.T) {
 		if err != nil || info.Status != tc.status || info.RecordWidth != tc.width || info.Limitations == "" || info.Evidence == "" {
 			t.Fatalf("%s ID%d revision%d=%+v error=%v", tc.profile, tc.id, tc.revision, info, err)
 		}
-		if tc.id == 40 && (info.Readable || info.Editable || len(info.Accessors) != 0) {
-			t.Fatalf("unrepaired consumer advertised=%+v", info)
-		}
 	}
 	file := supportFixture(t, bsp.ProfileSDK2013, 20)
 	for _, id := range []bsp.LumpId{2, 3, 5, 33, 60} {

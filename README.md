@@ -175,6 +175,22 @@ Explicit widths and genuine consumer evidence are in
 [task09](09-overlay-cubemap-and-primitive-layouts.md).
 
 
+## Read-only embedded resources
+
+`Pakfile()` returns an immutable archive snapshot. `Entries()` returns metadata
+in ZIP directory order; `ReadFile(name)` returns owned bytes and closes every
+opened reader, including failed reads. Missing resources wrap `fs.ErrNotExist`;
+empty entries succeed. CRC/decompression/close errors retain their underlying cause.
+Lookup is case-insensitive, converts backslashes and collapses repeated slashes.
+The first normalized collision wins; `..` remains literal, not filesystem resolution.
+
+Absent pak bytes mean an empty view; corrupt nonempty ZIPs return parse errors.
+Use `SetRawLump(LumpPakfile, descriptor, rawZIP)` for whole-archive replacement.
+Earlier snapshots stay bound to earlier bytes; new lookup/export sees the replacement.
+No per-entry editor or disk extraction is provided. Go's standard ZIP methods0/8
+are readable; ZIP-LZMA method14 (observed in SDK Bagel) returns `zip.ErrAlgorithm`.
+Source lump LZMA support does not imply ZIP-LZMA support or a ZIP expansion cap.
+
 ## Visibility and optional map flags
 
 `Visibility()` returns owned `lumps.Visibility{Offsets, Data}`. Cluster count is
@@ -332,7 +348,7 @@ Evidence: [pinned SDK header](https://github.com/ValveSoftware/source-sdk-2013/b
 | 37 | primitives | T0rw | T0rw | T0rw | T0rw | 10 | `Primitives`, `SetPrimitives` | Primitive types 0 and 1 supported; sibling index/vertex spans checked; other types return unsupported. |
 | 38 | primverts | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.PrimVert.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
 | 39 | primindices | T0r | T0r | T0r | T0r | 2 | `Lump -> lumps.PrimIndice.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
-| 40 | pakfile | B0(raw only) | B0(raw only) | B0(raw only) | B0(raw only) | 0 | raw only | Legacy ZIP reader exists via Lump(40). Empty ZIP handling, bounded resource reads, missing/ambiguous paths and reader closure are not repaired until task13; no attached safe resource API advertised. |
+| 40 | pakfile | B0r | B0r | B0r | B0r | 0 | `Pakfile`, `Pakfile.Entries`, `Pakfile.ReadFile` | Read-only ZIP snapshots with normalized first-match lookup, not-found/errors and closed readers. Whole replacement is raw; ZIP methods0/8 supported, method14 returns `zip.ErrAlgorithm`. No ZIP expansion cap. |
 | 41 | clipportalverts | T0r | T0r | T0r | T0r | 12 | `Lump -> lumps.ClipPortalVerts.GetData` | Legacy Lump snapshot/GetData only; no attached persistent setter or automatic sibling-reference repair. |
 | 42 | cubemaps | T0rw | T0rw | T0rw | T0rw | 16 | `Cubemaps`, `SetCubemaps` | Integer origin, size code and padding preserved; no texture-resource synthesis. |
 | 43 | texdatastringdata | B0r | B0r | B0r | B0r | 0 | `Lump -> lumps.TexDataStringData.GetData` | Exact NUL-separated string bytes; no table-reference-aware attached editor. |

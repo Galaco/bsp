@@ -91,7 +91,7 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 39:
 		ret = new(lumps.PrimIndice)
 	case 40:
-		ret = new(lumps.Pakfile) //pakfile
+		ret = new(codec.Pakfile)
 	case 41:
 		ret = new(lumps.ClipPortalVerts)
 	case 42:
