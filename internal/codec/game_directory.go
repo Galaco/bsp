@@ -53,36 +53,61 @@ func ParseGameDirectory(raw []byte, base int32) (GameDirectory, error) {
 	return directory, nil
 }
 
-// RelocateGameDirectory preserves every byte except nonzero absolute directory
-// offsets. Raw and Base are authoritative; Entries need not be populated.
-// Allocation-free validation and target arithmetic checks precede the single
-// raw clone. Callers must keep the borrowed source bytes immutable.
-func RelocateGameDirectory(directory GameDirectory, newBase int32) ([]byte, error) {
+// GameRelocation borrows an immutable source and records validated offset changes.
+// Prepare it before allocating a complete output file.
+type GameRelocation struct {
+	raw   []byte
+	count int
+	delta int64
+}
+
+func PlanGameRelocation(directory GameDirectory, newBase int32) (GameRelocation, error) {
 	count, _, err := validateGameDirectory(directory.Raw, directory.Base)
 	if err != nil {
-		return nil, err
+		return GameRelocation{}, err
 	}
 	if err := validateGameExtent(len(directory.Raw), newBase); err != nil {
-		return nil, err
+		return GameRelocation{}, err
 	}
 	delta := int64(newBase) - int64(directory.Base)
 	for index := 0; index < count; index++ {
 		offset := readGameEntry(directory.Raw, index).Offset
 		if offset != 0 && (int64(offset)+delta < 0 || int64(offset)+delta > gameMaxInt32) {
-			return nil, fmt.Errorf("game entry %d: relocated offset is not representable", index)
+			return GameRelocation{}, fmt.Errorf("game entry %d: relocated offset is not representable", index)
 		}
+	}
+	return GameRelocation{raw: directory.Raw, count: count, delta: delta}, nil
+}
+
+// CopyTo copies directly into its final destination, avoiding a staging payload.
+func (plan GameRelocation) CopyTo(raw []byte) error {
+	if len(raw) != len(plan.raw) {
+		return io.ErrShortBuffer
+	}
+	copy(raw, plan.raw)
+	for index := 0; index < plan.count; index++ {
+		position := 4 + index*gameEntrySize + 8
+		offset := int32(binary.LittleEndian.Uint32(raw[position : position+4]))
+		if offset != 0 {
+			binary.LittleEndian.PutUint32(raw[position:position+4], uint32(int64(offset)+plan.delta))
+		}
+	}
+	return nil
+}
+
+// RelocateGameDirectory preserves all bytes except nonzero absolute offsets.
+// Raw and Base are authoritative; validation precedes one output allocation.
+func RelocateGameDirectory(directory GameDirectory, newBase int32) ([]byte, error) {
+	plan, err := PlanGameRelocation(directory, newBase)
+	if err != nil {
+		return nil, err
 	}
 	if len(directory.Raw) == 0 {
 		return nil, nil
 	}
 	raw := make([]byte, len(directory.Raw))
-	copy(raw, directory.Raw)
-	for index := 0; index < count; index++ {
-		position := 4 + index*gameEntrySize + 8
-		offset := int32(binary.LittleEndian.Uint32(raw[position : position+4]))
-		if offset != 0 {
-			binary.LittleEndian.PutUint32(raw[position:position+4], uint32(int64(offset)+delta))
-		}
+	if err := plan.CopyTo(raw); err != nil {
+		return nil, err
 	}
 	return raw, nil
 }

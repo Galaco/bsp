@@ -3,6 +3,11 @@ package format
 
 import "encoding/binary"
 
+const (
+	HeaderSize = 1036
+	LumpCount  = 64
+)
+
 type HeaderLayout uint8
 
 const (

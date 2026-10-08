@@ -3,6 +3,7 @@ package bsp
 import (
 	"errors"
 	"fmt"
+	"github.com/galaco/bsp/internal/format"
 )
 
 var (
@@ -26,8 +27,8 @@ func (e *FormatError) Unwrap() error        { return e.Err }
 func (e *FormatError) Is(target error) bool { return target == ErrMalformed }
 
 const (
-	HeaderSize       = 1036
-	LumpCount        = 64
+	HeaderSize       = format.HeaderSize
+	LumpCount        = format.LumpCount
 	fileIdent  int32 = 0x50534256
 )
 

@@ -59,12 +59,12 @@ func decodeHeader(raw []byte, layout format.HeaderLayout) Header {
 	return header
 }
 
-func encodeHeader(header Header, layout format.HeaderLayout) [HeaderSize]byte {
-	var raw [HeaderSize]byte
+func encodeHeader(raw []byte, header *Header, layout format.HeaderLayout) {
 	order := binary.LittleEndian
 	order.PutUint32(raw[:], uint32(header.Id))
 	order.PutUint32(raw[4:], uint32(header.Version))
-	for i, desc := range header.Lumps {
+	for i := range header.Lumps {
+		desc := &header.Lumps[i]
 		entry := raw[8+i*16 : 8+(i+1)*16]
 		if layout == format.L4D2Header {
 			order.PutUint32(entry, uint32(desc.Version))
@@ -78,7 +78,6 @@ func encodeHeader(header Header, layout format.HeaderLayout) [HeaderSize]byte {
 		copy(entry[12:], desc.FourCC[:])
 	}
 	order.PutUint32(raw[1032:], uint32(header.Revision))
-	return raw
 }
 
 func (bsp *Bsp) codecContext(index LumpId) format.Context {

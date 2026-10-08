@@ -8,71 +8,22 @@
 # Bsp
 Go library for handling Source Engine .bsp map files.
 
-### Features:
-* Read support for (most) non-xbox360 BSPs (v20,21). v19 support limited, may work
-* Freely modify and resize any Lump data
-* Limited write support, mostly untested
+### Features
 
-##### Not all lumps are currently supported, but can be freely read and modified, as they are treated as `[]byte`
+* Explicit little-endian PC profiles for SDK2013 BSP19/20, CS:GO BSP21 and L4D2 BSP21.
+* Owned raw replacement and independent typed snapshots; edits require setters.
+* Canonical full-file export covering all 64 IDs, preserving opaque bytes and metadata.
+* Bounded game directories and pure absolute-offset relocation, including unknown children.
 
-The following lumps currently have a full implementation for v20 & v21 BSPs (tested against CS:S & CS:GO):
+Container/raw support and typed record support are separate. See the profile
+matrix below. Branch-specific ordinary records, compression and static-prop
+codecs are tracked by the ordered implementation tasks; directory acceptance
+does not establish a correct typed layout for every payload.
 
-```
-0: Entdata
-1: Planes
-2: Texdata
-3: Vertexes
-4: Visibility
-5: Nodes
-6: Texinfo
-7: Faces
-8: Lighting
-9: Occlusion
-10: Leafs
-11: FaceId
-12: Edges
-13: Surfedges
-14: Models
-15: WorldLight
-16: Leaffaces
-17: LeafBrushes
-18: Brushes
-19: Brushsides
-20: Areas
-21: AreaPortals
-26: DispInfo
-27: OriginalFaces
-28: PhysDisp
-30: VertNormals
-31: VertNormalIndices
-33: DispVerts
-34: DispLightmapSamplePosition
-35: Game lump (partial: sprp only)
-36: LeafWaterData
-37: Primitives
-38: PrimVerts
-39: PrimIndices
-40: Pakfile
-41: ClipPortalVerts
-42: Cubemaps
-43: Texdatastringdata
-44: Texdatastringtable
-45: Overlays
-46: LeafMinDistToWater
-47: FaceMacroTextureInfo
-48: DispTris
-51: LeafAmbientIndexHDR
-52: LeafAmbientIndex
-53: WorldLightHDR
-54: WorldLightHDR
-55: LeafAmbientLightingHDR
-56: LeafAmbientLighting
-58: FacesHDR
-59: MapFlags
-60: OverlayFades
-```
-
-##### This library may reorganise lump order during the first export. This is intentional to handle lump resizing, but will change your checksum if you export without changes.
+Canonical export intentionally uses numeric ID order, four-byte alignment and
+zero locations for empty descriptors. It does not preserve original physical
+ordering, inter-lump gaps or unrelated trailing bytes. Game absolute-offset
+relocation changes directory bytes; checksum convention/order is a separate task.
 
 # Usage
 
@@ -103,9 +54,10 @@ func main() {
 Raw and decoded values are independent snapshots. Use `SetRawLump`, `SetEntities`,
 or `SetPlanes` to commit an edit; modifying a returned slice does not edit the file.
 `Header`/`Descriptor` return copied metadata, and stored lengths are derived from
-committed bytes. `NewWriter(file).WriteLump(id)` preserves stored bytes without
-requiring typed decoding. Whole-file layout and game relocation remain subject to
-the write-support limitations above.
+committed bytes. `NewWriter(file).Write()` plans checked sizes before allocating,
+then emits committed payloads without typed decoding or source mutation.
+`WriteLump(id)` returns stored bytes; `MarshalGameLump(base)` explicitly relocates
+game bytes. Input descriptor offsets remain historical, not planned output locations.
 
 ## Format selection
 
