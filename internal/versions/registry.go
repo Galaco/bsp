@@ -58,10 +58,16 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 		ret = new(lumps.Area)
 	case 21:
 		ret = new(lumps.AreaPortal)
-	case 22, 23, 24, 25:
-		return nil, fmt.Errorf("opaque lump %d", index)
+	case 22:
+		ret = new(codec.PropCollisions)
+	case 23:
+		ret = new(codec.PropHulls)
+	case 24:
+		ret = new(codec.PropHullVertices)
+	case 25:
+		ret = new(codec.PropHullTriangles)
 	case 26:
-		ret = new(lumps.DispInfo)
+		ret = new(codec.Displacements)
 	case 27:
 		ret = new(lumps.Face)
 	case 28, 29:
@@ -102,8 +108,10 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 		ret = new(lumps.FaceMacroTextureInfo)
 	case 48:
 		ret = new(lumps.DispTris)
-	case 49, 50:
-		return nil, fmt.Errorf("opaque lump %d", index)
+	case 49:
+		return nil, fmt.Errorf("byte-stream lump %d; use attached PropBlob accessor", index)
+	case 50:
+		ret = new(codec.WaterOverlays)
 	case 51:
 		ret = new(codec.LeafAmbientIndexHDR)
 	case 52:
@@ -124,8 +132,12 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 		ret = new(lumps.MapFlags)
 	case 60:
 		ret = new(lumps.OverlayFade)
-	case 61, 62, 63:
+	case 61:
+		ret = new(codec.OverlaySystemLevels)
+	case 62:
 		return nil, fmt.Errorf("opaque lump %d", index)
+	case 63:
+		ret = new(codec.DisplacementMultiblends)
 	default:
 		return nil, fmt.Errorf("invalid lump %d", index)
 	}

@@ -15,6 +15,7 @@ import (
 // References: Valve SDK b8cfb12 gamebspfile.h (4/5/6 and distinct10);
 // srctools cd7e841 bsp.py StaticPropVersion (common4–11); authored CS:GO v11
 // fixtures and independent consumer observations are recorded in task08.
+// Reactive Drop af3be02 gamebspfile.h defines common4–9, not either v10 dialect.
 func StaticPropLayoutFor(context format.Context) (lumps.StaticPropLayout, error) {
 	if err := validatePCContext(context); err != nil {
 		return 0, err
@@ -28,7 +29,7 @@ func StaticPropLayoutFor(context format.Context) (lumps.StaticPropLayout, error)
 		if version == 10 {
 			return lumps.StaticPropSDK2013V10, nil
 		}
-	case "l4d2":
+	case "l4d2", "reactivedrop":
 		if version >= 4 && version <= 9 {
 			return lumps.StaticPropLayout(version), nil
 		}

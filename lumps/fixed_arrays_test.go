@@ -148,14 +148,6 @@ func TestRetainedFixedArrayWireLayouts(t *testing.T) {
 			}
 			return values
 		}},
-		{26, "dispinfo", 176, 44, 4, func() ILump { return new(DispInfo) }, func(c ILump) []uint32 {
-			data := c.(*DispInfo).GetData()
-			values := make([]uint32, len(data))
-			for i, record := range data {
-				values[i] = uint32(record.LightmapSampleStartPosition)
-			}
-			return values
-		}},
 		{30, "vertnormal", 12, 8, 4, func() ILump { return new(VertNormal) }, func(c ILump) []uint32 {
 			data := c.(*VertNormal).GetData()
 			values := make([]uint32, len(data))
@@ -363,27 +355,6 @@ func TestFixedArrayNamedPadding(t *testing.T) {
 		got, err := c.Marshall()
 		if err != nil || !bytes.Equal(got, raw) {
 			t.Fatalf("edited water data discarded padding: %x, %v", got, err)
-		}
-	})
-	t.Run("DispInfo176", func(t *testing.T) {
-		raw := make([]byte, 176)
-		raw[38], raw[39] = 0x81, 0xde
-		for i := 48; i < len(raw); i++ {
-			raw[i] = byte(i*37 + 9)
-		}
-		c := new(DispInfo)
-		if err := c.Unmarshall(raw); err != nil {
-			t.Fatal(err)
-		}
-		record := c.GetData()[0]
-		if record.MapFacePadding != [2]byte{0x81, 0xde} || record.Ignore[31] != binary.LittleEndian.Uint32(raw[172:]) {
-			t.Fatalf("displacement padding/tail lost: %x, %#x", record.MapFacePadding, record.Ignore[31])
-		}
-		c.GetData()[0].MapFace = 345
-		binary.LittleEndian.PutUint16(raw[36:], 345)
-		got, err := c.Marshall()
-		if err != nil || !bytes.Equal(got, raw) {
-			t.Fatalf("edited displacement discarded padding/tail: %x, %v", got, err)
 		}
 	})
 }

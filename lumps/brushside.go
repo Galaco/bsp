@@ -1,7 +1,7 @@
 package lumps
 
 // BrushSide is an eight-byte brush side. SDK2013 and L4D2 store Bevel as a
-// signed short; CS:GO stores byte-sized Bevel and Thin. HasThin records that
+// signed short; CS:GO/Reactive Drop store byte-sized Bevel and Thin. HasThin records that
 // dialect explicitly, even when Thin is zero.
 type BrushSide struct {
 	PlaneNum uint16

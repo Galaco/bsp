@@ -195,3 +195,55 @@ func TestLeavesRejectWrongContexts(t *testing.T) {
 		}
 	}
 }
+
+// RD's pinned LoadLeafs explicitly accepts these two descriptor revisions;
+// BSP21 alone does not remove the old inline cube or its alignment bytes.
+func TestReactiveDropLeavesWireAndContext(t *testing.T) {
+	for _, version := range []int32{0, 1} {
+		context := format.Context{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: version, ByteOrder: binary.LittleEndian}
+		raw, want := leafWireRecords(version), leafExpectedRecords(version)
+		got, err := DecodeLeaves(raw, context)
+		if err != nil || !reflect.DeepEqual(got, want) {
+			t.Fatalf("RD leaf-v%d: got %+v err=%v want %+v", version, got, err, want)
+		}
+		encoded, err := EncodeLeaves(want, context)
+		if err != nil || !bytes.Equal(encoded, raw) {
+			t.Fatalf("RD leaf-v%d authored encoding: %v", version, err)
+		}
+		stride := 32
+		if version == 0 {
+			stride = 56
+		}
+		got[1].Padding = [2]byte{0x12, 0xef}
+		mutated := append([]byte(nil), raw...)
+		mutated[2*stride-2], mutated[2*stride-1] = 0x12, 0xef
+		encoded, err = EncodeLeaves(got, context)
+		if err != nil || !bytes.Equal(encoded, mutated) {
+			t.Fatalf("RD leaf-v%d padding edit changed other fields: %v", version, err)
+		}
+		for n := 1; n < len(raw); n++ {
+			if n == stride {
+				continue
+			}
+			if value, err := DecodeLeaves(raw[:n], context); err == nil || value != nil {
+				t.Fatalf("RD leaf-v%d accepted partial length %d", version, n)
+			}
+		}
+	}
+	for _, context := range []format.Context{
+		{Profile: "reactivedrop", BSPVersion: 19, LumpVersion: 1},
+		{Profile: "reactivedrop", BSPVersion: 20, LumpVersion: 1},
+		{Profile: "reactivedrop", BSPVersion: 22, LumpVersion: 1},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: -1},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 2},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 1, ByteOrder: binary.BigEndian},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 1, HeaderLayout: format.L4D2Header},
+	} {
+		if value, err := DecodeLeaves(leafWireRecords(1), context); err == nil || value != nil {
+			t.Fatalf("RD leaves accepted context %+v", context)
+		}
+		if raw, err := EncodeLeaves(leafExpectedRecords(1), context); err == nil || raw != nil {
+			t.Fatalf("RD leaves encoded context %+v", context)
+		}
+	}
+}

@@ -383,3 +383,129 @@ func TestAmbientRejectsWrongContexts(t *testing.T) {
 		}
 	}
 }
+
+func TestReactiveDropAmbientSiblingLayoutsAndPadding(t *testing.T) {
+	for _, legacy := range []bool{false, true} {
+		context := format.Context{Profile: "reactivedrop", BSPVersion: 21, LeafVersion: 1, LegacyAmbient: legacy}
+		versions := []int32{0, 1}
+		if legacy {
+			// The pinned consumer ignores garbage descriptors for old cubes;
+			// only absence of the LDR index selects both channels' old width.
+			versions = append(versions, -123, 999)
+		}
+		for _, version := range versions {
+			context.LumpVersion = version
+			raw, want := ambientWireRecords(!legacy), ambientExpectedRecords(!legacy)
+			got, err := DecodeAmbientSamples(raw, context)
+			if err != nil || !reflect.DeepEqual(got, want) {
+				t.Fatalf("RD ambient legacy=%v v%d: got %+v err=%v want %+v", legacy, version, got, err, want)
+			}
+			encoded, err := EncodeAmbientSamples(want, context)
+			if err != nil || !bytes.Equal(encoded, raw) {
+				t.Fatalf("RD authored ambient legacy=%v v%d: %v", legacy, version, err)
+			}
+			got[1].Cube.Color[5].Exponent = -127
+			mutated := append([]byte(nil), raw...)
+			stride := 28
+			if legacy {
+				stride = 24
+			}
+			mutated[stride+23] = 0x81
+			if !legacy {
+				got[1].Pad = 0xef
+				mutated[stride+27] = 0xef
+			}
+			encoded, err = EncodeAmbientSamples(got, context)
+			if err != nil || !bytes.Equal(encoded, mutated) {
+				t.Fatalf("RD ambient exponent/padding edit changed other fields: %v", err)
+			}
+			for n := 1; n < len(raw); n++ {
+				if n == stride {
+					continue
+				}
+				if records, err := DecodeAmbientSamples(raw[:n], context); err == nil || records != nil {
+					t.Fatalf("RD ambient legacy=%v accepted partial length %d", legacy, n)
+				}
+			}
+		}
+	}
+	context := format.Context{Profile: "reactivedrop", BSPVersion: 21, LeafVersion: 1, LumpVersion: 0}
+	raw := []byte{0x03, 0x01, 0x02, 0x04, 0x05, 0x08, 0x07, 0x06}
+	want := []lumps.AmbientIndex{
+		{AmbientSampleCount: 0x0103, FirstAmbientSample: 0x0402},
+		{AmbientSampleCount: 0x0805, FirstAmbientSample: 0x0607},
+	}
+	got, err := DecodeAmbientIndices(raw, context)
+	if err != nil || !reflect.DeepEqual(got, want) {
+		t.Fatalf("RD ambient index offsets: got %+v err=%v", got, err)
+	}
+	encoded, err := EncodeAmbientIndices(want, context)
+	if err != nil || !bytes.Equal(encoded, raw) {
+		t.Fatalf("RD independent ambient index encoding: %v", err)
+	}
+	for n := 1; n < len(raw); n++ {
+		if n == 4 {
+			continue
+		}
+		if value, err := DecodeAmbientIndices(raw[:n], context); err == nil || value != nil {
+			t.Fatalf("RD ambient indices accepted partial length %d", n)
+		}
+	}
+	for _, leafVersion := range []int32{0, 1} {
+		context.LeafVersion, context.LegacyAmbient, context.LumpVersion = leafVersion, true, 999
+		if _, err := DecodeAmbientIndices(raw, context); err == nil {
+			t.Fatal("RD old ambient layout consumed ignored separate indices")
+		}
+		if value, err := DecodeAmbientIndices(nil, context); err != nil || len(value) != 0 {
+			t.Fatalf("RD old ambient empty indices: %v", err)
+		}
+		if raw, err := EncodeAmbientIndices(want, context); err == nil || raw != nil {
+			t.Fatal("RD old ambient layout wrote ignored separate indices")
+		}
+	}
+	context.LeafVersion, context.LegacyAmbient = 0, false
+	if value, err := DecodeAmbientSamples(nil, context); err != nil || len(value) != 0 {
+		t.Fatalf("RD leaf-v0 unused ambient channel: %v", err)
+	}
+	if _, err := DecodeAmbientSamples(ambientWireRecords(false), context); err == nil {
+		t.Fatal("RD leaf-v0 consumed separate lighting instead of inline cube")
+	}
+	if raw, err := EncodeAmbientSamples(ambientExpectedRecords(false), context); err == nil || raw != nil {
+		t.Fatal("RD leaf-v0 wrote separate lighting")
+	}
+}
+
+func TestReactiveDropAmbientRejectsWrongContexts(t *testing.T) {
+	for _, context := range []format.Context{
+		{Profile: "reactivedrop", BSPVersion: 19, LeafVersion: 1},
+		{Profile: "reactivedrop", BSPVersion: 20, LeafVersion: 1},
+		{Profile: "reactivedrop", BSPVersion: 22, LeafVersion: 1},
+		{Profile: "reactivedrop", BSPVersion: 21, LeafVersion: -1},
+		{Profile: "reactivedrop", BSPVersion: 21, LeafVersion: 2},
+		{Profile: "reactivedrop", BSPVersion: 21, LeafVersion: 1, LumpVersion: -1},
+		{Profile: "reactivedrop", BSPVersion: 21, LeafVersion: 1, LumpVersion: 2},
+		{Profile: "reactivedrop", BSPVersion: 21, LeafVersion: 1, ByteOrder: binary.BigEndian},
+		{Profile: "reactivedrop", BSPVersion: 21, LeafVersion: 1, HeaderLayout: format.L4D2Header},
+	} {
+		if _, err := DecodeAmbientSamples(ambientWireRecords(true), context); err == nil {
+			t.Fatalf("RD ambient samples accepted context %+v", context)
+		}
+		if raw, err := EncodeAmbientSamples(ambientExpectedRecords(true), context); err == nil || raw != nil {
+			t.Fatalf("RD ambient samples encoded context %+v", context)
+		}
+		if _, err := DecodeAmbientIndices([]byte{1, 0, 0, 0}, context); err == nil {
+			t.Fatalf("RD ambient indices accepted context %+v", context)
+		}
+		if raw, err := EncodeAmbientIndices([]lumps.AmbientIndex{{AmbientSampleCount: 1}}, context); err == nil || raw != nil {
+			t.Fatalf("RD ambient indices encoded context %+v", context)
+		}
+	}
+	// Sample revision 1 is valid, but index revision 1 is not.
+	context := format.Context{Profile: "reactivedrop", BSPVersion: 21, LeafVersion: 1, LumpVersion: 1}
+	if _, err := DecodeAmbientIndices([]byte{1, 0, 0, 0}, context); err == nil {
+		t.Fatal("RD ambient index accepted sample revision")
+	}
+	if raw, err := EncodeAmbientIndices([]lumps.AmbientIndex{{AmbientSampleCount: 1}}, context); err == nil || raw != nil {
+		t.Fatal("RD ambient index encoded sample revision")
+	}
+}

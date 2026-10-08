@@ -9,8 +9,9 @@ import (
 	"github.com/galaco/bsp/primitives/common"
 )
 
-// Valve SDK2013 bsplib.cpp, LoadLeafAmbientLighting: leaf-v0 already supplied
-// inline LDR lighting and bypasses all four separate ambient lumps. For leaf-v1,
+// Valve SDK2013 and Reactive Drop af3be02 bsplib.cpp LoadLeafAmbientLighting:
+// leaf-v0 already supplied inline LDR lighting and bypasses all four separate
+// ambient lumps. For leaf-v1,
 // absence of the LDR index selects legacy cubes for BOTH channels, even when
 // HDR indices exist or sample descriptors contain garbage versions.
 func ambientSampleSize(context format.Context) (int, error) {

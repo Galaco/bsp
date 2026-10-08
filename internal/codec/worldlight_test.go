@@ -66,7 +66,7 @@ func worldLightTestRecords(revision int32) []lumps.WorldLight {
 }
 
 func TestWorldLightsIndependentVersions(t *testing.T) {
-	contexts := []format.Context{lightTestContext("sdk2013", 0), lightTestContext("csgo", 0), lightTestContext("l4d2", 0), lightTestContext("csgo", 1)}
+	contexts := []format.Context{lightTestContext("sdk2013", 0), lightTestContext("csgo", 0), lightTestContext("l4d2", 0), lightTestContext("csgo", 1), lightTestContext("reactivedrop", 0), lightTestContext("reactivedrop", 1)}
 	sdk19 := lightTestContext("sdk2013", 0)
 	sdk19.BSPVersion = 19
 	contexts = append(contexts, sdk19)
@@ -143,6 +143,10 @@ func TestWorldLightsMalformedAndContext(t *testing.T) {
 		{}, lightTestContext("unknown", 0), lightTestContext("csgo", -1), lightTestContext("csgo", 2), lightTestContext("sdk2013", 1), lightTestContext("l4d2", 1),
 		{Profile: "csgo", BSPVersion: 20}, {Profile: "sdk2013", BSPVersion: 21}, {Profile: "l4d2", BSPVersion: 20},
 		{Profile: "csgo", BSPVersion: 21, ByteOrder: binary.BigEndian},
+		lightTestContext("reactivedrop", -1), lightTestContext("reactivedrop", 2),
+		{Profile: "reactivedrop", BSPVersion: 19}, {Profile: "reactivedrop", BSPVersion: 20},
+		{Profile: "reactivedrop", BSPVersion: 21, ByteOrder: binary.BigEndian},
+		{Profile: "reactivedrop", BSPVersion: 21, HeaderLayout: format.L4D2Header},
 	}
 	for _, context := range invalid {
 		if got, err := DecodeWorldLights(nil, context); err == nil || got != nil {
@@ -178,6 +182,50 @@ func TestLightSidePayloadSizeBoundaries(t *testing.T) {
 		}
 		if _, err := lightSidePayloadSize(int(^uint(0)>>1), width); err == nil {
 			t.Fatalf("native multiplication overflow width %d accepted", width)
+		}
+	}
+}
+
+func TestReactiveDropWorldlightDescriptorNotPayloadDivisibility(t *testing.T) {
+	// 2200 bytes fit both layouts. The RD consumer chooses the descriptor,
+	// not the length, and v0's integer tail occupies v1's shadow-vector slot.
+	raw := make([]byte, 2200)
+	for _, word := range []struct {
+		offset int
+		bits   uint32
+	}{
+		{0, 0x7fc12345}, {4, 0x80000000},
+		{36, 0x41880000}, {40, 0x41900000}, {44, 0x41980000},
+		{48, 0xffffffe5}, {88, 0x41500000}, {100, 0x41b80000},
+	} {
+		binary.LittleEndian.PutUint32(raw[word.offset:], word.bits)
+	}
+	for _, version := range []int32{0, 1} {
+		context := lightTestContext("reactivedrop", version)
+		records, err := DecodeWorldLights(raw, context)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if math.Float32bits(records[0].Origin[0]) != 0x7fc12345 || math.Float32bits(records[0].Origin[1]) != 0x80000000 {
+			t.Fatal("RD worldlights changed float bits")
+		}
+		if version == 0 {
+			if len(records) != 25 || records[0].Cluster != 0x41880000 || records[0].ShadowCastOffset != (mgl32.Vec3{}) || records[1].Origin[0] != 13 {
+				t.Fatalf("RD v0 tail or stride selected incorrectly: %+v", records)
+			}
+		} else if len(records) != 22 || records[0].Cluster != -27 || records[0].ShadowCastOffset != (mgl32.Vec3{17, 18, 19}) || records[1].Origin[0] != 23 {
+			t.Fatalf("RD v1 shadow vector or stride selected incorrectly: %+v", records)
+		}
+		encoded, err := EncodeWorldLights(records, context)
+		if err != nil || !bytes.Equal(encoded, raw) {
+			t.Fatalf("RD v%d changed wire bytes: %v", version, err)
+		}
+	}
+	for _, bits := range []uint32{0x3f800000, 0x80000000, 0x7fc12345} {
+		records := worldLightTestRecords(0)
+		records[1].ShadowCastOffset[2] = math.Float32frombits(bits)
+		if encoded, err := EncodeWorldLights(records, lightTestContext("reactivedrop", 0)); err == nil || encoded != nil {
+			t.Fatalf("RD v0 discarded shadow-vector bits %08x", bits)
 		}
 	}
 }

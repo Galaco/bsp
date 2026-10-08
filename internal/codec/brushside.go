@@ -17,7 +17,7 @@ func BrushSideHasThin(context format.Context) (bool, error) {
 	if context.LumpVersion != 0 {
 		return false, fmt.Errorf("unsupported brushside revision %d for %s", context.LumpVersion, context.Profile)
 	}
-	return context.Profile == "csgo", nil
+	return context.Profile == "csgo" || context.Profile == "reactivedrop", nil
 }
 
 // DecodeBrushSides consumes complete eight-byte records without size-based

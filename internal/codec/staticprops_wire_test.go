@@ -30,6 +30,12 @@ var staticPropWireCases = []struct {
 	{"common10", "csgo", 10, lumps.StaticPropCommon10, 76},
 	{"candidate11", "csgo", 11, lumps.StaticPropCommon11, 80},
 	{"sdk10", "sdk2013", 10, lumps.StaticPropSDK2013V10, 72},
+	{"reactivedrop4", "reactivedrop", 4, lumps.StaticPropCommon4, 56},
+	{"reactivedrop5", "reactivedrop", 5, lumps.StaticPropCommon5, 60},
+	{"reactivedrop6", "reactivedrop", 6, lumps.StaticPropCommon6, 64},
+	{"reactivedrop7", "reactivedrop", 7, lumps.StaticPropCommon7, 68},
+	{"reactivedrop8", "reactivedrop", 8, lumps.StaticPropCommon8, 68},
+	{"reactivedrop9", "reactivedrop", 9, lumps.StaticPropCommon9, 72},
 }
 
 func staticPropTestContext(profile string, version int32) format.Context {
@@ -190,9 +196,10 @@ func TestStaticPropsIndependentMultipleRecordLayouts(t *testing.T) {
 
 func TestStaticPropsExplicitContextMatrix(t *testing.T) {
 	matrix := map[string]map[int32]lumps.StaticPropLayout{
-		"sdk2013": {4: 4, 5: 5, 6: 6, 10: lumps.StaticPropSDK2013V10},
-		"l4d2":    {4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9},
-		"csgo":    {4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11},
+		"sdk2013":      {4: 4, 5: 5, 6: 6, 10: lumps.StaticPropSDK2013V10},
+		"l4d2":         {4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9},
+		"csgo":         {4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11},
+		"reactivedrop": {4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9},
 	}
 	for profile, accepted := range matrix {
 		for _, bspVersion := range []int32{19, 20, 21} {
@@ -240,6 +247,26 @@ func TestStaticPropsExplicitContextMatrix(t *testing.T) {
 	}
 	if _, err := DecodeStaticProps(staticPropTestBytes(lumps.StaticPropSDK2013V10), staticPropTestContext("csgo", 10)); err == nil {
 		t.Fatal("CSGO context accepted SDK v10")
+	}
+	rd9 := staticPropTestContext("reactivedrop", 9)
+	for _, layout := range []lumps.StaticPropLayout{lumps.StaticPropSDK2013V10, lumps.StaticPropCommon10} {
+		if raw, err := EncodeStaticProps(staticPropTestValue(layout), rd9); err == nil || raw != nil {
+			t.Fatalf("Reactive Drop v9 accepted layout %d", layout)
+		}
+		if _, err := DecodeStaticProps(staticPropTestBytes(layout), staticPropTestContext("reactivedrop", 10)); err == nil {
+			t.Fatalf("Reactive Drop admitted v10 layout %d", layout)
+		}
+	}
+	for _, context := range []format.Context{
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 9, ByteOrder: binary.BigEndian},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 9, HeaderLayout: format.L4D2Header},
+	} {
+		if _, err := DecodeStaticProps(staticPropTestBytes(lumps.StaticPropCommon9), context); err == nil {
+			t.Fatalf("decoded staticprops with invalid RD context %+v", context)
+		}
+		if raw, err := EncodeStaticProps(staticPropTestValue(lumps.StaticPropCommon9), context); err == nil || raw != nil {
+			t.Fatalf("encoded staticprops with invalid RD context %+v", context)
+		}
 	}
 }
 
@@ -494,5 +521,50 @@ func TestStaticPropsCountMismatchAndNameBoundaries(t *testing.T) {
 				t.Fatalf("%s lost original name-slot tail: %v", tc.name, err)
 			}
 		}
+	}
+}
+
+func TestReactiveDropStaticPropNineIsNotSDKTen(t *testing.T) {
+	// Equal 72-byte widths are deliberately ambiguous. Context, not byte size,
+	// distinguishes RD v9's byte flags/CPU/GPU/diffuse/X360/padding fields
+	// from SDK v10's base padding/DX/full flags/lightmap fields.
+	raw := staticPropTestBytes(lumps.StaticPropCommon9)
+	rdContext := staticPropTestContext("reactivedrop", 9)
+	rd, err := DecodeStaticProps(raw, rdContext)
+	if err != nil || !reflect.DeepEqual(rd, staticPropTestValue(lumps.StaticPropCommon9)) {
+		t.Fatalf("RD v9 selected wrong equal-width layout: %+v %v", rd, err)
+	}
+	sdkContext := staticPropTestContext("sdk2013", 10)
+	sdk, err := DecodeStaticProps(raw, sdkContext)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, second := sdk.Props[0], sdk.Props[1]
+	if sdk.Layout != lumps.StaticPropSDK2013V10 ||
+		first.BasePadding != 0xf1 || first.MinDXLevel != 0x0605 || first.MaxDXLevel != 0x0807 ||
+		first.Flags != 0x04030201 || first.LightmapResX != 0xde83 || first.LightmapResY != 0xbead ||
+		second.BasePadding != 0x8a || second.MinDXLevel != 0xfeff || second.MaxDXLevel != 0xfcfd ||
+		second.Flags != 0x204080ff || second.LightmapResX != 0x12ff || second.LightmapResY != 0x5634 {
+		t.Fatalf("SDK v10 did not retain its distinct fields: %+v", sdk)
+	}
+	for _, record := range sdk.Props {
+		if record.MinCPULevel != 0 || record.MaxCPULevel != 0 || record.MinGPULevel != 0 || record.MaxGPULevel != 0 ||
+			record.DiffuseModulation != ([4]byte{}) || record.DisableXBox360 != 0 || record.Padding != ([3]byte{}) {
+			t.Fatalf("SDK v10 also exposed RD v9's fields: %+v", record)
+		}
+	}
+	encoded, err := EncodeStaticProps(rd, rdContext)
+	if err != nil || !bytes.Equal(encoded, raw) {
+		t.Fatalf("RD v9 exact reencoding: %v", err)
+	}
+	encoded, err = EncodeStaticProps(sdk, sdkContext)
+	if err != nil || !bytes.Equal(encoded, raw) {
+		t.Fatalf("SDK v10 exact reencoding: %v", err)
+	}
+	if encoded, err := EncodeStaticProps(sdk, rdContext); err == nil || encoded != nil {
+		t.Fatal("equal record width authorized SDK-to-RD dialect conversion")
+	}
+	if encoded, err := EncodeStaticProps(rd, sdkContext); err == nil || encoded != nil {
+		t.Fatal("equal record width authorized RD-to-SDK dialect conversion")
 	}
 }

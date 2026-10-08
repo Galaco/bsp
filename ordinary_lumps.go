@@ -320,6 +320,14 @@ func (bsp *Bsp) validateAmbientChannel(indexID, sampleID LumpId, indices *[]lump
 
 func (bsp *Bsp) validateOrdinarySnapshot(id LumpId, decoded lumps.ILump) error {
 	switch id {
+	case LumpDispInfo:
+		return bsp.validateDisplacementReferences(decoded.(*codec.Displacements).GetData())
+	case LumpWaterOverlays:
+		return bsp.validateWaterOverlayReferences(decoded.(*codec.WaterOverlays).GetData())
+	case LumpOverlaySystemLevels:
+		return bsp.validateOverlaySystemLevelReferences(decoded.(*codec.OverlaySystemLevels).GetData())
+	case LumpDispMultiBlend:
+		return bsp.validateMultiblendReferences(decoded.(*codec.DisplacementMultiblends).GetData())
 	case LumpOverlays:
 		return bsp.validateOverlayReferences(decoded.(*codec.Overlays).GetData())
 	case LumpPrimitives:

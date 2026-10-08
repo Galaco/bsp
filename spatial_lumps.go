@@ -74,6 +74,9 @@ func (bsp *Bsp) SetPrimitives(records []lumps.Primitive) error {
 }
 
 func (bsp *Bsp) validateOverlayReferences(records []lumps.Overlay) error {
+	if err := bsp.validateOverlaySystemLevelCount(len(records)); err != nil {
+		return err
+	}
 	if len(records) == 0 {
 		return nil
 	}

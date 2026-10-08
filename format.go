@@ -11,9 +11,10 @@ import (
 type Profile string
 
 const (
-	ProfileSDK2013 Profile = "sdk2013"
-	ProfileCSGO    Profile = "csgo"
-	ProfileL4D2    Profile = "l4d2"
+	ProfileSDK2013      Profile = "sdk2013"
+	ProfileCSGO         Profile = "csgo"
+	ProfileL4D2         Profile = "l4d2"
+	ProfileReactiveDrop Profile = "reactivedrop"
 )
 
 // ReadOptions selects a dialect and overridable lazy-decode safety limits.
@@ -56,6 +57,10 @@ func profileLayout(profile Profile, version int32) (format.HeaderLayout, error) 
 	case ProfileL4D2:
 		if version == 21 {
 			return format.L4D2Header, nil
+		}
+	case ProfileReactiveDrop:
+		if version == 21 {
+			return format.StandardHeader, nil
 		}
 	}
 	return 0, fmt.Errorf("%w: profile %q, BSP version %d", ErrUnsupportedFormat, profile, version)

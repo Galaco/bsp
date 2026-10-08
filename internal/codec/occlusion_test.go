@@ -255,6 +255,7 @@ func TestOcclusionContexts(t *testing.T) {
 		{Profile: "csgo", BSPVersion: 21, LumpVersion: 2},
 		{Profile: "l4d2", BSPVersion: 21, LumpVersion: 1},
 		{Profile: "l4d2", BSPVersion: 21, LumpVersion: 2},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 2},
 	}
 	for _, context := range valid {
 		if _, err := DecodeOcclusion(occlusionFixture(context.LumpVersion), context); err != nil {
@@ -271,6 +272,13 @@ func TestOcclusionContexts(t *testing.T) {
 		{Profile: "l4d2", BSPVersion: 19, LumpVersion: 2},
 		{Profile: "guessed", BSPVersion: 20, LumpVersion: 2},
 		{Profile: "sdk2013", BSPVersion: 20, LumpVersion: 2, ByteOrder: binary.BigEndian},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 0},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 1},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 3},
+		{Profile: "reactivedrop", BSPVersion: 19, LumpVersion: 2},
+		{Profile: "reactivedrop", BSPVersion: 20, LumpVersion: 2},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 2, ByteOrder: binary.BigEndian},
+		{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 2, HeaderLayout: format.L4D2Header},
 	}
 	for _, context := range invalid {
 		if _, err := DecodeOcclusion(occlusionFixture(2), context); err == nil {
@@ -361,5 +369,36 @@ func TestOcclusionEncodedSizeBoundaries(t *testing.T) {
 				t.Fatalf("accepted signed count overflow %v", counts)
 			}
 		}
+	}
+}
+
+func TestReactiveDropOcclusionVersionTwoWire(t *testing.T) {
+	context := format.Context{Profile: "reactivedrop", BSPVersion: 21, LumpVersion: 2}
+	raw, want := occlusionFixture(2), occlusionExpected(2)
+	got, err := DecodeOcclusion(raw, context)
+	if err != nil || !reflect.DeepEqual(got, want) {
+		t.Fatalf("RD v2 occlusion: got %+v err=%v want %+v", got, err, want)
+	}
+	encoded, err := EncodeOcclusion(want, context)
+	if err != nil || !bytes.Equal(encoded, raw) {
+		t.Fatalf("RD v2 occlusion independent encoding: %v", err)
+	}
+	got.Data[1].Area = -1234
+	mutated := append([]byte(nil), raw...)
+	binary.LittleEndian.PutUint32(mutated[80:], 0xfffffb2e)
+	encoded, err = EncodeOcclusion(got, context)
+	if err != nil || !bytes.Equal(encoded, mutated) {
+		t.Fatalf("RD occlusion area edit changed other fields: %v", err)
+	}
+	for n := 0; n < len(raw); n++ {
+		if _, err := DecodeOcclusion(raw[:n], context); err == nil {
+			t.Fatalf("RD occlusion accepted partial length %d", n)
+		}
+	}
+	if _, err := DecodeOcclusion(append(raw, 0xd3), context); err == nil {
+		t.Fatal("RD occlusion accepted trailing byte")
+	}
+	if _, err := DecodeOcclusion(occlusionFixture(1), context); err == nil {
+		t.Fatal("RD occlusion treated 36-byte v1 records as v2")
 	}
 }

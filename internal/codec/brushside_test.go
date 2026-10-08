@@ -31,9 +31,9 @@ func brushSideTestRecords(thin bool) []lumps.BrushSide {
 }
 
 func TestBrushSidesIndependentDialectBytes(t *testing.T) {
-	for _, profile := range []string{"sdk2013", "csgo", "l4d2"} {
+	for _, profile := range []string{"sdk2013", "csgo", "l4d2", "reactivedrop"} {
 		context := lightTestContext(profile, 0)
-		raw, want := brushSideTestBytes(), brushSideTestRecords(profile == "csgo")
+		raw, want := brushSideTestBytes(), brushSideTestRecords(profile == "csgo" || profile == "reactivedrop")
 		got, err := DecodeBrushSides(raw, context)
 		if err != nil || !reflect.DeepEqual(got, want) {
 			t.Fatalf("%s: got=%+v err=%v want=%+v", profile, got, err, want)
@@ -63,7 +63,7 @@ func TestBrushSidesIndependentDialectBytes(t *testing.T) {
 
 func TestBrushSidesMalformedAndContexts(t *testing.T) {
 	raw := brushSideTestBytes()
-	for _, profile := range []string{"sdk2013", "csgo", "l4d2"} {
+	for _, profile := range []string{"sdk2013", "csgo", "l4d2", "reactivedrop"} {
 		context := lightTestContext(profile, 0)
 		for n := 1; n < len(raw); n++ {
 			if n == 8 {
@@ -86,6 +86,10 @@ func TestBrushSidesMalformedAndContexts(t *testing.T) {
 		{}, lightTestContext("unknown", 0), lightTestContext("sdk2013", 1), lightTestContext("csgo", 1), lightTestContext("l4d2", -1),
 		{Profile: "csgo", BSPVersion: 20}, {Profile: "sdk2013", BSPVersion: 21}, {Profile: "l4d2", BSPVersion: 19},
 		{Profile: "csgo", BSPVersion: 21, ByteOrder: binary.BigEndian},
+		lightTestContext("reactivedrop", -1), lightTestContext("reactivedrop", 1),
+		{Profile: "reactivedrop", BSPVersion: 19}, {Profile: "reactivedrop", BSPVersion: 20},
+		{Profile: "reactivedrop", BSPVersion: 21, ByteOrder: binary.BigEndian},
+		{Profile: "reactivedrop", BSPVersion: 21, HeaderLayout: format.L4D2Header},
 	}
 	for _, context := range invalid {
 		if got, err := DecodeBrushSides(nil, context); err == nil || got != nil {
@@ -106,14 +110,14 @@ func TestBrushSidesRejectNonrepresentableSetters(t *testing.T) {
 			t.Fatalf("accepted non-byte bevel %d", bevel)
 		}
 	}
-	for _, profile := range []string{"sdk2013", "csgo", "l4d2"} {
+	for _, profile := range []string{"sdk2013", "csgo", "l4d2", "reactivedrop"} {
 		context := lightTestContext(profile, 0)
-		records := brushSideTestRecords(profile == "csgo")
+		records := brushSideTestRecords(profile == "csgo" || profile == "reactivedrop")
 		records[1].HasThin = !records[1].HasThin
 		if raw, err := EncodeBrushSides(records, context); err == nil || raw != nil {
 			t.Fatalf("%s silently converted tail dialect", profile)
 		}
-		if profile != "csgo" {
+		if profile != "csgo" && profile != "reactivedrop" {
 			records = brushSideTestRecords(false)
 			records[1].Thin = 1
 			if raw, err := EncodeBrushSides(records, context); err == nil || raw != nil {

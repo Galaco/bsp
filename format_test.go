@@ -112,7 +112,7 @@ func TestUnsupportedProfileStopsAtHeader(t *testing.T) {
 	for _, tc := range []struct {
 		profile bsp.Profile
 		version int32
-	}{{"", 20}, {"unknown", 20}, {bsp.ProfileSDK2013, 21}, {bsp.ProfileCSGO, 20}, {bsp.ProfileL4D2, 20}, {"reactivedrop", 21}} {
+	}{{"", 20}, {"unknown", 20}, {bsp.ProfileSDK2013, 21}, {bsp.ProfileCSGO, 20}, {bsp.ProfileL4D2, 20}, {bsp.ProfileReactiveDrop, 19}, {bsp.ProfileReactiveDrop, 20}} {
 		stream := bytes.NewReader(profileContainer(bsp.ProfileCSGO, tc.version, []byte("unread payload")))
 		if _, err := bsp.ReadFromStream(stream, bsp.ReadOptions{Profile: tc.profile}); !errors.Is(err, bsp.ErrUnsupportedFormat) {
 			t.Fatalf("profile=%s version=%d error=%v", tc.profile, tc.version, err)

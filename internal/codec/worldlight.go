@@ -11,7 +11,7 @@ import (
 )
 
 // WorldLightRecordSize selects the descriptor revision without payload guessing.
-// SDK2013 defines v0; CS:GO retains v0 and adds v1.
+// SDK2013 defines v0; CS:GO and Reactive Drop retain v0 and add v1.
 func WorldLightRecordSize(context format.Context) (int, error) {
 	if err := validatePCContext(context); err != nil {
 		return 0, err
@@ -20,7 +20,7 @@ func WorldLightRecordSize(context format.Context) (int, error) {
 	case 0:
 		return 88, nil
 	case 1:
-		if context.Profile == "csgo" {
+		if context.Profile == "csgo" || context.Profile == "reactivedrop" {
 			return 100, nil
 		}
 	}

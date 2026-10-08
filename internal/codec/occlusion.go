@@ -160,6 +160,11 @@ func occlusionRecordWidth(context format.Context) (int, error) {
 	if err := validatePCContext(context); err != nil {
 		return 0, fmt.Errorf("occlusion: %w", err)
 	}
+	// Reactive Drop af3be02 bsplib.cpp LoadOcclusionLump reads only v2;
+	// v0 is an unused lump, and the SDK's old v1 layout is not accepted.
+	if context.Profile == "reactivedrop" && context.LumpVersion != 2 {
+		return 0, fmt.Errorf("occlusion: unsupported revision %d for %s", context.LumpVersion, context.Profile)
+	}
 	switch context.LumpVersion {
 	case 1:
 		return 36, nil
