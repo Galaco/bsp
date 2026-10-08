@@ -24,7 +24,7 @@ for every payload.
 Canonical export intentionally uses numeric ID order, four-byte alignment and
 zero locations for empty descriptors. It does not preserve original physical
 ordering, inter-lump gaps or unrelated trailing bytes. Game absolute-offset
-relocation changes directory bytes; checksum convention/order is a separate task.
+relocation changes directory bytes and therefore the current-export map checksum.
 
 # Usage
 
@@ -174,6 +174,21 @@ untouched malformed payloads remain raw/exportable, not silently shortened.
 Explicit widths and genuine consumer evidence are in
 [task09](09-overlay-cubemap-and-primitive-layouts.md).
 
+
+## Current-export map checksum
+
+`CRC32()` hashes the pure planned export's stored payloads in numeric ID order,
+IDs1–63: no entities, header or padding. Opaque/compressed bytes remain stored;
+game directory offsets are hashed after canonical relocation. Committed typed
+edits therefore affect the result. Repeated calls are pure; invalid export state
+returns the same planning error as writing.
+
+The convention is pinned SDK **map state**, not standard finalized ZIP CRC:
+`CRC32_Init` plus `CRC32_ProcessBuffer`, without `CRC32_Final` in the SDK map caller.
+Go already finalizes its accumulator, so the final complement is intentional.
+Changing placement is neutral only when included payloads themselves stay equal;
+game absolute offsets can legitimately change. Task14 records the runnable SDK
+reference harness and explains the bundled canonical value `2037425296`.
 
 ## Read-only embedded resources
 

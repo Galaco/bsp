@@ -1,38 +1,27 @@
 package bsp
 
-import (
-	"hash/crc32"
-	"sort"
-)
+import "hash/crc32"
 
-func (bsp *Bsp) CRC32() (uint32, error) {
-	const lumpCount = 64
-
-	crc := crc32.NewIEEE()
-
-	lumpList := make([]LumpId, lumpCount)
-	for i := 0; i < lumpCount; i++ {
-		lumpList[i] = LumpId(i)
+// CRC32 computes the SDK map checksum of the current planned export: numeric
+// IDs1..63, final stored bytes including relocated game offsets, no header or
+// alignment padding. Untouched compressed/opaque payloads are not decoded.
+//
+// Valve SDK b8cfb12c0e083a2ef5b2f9f9b50f3902fa034474 bsplib.cpp initializes
+// CRC_MapFile's state with CRC32_Init and consumes it without CRC32_Final.
+// Go's accumulator is already finalized, so the final complement below restores
+// that SDK map-state convention; this is not the standard finalized ZIP CRC.
+func (file *Bsp) CRC32() (uint32, error) {
+	plan, err := file.prepareExport()
+	if err != nil {
+		return 0, err
 	}
-
-	sort.Slice(lumpList, func(i, j int) bool {
-		return bsp.header.Lumps[lumpList[i]].Offset < bsp.header.Lumps[lumpList[j]].Offset
-	})
-
-	for i := 0; i < lumpCount; i++ {
-		l := lumpList[i]
-		if l == LumpEntities {
-			continue
-		}
-
-		_, err := crc.Write(bsp.lumps[l].raw)
-		if err != nil {
-			return 0, err
+	var crc uint32
+	for id := LumpId(1); id < LumpCount; id++ {
+		if id == LumpGame {
+			crc = plan.game.UpdateCRC32(crc)
+		} else {
+			crc = crc32.Update(crc, crc32.IEEETable, file.lumps[id].raw)
 		}
 	}
-
-	// see CRC32_Final
-	res := crc.Sum32() ^ 0xFFFFFFFF
-
-	return res, nil
+	return crc ^ 0xffffffff, nil
 }

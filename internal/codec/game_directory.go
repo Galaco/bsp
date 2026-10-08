@@ -4,6 +4,7 @@ package codec
 import (
 	"encoding/binary"
 	"fmt"
+	"hash/crc32"
 	"io"
 
 	"github.com/galaco/bsp/lumps"
@@ -93,6 +94,29 @@ func (plan GameRelocation) CopyTo(raw []byte) error {
 		}
 	}
 	return nil
+}
+
+// UpdateCRC32 hashes exactly CopyTo's relocated bytes without staging a game
+// payload. The accumulator uses Go's finalized IEEE representation; callers
+// choose the target's external finalization convention.
+func (plan GameRelocation) UpdateCRC32(crc uint32) uint32 {
+	if plan.delta == 0 {
+		return crc32.Update(crc, crc32.IEEETable, plan.raw)
+	}
+	cursor := 0
+	var word [4]byte
+	for index := 0; index < plan.count; index++ {
+		position := 4 + index*gameEntrySize + 8
+		offset := int32(binary.LittleEndian.Uint32(plan.raw[position : position+4]))
+		if offset == 0 {
+			continue
+		}
+		crc = crc32.Update(crc, crc32.IEEETable, plan.raw[cursor:position])
+		binary.LittleEndian.PutUint32(word[:], uint32(int64(offset)+plan.delta))
+		crc = crc32.Update(crc, crc32.IEEETable, word[:])
+		cursor = position + 4
+	}
+	return crc32.Update(crc, crc32.IEEETable, plan.raw[cursor:])
 }
 
 // RelocateGameDirectory preserves all bytes except nonzero absolute offsets.
