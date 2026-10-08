@@ -152,6 +152,30 @@ leaves; positive spans address samples, zero-count indices reference leaves.
 Absent channels stay absent, with no fallback or implicit layout migration.
 Occlusion getters/setters validate polygon spans and actual plane/vertex references.
 
+## Spatial records and fixed-width safety
+
+Use `Overlays`/`SetOverlays`, `Cubemaps`/`SetCubemaps` and
+`Primitives`/`SetPrimitives` for owned snapshots and atomic edits:
+
+| Record | Wire layout and retained data |
+| --- | --- |
+| `lumps.Overlay` | 352 bytes:64 face slots, U/V bounds, four UV vectors, origin/normal; packed lower14-bit count and upper2-bit order |
+| `lumps.Cubemap` | 16 bytes: signed32 integer origin, original size code, three padding bytes |
+| `lumps.Primitive` | ten bytes: type, byte1 padding, four uint16 index/vertex span fields |
+
+Overlay `SetFaceCount`/`SetRenderOrder` reject >64/>3 without changing other bits.
+Only active face slots and valid material texinfos are checked; inactive slots
+remain unchanged. Primitive types0/1 are verified; unknown types remain raw.
+Positive vertex-count primitives contain **absolute** ID38 indices within their
+declared span. Zero vertex-count primitives instead use owning face-winding
+indices; genuine maps may have an empty ID38. No automatic HDR migration occurs.
+
+Every retained fixed-array codec rejects partial records before allocation;
+untouched malformed payloads remain raw/exportable, not silently shortened.
+Explicit widths and genuine consumer evidence are in
+[task09](09-overlay-cubemap-and-primitive-layouts.md).
+
+
 ## Static-prop editing
 
 `StaticProps()` returns fresh `lumps.StaticProps` arrays; `SetStaticProps(value)`

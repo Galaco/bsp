@@ -79,7 +79,7 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 36:
 		ret = new(lumps.LeafWaterData)
 	case 37:
-		return nil, fmt.Errorf("opaque lump %d", index)
+		ret = new(codec.Primitives)
 	case 38:
 		ret = new(lumps.PrimVert)
 	case 39:
@@ -89,13 +89,13 @@ func New(index int, context format.Context) (lumps.ILump, error) {
 	case 41:
 		ret = new(lumps.ClipPortalVerts)
 	case 42:
-		ret = new(lumps.Cubemap)
+		ret = new(codec.Cubemaps)
 	case 43:
 		ret = new(lumps.TexDataStringData)
 	case 44:
 		ret = new(lumps.TexDataStringTable)
 	case 45:
-		ret = new(lumps.Overlay)
+		ret = new(codec.Overlays)
 	case 46:
 		ret = new(lumps.LeafMinDistToWater)
 	case 47:

@@ -3,8 +3,8 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/galaco/bsp/internal/format"
 	primitives "github.com/galaco/bsp/primitives/node"
-	"unsafe"
 )
 
 // Node is Lump 5: Node
@@ -14,16 +14,18 @@ type Node struct {
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Node) Unmarshall(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]primitives.Node, length/int(unsafe.Sizeof(primitives.Node{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+func (lump *Node) Unmarshall(raw []byte) error {
+	count, err := format.FixedRecordCount(len(raw), 32)
 	if err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
-
-	return err
+	data := make([]primitives.Node, count)
+	if err := binary.Read(bytes.NewReader(raw), binary.LittleEndian, data); err != nil {
+		return err
+	}
+	lump.data = data
+	lump.Metadata.SetLength(len(raw))
+	return nil
 }
 
 // GetData gets internal format structure data
@@ -33,7 +35,13 @@ func (lump *Node) GetData() []primitives.Node {
 
 // Marshall dumps this lump back to raw byte data
 func (lump *Node) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+	length, err := format.FixedRecordBytes(len(lump.data), 32)
+	if err != nil {
+		return nil, err
+	}
+	buf := bytes.NewBuffer(make([]byte, 0, length))
+	if err := binary.Write(buf, binary.LittleEndian, lump.data); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

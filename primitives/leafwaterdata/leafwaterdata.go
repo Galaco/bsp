@@ -8,5 +8,5 @@ type LeafWaterData struct {
 	MinZ float32
 	// SurfaceTexInfoID
 	SurfaceTexInfoID int16
-	_                int16 // Because struct is 4byte aligned
+	Padding          [2]byte // Preserved bytes aligning the wire record to four bytes.
 }

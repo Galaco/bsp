@@ -3,8 +3,8 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/galaco/bsp/internal/format"
 	primitives "github.com/galaco/bsp/primitives/vertnormal"
-	"unsafe"
 )
 
 // VertNormal is Lump 30: VertNormal
@@ -14,16 +14,18 @@ type VertNormal struct {
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *VertNormal) Unmarshall(raw []byte) (err error) {
-	length := len(raw)
-	lump.Metadata.SetLength(length)
-	if length == 0 {
-		return
+func (lump *VertNormal) Unmarshall(raw []byte) error {
+	count, err := format.FixedRecordCount(len(raw), 12)
+	if err != nil {
+		return err
 	}
-
-	lump.data = make([]primitives.VertNormal, length/int(unsafe.Sizeof(primitives.VertNormal{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	return err
+	data := make([]primitives.VertNormal, count)
+	if err := binary.Read(bytes.NewReader(raw), binary.LittleEndian, data); err != nil {
+		return err
+	}
+	lump.data = data
+	lump.Metadata.SetLength(len(raw))
+	return nil
 }
 
 // GetData gets internal format structure data
@@ -33,7 +35,13 @@ func (lump *VertNormal) GetData() []primitives.VertNormal {
 
 // Marshall dumps this lump back to raw byte data
 func (lump *VertNormal) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+	length, err := format.FixedRecordBytes(len(lump.data), 12)
+	if err != nil {
+		return nil, err
+	}
+	buf := bytes.NewBuffer(make([]byte, 0, length))
+	if err := binary.Write(buf, binary.LittleEndian, lump.data); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

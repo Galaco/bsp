@@ -3,6 +3,7 @@ package bsp
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"math"
 
@@ -68,6 +69,9 @@ func (bsp *Bsp) Lump(index LumpId) (lumps.ILump, error) {
 		raw = cloneBytes(raw)
 	}
 	if err := decoder.Unmarshall(raw); err != nil {
+		if errors.Is(err, codec.ErrUnsupportedPrimitiveType) {
+			return nil, fmt.Errorf("%w: %s", ErrUnsupportedLump, err)
+		}
 		return nil, &FormatError{fmt.Sprintf("decode lump %d", index), err}
 	}
 	if err := bsp.validateOrdinarySnapshot(index, decoder); err != nil {

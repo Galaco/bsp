@@ -3,8 +3,8 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/galaco/bsp/internal/format"
 	primitives "github.com/galaco/bsp/primitives/brush"
-	"unsafe"
 )
 
 // Brush is Lump 18: Brush
@@ -14,15 +14,17 @@ type Brush struct {
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *Brush) Unmarshall(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]primitives.Brush, length/int(unsafe.Sizeof(primitives.Brush{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+func (lump *Brush) Unmarshall(raw []byte) error {
+	count, err := format.FixedRecordCount(len(raw), 12)
 	if err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
-
+	data := make([]primitives.Brush, count)
+	if err := binary.Read(bytes.NewReader(raw), binary.LittleEndian, data); err != nil {
+		return err
+	}
+	lump.data = data
+	lump.Metadata.SetLength(len(raw))
 	return nil
 }
 
@@ -33,7 +35,13 @@ func (lump *Brush) GetData() []primitives.Brush {
 
 // Marshall dumps this lump back to raw byte data
 func (lump *Brush) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+	length, err := format.FixedRecordBytes(len(lump.data), 12)
+	if err != nil {
+		return nil, err
+	}
+	buf := bytes.NewBuffer(make([]byte, 0, length))
+	if err := binary.Write(buf, binary.LittleEndian, lump.data); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

@@ -3,8 +3,8 @@ package lumps
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/galaco/bsp/internal/format"
 	"github.com/go-gl/mathgl/mgl32"
-	"unsafe"
 )
 
 // ClipPortalVerts is Lump 41: ClipPortalVerts
@@ -14,14 +14,17 @@ type ClipPortalVerts struct {
 }
 
 // Unmarshall Imports this lump from raw byte data
-func (lump *ClipPortalVerts) Unmarshall(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]mgl32.Vec3, length/int(unsafe.Sizeof(mgl32.Vec3{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
+func (lump *ClipPortalVerts) Unmarshall(raw []byte) error {
+	count, err := format.FixedRecordCount(len(raw), 12)
 	if err != nil {
 		return err
 	}
-	lump.Metadata.SetLength(length)
+	data := make([]mgl32.Vec3, count)
+	if err := binary.Read(bytes.NewReader(raw), binary.LittleEndian, data); err != nil {
+		return err
+	}
+	lump.data = data
+	lump.Metadata.SetLength(len(raw))
 	return nil
 }
 
@@ -32,7 +35,13 @@ func (lump *ClipPortalVerts) GetData() []mgl32.Vec3 {
 
 // Marshall dumps this lump back to raw byte data
 func (lump *ClipPortalVerts) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+	length, err := format.FixedRecordBytes(len(lump.data), 12)
+	if err != nil {
+		return nil, err
+	}
+	buf := bytes.NewBuffer(make([]byte, 0, length))
+	if err := binary.Write(buf, binary.LittleEndian, lump.data); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

@@ -24,8 +24,8 @@ type DispInfo struct {
 	// Contents
 	Contents int32
 	// MapFace
-	MapFace uint16
-	_       [2]byte
+	MapFace        uint16
+	MapFacePadding [2]byte
 	// LightmapAlphaStart
 	LightmapAlphaStart int32
 	// LightmapSampleStartPosition
