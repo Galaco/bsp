@@ -402,3 +402,77 @@ func TestReactiveDropOcclusionVersionTwoWire(t *testing.T) {
 		t.Fatal("RD occlusion treated 36-byte v1 records as v2")
 	}
 }
+
+func FuzzOcclusionCountedSections(f *testing.F) {
+	for _, version := range []int32{1, 2} {
+		raw := occlusionFixture(version)
+		f.Add(raw, version == 2)
+		f.Add(make([]byte, 12), version == 2)
+		f.Add(raw[:len(raw)-1], version == 2)
+		f.Add(append(append([]byte(nil), raw...), 0xa5), version == 2)
+		width := 36
+		if version == 2 {
+			width = 40
+		}
+		for _, offset := range []int{0, 4 + 2*width, 8 + 2*width + 3*12} {
+			for _, count := range []uint32{0xffffffff, 0x7fffffff} {
+				malformed := append([]byte(nil), raw...)
+				binary.LittleEndian.PutUint32(malformed[offset:], count)
+				f.Add(malformed, version == 2)
+			}
+		}
+	}
+	f.Add([]byte{}, false)
+	f.Fuzz(func(t *testing.T, raw []byte, revisionTwo bool) {
+		if len(raw) > 4096 {
+			return
+		}
+		raw = append([]byte(nil), raw...)
+		version, width := int32(1), 36
+		if revisionTwo {
+			version, width = 2, 40
+		}
+		context := occlusionTestContext(version)
+		initial := occlusionFixture(version)
+		var adapter Occlusion
+		adapter.SetContext(context)
+		if err := adapter.Decode(initial); err != nil {
+			t.Fatal(err)
+		}
+		before := append([]byte(nil), raw...)
+		err := adapter.Decode(raw)
+		if !bytes.Equal(raw, before) {
+			t.Fatal("decode mutated source")
+		}
+		encoded, encodeErr := adapter.Encode()
+		if err != nil {
+			if encodeErr != nil || adapter.Length() != len(initial) || !bytes.Equal(encoded, initial) {
+				t.Fatalf("failed counted decode changed committed state: %v", encodeErr)
+			}
+			return
+		}
+		value := adapter.GetData()
+		if len(raw) != 12+width*len(value.Data)+12*len(value.Polygons)+4*len(value.VertexIndices) {
+			t.Fatal("counted sections did not consume exactly the selected revision")
+		}
+		for i, record := range value.Data {
+			if record.FirstPoly < 0 || record.PolyCount < 0 || int64(record.FirstPoly)+int64(record.PolyCount) > int64(len(value.Polygons)) {
+				t.Fatalf("occluder %d has an invalid polygon span", i)
+			}
+		}
+		for i, record := range value.Polygons {
+			if record.FirstVertexIndex < 0 || record.VertexCount < 0 || int64(record.FirstVertexIndex)+int64(record.VertexCount) > int64(len(value.VertexIndices)) {
+				t.Fatalf("polygon %d has an invalid vertex-index span", i)
+			}
+		}
+		if encodeErr != nil || len(encoded) != len(raw) || !bytes.Equal(encoded, before) || !bytes.Equal(raw, before) {
+			t.Fatalf("occlusion wire/float bits changed on export: %v", encodeErr)
+		}
+		raw[len(raw)-1] ^= 0xff
+		encoded[0] ^= 0xff
+		repeated, err := adapter.Encode()
+		if err != nil || !bytes.Equal(repeated, before) {
+			t.Fatalf("occlusion snapshot borrowed source or export bytes: %v", err)
+		}
+	})
+}

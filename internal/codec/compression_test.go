@@ -263,7 +263,14 @@ func FuzzDecodeLZMA(f *testing.F) {
 		f.Add(raw, binary.LittleEndian.Uint32(raw[4:8]), false)
 		f.Add(append(raw, 0xff, 0xff), binary.LittleEndian.Uint32(raw[4:8]), true)
 	}
+	f.Add([]byte("LZMA"), uint32(0), false)
+	malformed := sourceLZMAFixture(f, sourceLZMANoEOSHex)
+	binary.LittleEndian.PutUint32(malformed[4:8], 4097)
+	f.Add(malformed, uint32(4097), false)
 	f.Fuzz(func(t *testing.T, raw []byte, expected uint32, trailing bool) {
+		if len(raw) > 4096 {
+			return
+		}
 		before := append([]byte(nil), raw...)
 		// Explicit small policy defaults keep fuzz mutations of advertised
 		// lengths/dictionaries from requesting the normal production limits.
@@ -279,6 +286,10 @@ func FuzzDecodeLZMA(f *testing.F) {
 		}
 		if len(decoded) != int(expected) || len(decoded) > 4096 {
 			t.Fatalf("decoded length %d differs from bounded expected size %d", len(decoded), expected)
+		}
+		repeated, err := DecodeLZMA(raw, expected, trailing, Limits{MaxDecodedLumpBytes: 4096, MaxLZMADictionaryBytes: 4096})
+		if err != nil || !bytes.Equal(repeated, decoded) || !bytes.Equal(raw, before) {
+			t.Fatalf("repeat decode changed output or source: %v", err)
 		}
 	})
 }

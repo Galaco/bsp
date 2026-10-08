@@ -568,3 +568,62 @@ func TestReactiveDropStaticPropNineIsNotSDKTen(t *testing.T) {
 		t.Fatal("equal record width authorized RD-to-SDK dialect conversion")
 	}
 }
+
+func FuzzStaticPropCountedSections(f *testing.F) {
+	for selection, tc := range staticPropWireCases {
+		raw := staticPropTestBytes(tc.layout)
+		f.Add(raw, uint8(selection))
+		f.Add(make([]byte, 12), uint8(selection))
+		f.Add(raw[:len(raw)-1], uint8(selection))
+		f.Add(append(append([]byte(nil), raw...), 0xa5), uint8(selection))
+		for _, offset := range []int{0, 260, 270} {
+			for _, count := range []uint32{0xffffffff, 0x7fffffff} {
+				malformed := append([]byte(nil), raw...)
+				binary.LittleEndian.PutUint32(malformed[offset:], count)
+				f.Add(malformed, uint8(selection))
+			}
+		}
+	}
+	f.Add([]byte{}, uint8(0))
+	f.Fuzz(func(t *testing.T, raw []byte, selection uint8) {
+		// The three count words must prove their byte budgets before allocation;
+		// bounded input limits all successful model/leaf/prop arrays and exports.
+		if len(raw) > 4096 {
+			return
+		}
+		raw = append([]byte(nil), raw...)
+		tc := staticPropWireCases[int(selection)%len(staticPropWireCases)]
+		context := staticPropTestContext(tc.profile, tc.version)
+		before := append([]byte(nil), raw...)
+		value, err := DecodeStaticProps(raw, context)
+		if !bytes.Equal(raw, before) {
+			t.Fatal("decode mutated source")
+		}
+		if err != nil {
+			if value.Layout != 0 || value.Models != nil || value.LeafIndices != nil || value.Props != nil {
+				t.Fatal("failed decode published partial sections")
+			}
+			return
+		}
+		if value.Layout != tc.layout || len(raw) != 12+128*len(value.Models)+2*len(value.LeafIndices)+tc.width*len(value.Props) {
+			t.Fatal("decoded sections do not exactly consume the selected wire layout")
+		}
+		for i, prop := range value.Props {
+			end := uint32(prop.FirstLeaf) + uint32(prop.LeafCount)
+			if int(prop.ModelIndex) >= len(value.Models) || end > uint32(len(value.LeafIndices)) {
+				t.Fatalf("prop %d has an invalid model or leaf span", i)
+			}
+		}
+		encoded, err := EncodeStaticProps(value, context)
+		if err != nil || len(encoded) != len(raw) || !bytes.Equal(encoded, before) || !bytes.Equal(raw, before) {
+			t.Fatalf("static-prop wire/padding/float bits changed on export: %v", err)
+		}
+		// Caller input and export buffers must not be retained by the snapshot.
+		raw[len(raw)-1] ^= 0xff
+		encoded[0] ^= 0xff
+		repeated, err := EncodeStaticProps(value, context)
+		if err != nil || !bytes.Equal(repeated, before) {
+			t.Fatalf("static-prop snapshot borrowed source or export bytes: %v", err)
+		}
+	})
+}

@@ -1,11 +1,5 @@
-[![GoDoc](https://godoc.org/github.com/Galaco/bsp?status.svg)](https://godoc.org/github.com/Galaco/bsp)
-[![Go report card](https://goreportcard.com/badge/github.com/galaco/bsp)](https://goreportcard.com/badge/github.com/galaco/bsp)
-[![GolangCI](https://golangci.com/badges/github.com/galaco/bsp.svg)](https://golangci.com)
-[![Build Status](https://travis-ci.com/Galaco/bsp.svg?branch=master)](https://travis-ci.com/Galaco/bsp)
-[![CircleCI](https://circleci.com/gh/Galaco/bsp/tree/master.svg?style=svg)](https://circleci.com/gh/Galaco/bsp/tree/master)
-[![codecov](https://codecov.io/gh/Galaco/bsp/branch/master/graph/badge.svg)](https://codecov.io/gh/Galaco/bsp)
 
-# Bsp
+# BSP
 Go library for handling Source Engine .bsp map files.
 
 ### Features
@@ -33,8 +27,10 @@ Minimal example printing the exact entity text of a specified `.bsp`:
 package main
 
 import (
-	"github.com/galaco/bsp"
+	"fmt"
 	"log"
+
+	"github.com/galaco/bsp"
 )
 
 func main() {
@@ -46,7 +42,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(text)
+	fmt.Print(text)
 }
 ```
 
@@ -190,7 +186,7 @@ Explicit widths and genuine consumer evidence are in
 
 ## Current-export map checksum
 
-`CRC32()` hashes the pure planned export's stored payloads in numeric ID order,
+`MapCRC32()` hashes the pure planned export's stored payloads in numeric ID order,
 IDs1–63: no entities, header or padding. Opaque/compressed bytes remain stored;
 game directory offsets are hashed after canonical relocation. Committed typed
 edits therefore affect the result. Repeated calls are pure; invalid export state
@@ -406,7 +402,40 @@ Ambient metadata is conservative for unknown revisions even where the actual con
 ID35 is a counted directory, not a uniformly typed game-record array. `StaticPropVersions` comes from the shared static-prop profile selector; `StaticPropStatus` is typed only when the actual directory has one unique `sprp` child with an accepted revision (RD v9 is accepted). Missing/duplicate/unknown-revision children remain opaque while directory and other children remain accessible. This status is selector coverage, not successful validation of the child payload. The selector never infers versions from byte length.
 
 
-## Real World examples
+## Development and release verification
+
+Go modules; minimum language/compiler contract Go1.19. No cgo, external decoder,
+Node/Bun, application executable or configured third-party linter.
+CI pins official `golang:1.27.1-bookworm` by manifest digest, disables automatic
+toolchain switching and explicitly runs:
+
+```sh
+go build ./...
+go test ./... -count=1
+go vet ./...
+go test ./... -coverprofile=/tmp/bsp-coverage.out
+go tool cover -func=/tmp/bsp-coverage.out
+```
+
+The last two commands measure local coverage; CI does not upload it or enforce a
+percentage threshold. Regression fixtures are independently byte-authored; optional
+genuine v11 tests require the separately obtained, hash-pinned maps documented in
+[task08](08-static-prop-codecs-and-editing.md), using `BSP_CSGO_V11_FIXTURE_DIR`.
+The bundled gzip map is always exercised; missing bytes are a failure, not a skip.
+
+`.gitattributes` configures LFS for `*.bsp.gz`, but the current bundled fixture is a
+regular Git gzip blob. CI installs Git LFS before checkout, explicitly retrieves
+matching LFS objects if present, then validates the gzip. Clean local/HTTPS clones
+yielded usable bytes; this does not demonstrate transfer of an LFS object.
+No asset normalization or redistribution of externally acquired game maps is required.
+
+LZMA dependency `github.com/ulikunitz/xz` v0.5.11 declares Go1.12 and uses BSD3-Clause;
+retain its source/binary license notices when distributing. Repository code licensing
+does not establish distribution rights for game maps or embedded resources.
+Detailed exercised release evidence and the remote-CI observation gate are recorded
+in [task16](16-qa-documentation-and-tooling.md).
+
+## Historical consumers (pre-cutover APIs)
 * Proof of concept BSP viewer: [https://github.com/Galaco/kero](https://github.com/Galaco/kero)
 * Insert game_text newline placeholder characters (avoids Hammer crash) as a compile step: [https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang](https://github.com/Galaco/CS-GO-game_text-newline-inserter/tree/golang)
 * Bspzip filelist generator from a mountable resource directory: [https://github.com/Galaco/bspzip-traverser](https://github.com/Galaco/bspzip-traverser)

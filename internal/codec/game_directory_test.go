@@ -358,13 +358,21 @@ func FuzzParseGameDirectory(f *testing.F) {
 	f.Add([]byte{0, 0, 0, 0}, int32(100))
 	f.Add(authoredGameWire([]wireGameEntry{{1, 0, 7, 276, 3}}, []byte("abc")), int32(256))
 	f.Add(authoredGameWire([]wireGameEntry{{1, 1, 7, 292, 1000}, {0, 0, 0, 0, 0}}, []byte("zip")), int32(256))
+	f.Add([]byte{0xff, 0xff, 0xff, 0x7f}, int32(0))
+	f.Add(authoredGameWire([]wireGameEntry{{1, 0, 7, 275, 3}}, []byte("abc")), int32(256))
 	f.Fuzz(func(t *testing.T, raw []byte, base int32) {
 		if len(raw) > 4096 {
 			return
 		}
 		before := append([]byte(nil), raw...)
 		directory, err := ParseGameDirectory(raw, base)
+		if !bytes.Equal(raw, before) {
+			t.Fatal("parse mutated source")
+		}
 		if err != nil {
+			if directory.Raw != nil || directory.Base != 0 || directory.Entries != nil {
+				t.Fatal("partial directory returned on failure")
+			}
 			return
 		}
 		exported, err := RelocateGameDirectory(directory, base)

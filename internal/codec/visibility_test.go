@@ -234,3 +234,150 @@ func TestVisibilityContextsAndSizeBudget(t *testing.T) {
 		t.Fatalf("exact signed budget: %d %v", size, err)
 	}
 }
+
+func FuzzVisibilityOffsetsRLE(f *testing.F) {
+	f.Add([]byte{})
+	f.Add([]byte{0xff, 0xff, 0xff, 0xff})
+	f.Add([]byte{1, 0, 1, 0}) // count 65537, beyond the wire limit
+	f.Add(visibilityWire(0, nil, nil))
+	f.Add(visibilityWire(0, nil, []byte{0xa5})) // preserve unreferenced bytes
+	f.Add(visibilityWire(1, [][2]int32{{12, -1}}, []byte{0xff}))
+	f.Add(visibilityWire(8, [][2]int32{{68, 68}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {68, -1}}, []byte{0x81}))
+	for _, count := range []int{9, 17} {
+		pairs := make([][2]int32, count)
+		for i := range pairs {
+			pairs[i] = [2]int32{-1, -1}
+		}
+		start := int32(4 + 8*count)
+		data := []byte{1, 0x81, 0, 2}
+		if count == 17 {
+			data = []byte{1, 0, 1, 0x81, 0, 3}
+		}
+		pairs[0], pairs[count-1] = [2]int32{start, start + int32(len(data)-2)}, [2]int32{start, -1}
+		raw := visibilityWire(count, pairs, data)
+		f.Add(raw)
+		f.Add(raw[:len(raw)-1])
+	}
+	for _, tc := range []struct {
+		offset int32
+		data   []byte
+	}{
+		{-2, []byte{1}},
+		{0, []byte{1}},
+		{11, []byte{1}},
+		{13, []byte{1}},
+		{0x7fffffff, []byte{1}},
+		{12, []byte{0}},
+		{12, []byte{0, 0}},
+		{12, []byte{0, 2}},
+	} {
+		for kind := 0; kind < 2; kind++ {
+			pair := [2]int32{-1, -1}
+			pair[kind] = tc.offset
+			f.Add(visibilityWire(1, [][2]int32{pair}, tc.data))
+		}
+	}
+	f.Fuzz(func(t *testing.T, raw []byte) {
+		// A 4 KiB table admits at most 511 clusters, bounding both parser
+		// allocation and the independent per-row RLE/bitset oracle below.
+		if len(raw) > 4096 {
+			return
+		}
+		raw = append([]byte(nil), raw...)
+		context := visibilityTestContext()
+		initial := visibilityWire(1, [][2]int32{{12, -1}}, []byte{0x80})
+		var adapter Visibility
+		adapter.SetContext(context)
+		if err := adapter.Decode(initial); err != nil {
+			t.Fatal(err)
+		}
+		before := append([]byte(nil), raw...)
+		err := adapter.Decode(raw)
+		if !bytes.Equal(raw, before) {
+			t.Fatal("decode mutated source")
+		}
+		encoded, encodeErr := adapter.Encode()
+		if err != nil {
+			if encodeErr != nil || adapter.Length() != len(initial) || !bytes.Equal(encoded, initial) {
+				t.Fatalf("failed visibility decode changed committed state: %v", encodeErr)
+			}
+			return
+		}
+		value := adapter.GetData()
+		if encodeErr != nil || len(encoded) != len(raw) || !bytes.Equal(encoded, before) || !bytes.Equal(raw, before) {
+			t.Fatalf("visibility offsets or RLE bytes changed on export: %v", encodeErr)
+		}
+		count := len(value.Offsets)
+		tableEnd, rowSize := 4+8*count, (count+7)/8
+		if tableEnd > len(raw) || !bytes.Equal(value.Data, before[tableEnd:]) {
+			t.Fatal("decoded table/data boundary changed")
+		}
+		for cluster, pair := range value.Offsets {
+			for kind, offset := range pair {
+				row, present, err := value.Row(cluster, lumps.VisibilityKind(kind))
+				visible, visiblePresent, visibleErr := value.VisibleClusters(cluster, lumps.VisibilityKind(kind))
+				if err != nil || visibleErr != nil || visiblePresent != present {
+					t.Fatalf("parsed row cannot be queried: %v / %v", err, visibleErr)
+				}
+				if offset == -1 {
+					if present || row != nil || visible != nil {
+						t.Fatal("missing offset fabricated a row")
+					}
+					continue
+				}
+				if !present || len(row) != rowSize || offset < int32(tableEnd) || int64(offset) >= int64(len(raw)) {
+					t.Fatal("present row has invalid bounds or decoded length")
+				}
+				// Independent wire oracle: literals append one byte; 0,N appends
+				// exactly N zero bytes. A run cannot exceed the derived row width.
+				want := make([]byte, 0, rowSize)
+				cursor := int(offset) - tableEnd
+				for len(want) < rowSize {
+					if cursor >= len(value.Data) {
+						t.Fatal("accepted a truncated literal/RLE stream")
+					}
+					word := value.Data[cursor]
+					cursor++
+					if word != 0 {
+						want = append(want, word)
+						continue
+					}
+					if cursor >= len(value.Data) {
+						t.Fatal("accepted a truncated run count")
+					}
+					run := int(value.Data[cursor])
+					cursor++
+					if run == 0 || run > rowSize-len(want) {
+						t.Fatal("accepted a zero or overflowing run")
+					}
+					for i := 0; i < run; i++ {
+						want = append(want, 0)
+					}
+				}
+				if !bytes.Equal(row, want) {
+					t.Fatal("row differs from literal/run wire semantics")
+				}
+				wantVisible := make([]int, 0)
+				for index := 0; index < count; index++ {
+					if want[index/8]&(1<<uint(index%8)) != 0 {
+						wantVisible = append(wantVisible, index)
+					}
+				}
+				if !reflect.DeepEqual(visible, wantVisible) {
+					t.Fatal("visible IDs differ from row bits or include unused high bits")
+				}
+				row[0] ^= 0xff
+				repeatedRow, _, err := value.Row(cluster, lumps.VisibilityKind(kind))
+				if err != nil || !bytes.Equal(repeatedRow, want) {
+					t.Fatal("queried row aliases visibility state")
+				}
+			}
+		}
+		raw[len(raw)-1] ^= 0xff
+		encoded[0] ^= 0xff
+		repeated, err := adapter.Encode()
+		if err != nil || !bytes.Equal(repeated, before) {
+			t.Fatalf("visibility snapshot borrowed source or export bytes: %v", err)
+		}
+	})
+}
