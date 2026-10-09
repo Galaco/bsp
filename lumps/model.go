@@ -1,39 +1,21 @@
 package lumps
 
 import (
-	"bytes"
-	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/model"
-	"unsafe"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
-// Model is Lump 14: Model
+// Model is a BSP root node.
 type Model struct {
-	Generic
-	data []primitives.Model
-}
-
-// Unmarshall Imports this lump from raw byte data
-func (lump *Model) Unmarshall(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]primitives.Model, length/int(unsafe.Sizeof(primitives.Model{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		return err
-	}
-	lump.Metadata.SetLength(length)
-
-	return err
-}
-
-// GetData gets internal format structure data
-func (lump *Model) GetData() []primitives.Model {
-	return lump.data
-}
-
-// Marshall dumps this lump back to raw byte data
-func (lump *Model) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+	// Mins is bounding volume smallest value corner
+	Mins mgl32.Vec3
+	// Maxs is bounding volume largest value corner
+	Maxs mgl32.Vec3
+	// Origin is the center/specified origin position
+	Origin mgl32.Vec3
+	// HeadNode
+	HeadNode int32
+	// FirstFace is index into the faces lump
+	FirstFace int32
+	// NumFaces is number of faces in this model
+	NumFaces int32
 }

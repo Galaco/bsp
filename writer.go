@@ -1,153 +1,146 @@
 package bsp
 
 import (
-	"bytes"
-	"encoding/binary"
-	"github.com/galaco/bsp/lumps"
+	"fmt"
+	"io"
+
+	"github.com/galaco/bsp/internal/codec"
+	"github.com/galaco/bsp/internal/format"
 )
 
-// Writer is a Bsp export writer.
-type Writer struct {
-	data Bsp
+type exportPlan struct {
+	layout       codec.Layout
+	headerLayout format.HeaderLayout
+	game         codec.GameRelocation
 }
 
-// GetBsp Gets bsp file to write.
-func (w *Writer) GetBsp() Bsp {
-	return w.data
-}
-
-// SetBsp Sets bsp file to write.
-func (w *Writer) SetBsp(file Bsp) {
-	w.data = file
-}
-
-// Write bsp to []byte.
-func (w *Writer) Write() ([]byte, error) {
-	// First we need to update the header to reflect any lump changes
-	// At the same time we can dump our lumps as bytes to write later
-	lumpBytes := make([][]byte, 64)
-	currentOffset := 1036 // Header always 1036bytes
-
-	for _, index := range getDefaultLumpOrdering() {
-		// We have to handle lump 35 (GameData differently)
-		// Because valve mis-designed the file format and relatively positioned data contains absolute file offsets.
-		if index == LumpGame {
-			gamelump := w.data.lumps[int(index)].Contents().(*lumps.Game)
-			w.data.lumps[int(index)].SetContents(
-				gamelump.UpdateInternalOffsets(int32(currentOffset) - w.data.header.Lumps[int(index)].Offset))
-		}
-		exportBytes, err := w.WriteLump(index)
-		if err != nil {
-			return nil, err
-		}
-		lumpBytes[int(index)] = exportBytes
-
-		lumpSize := len(lumpBytes[int(index)])
-
-		w.data.header.Lumps[int(index)].Length = int32(lumpSize)
-		w.data.header.Lumps[int(index)].Offset = int32(currentOffset)
-
-		currentOffset += lumpSize
-
-		// Finally 4byte align each lump.
-		lumpBytes[int(index)] = append(lumpBytes[int(index)], make([]byte, currentOffset%4)...)
-		currentOffset += currentOffset % 4
+// prepareExport is shared by emission and current-state map checksums.
+func (file *File) prepareExport() (exportPlan, error) {
+	if file == nil || file.header.ID != fileIdent {
+		return exportPlan{}, fmt.Errorf("%w: nil file or invalid file identity", ErrMalformed)
 	}
+	layoutKind, err := profileLayout(file.profile, file.header.Version)
+	if err != nil {
+		return exportPlan{}, err
+	}
+	var lengths [LumpCount]int64
+	for i := range lengths {
+		lengths[i] = int64(len(file.lumps[i].raw))
+	}
+	layout, err := codec.PlanLayout(lengths)
+	if err != nil {
+		return exportPlan{}, &FormatError{"output layout", err}
+	}
+	var game codec.GameRelocation
+	if lengths[LumpGame] != 0 {
+		view, err := file.gameDirectoryView()
+		if err != nil {
+			return exportPlan{}, err
+		}
+		game, err = codec.PlanGameRelocation(view, layout.Offsets[LumpGame])
+		if err != nil {
+			return exportPlan{}, &FormatError{"output game directory", err}
+		}
+	}
+	return exportPlan{layout: layout, headerLayout: layoutKind, game: game}, nil
+}
 
-	// Now we can export our bsp
-	var buf bytes.Buffer
+// exportHeader derives output descriptors without changing historical metadata.
+func (file *File) exportHeader(plan exportPlan) Header {
+	header := file.header
+	for i := range header.Lumps {
+		header.Lumps[i].Offset = plan.layout.Offsets[i]
+		header.Lumps[i].Length = plan.layout.Lengths[i]
+	}
+	return header
+}
 
-	//Write Header
-	err := binary.Write(&buf, binary.LittleEndian, w.data.header)
+// MarshalBinary emits a canonical numeric-ID layout with aligned stored payloads.
+// Export does not mutate the file; game-directory offsets are relocated.
+func (file *File) MarshalBinary() ([]byte, error) {
+	plan, err := file.prepareExport()
 	if err != nil {
 		return nil, err
 	}
-
-	//Write lumps
-	for _, lumpData := range lumpBytes {
-		if err = binary.Write(&buf, binary.LittleEndian, lumpData); err != nil {
-			return nil, err
+	layout, game := plan.layout, plan.game
+	// Validate the entire layout and game fixups before the output allocation.
+	raw := make([]byte, int(layout.Size))
+	header := file.exportHeader(plan)
+	for i := range header.Lumps {
+		if layout.Lengths[i] == 0 {
+			continue
+		}
+		start := int(layout.Offsets[i])
+		end := start + int(layout.Lengths[i])
+		if i == int(LumpGame) {
+			if err := game.CopyTo(raw[start:end]); err != nil {
+				return nil, &FormatError{"emit game directory", err}
+			}
+		} else {
+			copy(raw[start:end], file.lumps[i].raw)
 		}
 	}
-
-	return buf.Bytes(), nil
+	encodeHeader(raw[:HeaderSize], &header, plan.headerLayout)
+	return raw, nil
 }
 
-// WriteLump Exports a single lump to []byte.
-func (w *Writer) WriteLump(index LumpId) ([]byte, error) {
-	lump := w.data.Lump(index)
-	return lump.Marshall()
-}
-
-// NewWriter Returns a new bsp writer instance.
-func NewWriter() Writer {
-	w := Writer{}
-	return w
-}
-
-// getDefaultLumpOrdering gets Source Engines default export order.
-// Source compile tools write lumps out of order
-// While the ordering doesn't actually matter, it may
-// be useful/more performant to maintain the same order, particularly post-export
-func getDefaultLumpOrdering() [64]LumpId {
-	return [64]LumpId{
-		LumpPlanes,
-		LumpLeafs,
-		LumpLeafAmbientLighting,
-		LumpLeafAmbientIndex,
-		LumpLeafAmbientIndexHDR,
-		LumpLeafAmbientLightingHDR,
-		LumpVertexes,
-		LumpNodes,
-		LumpTexInfo,
-		LumpTexData,
-		LumpDispInfo,
-		LumpDispVerts,
-		LumpDispTris,
-		LumpDispLightmapSamplePositions,
-		LumpFaceMacroTextureInfo,
-		LumpPrimitives,
-		LumpPrimVerts,
-		LumpPrimIndices,
-		LumpFaces,
-		LumpFacesHDR,
-		LumpFaceIds,
-		LumpOriginalFaces,
-		LumpBrushes,
-		LumpBrushSides,
-		LumpLeafFaces,
-		LumpLeafBrushes,
-		LumpSurfEdges,
-		LumpEdges,
-		LumpModels,
-		LumpAreas,
-		LumpAreaPortals,
-		LumpLighting,
-		LumpLightingHDR,
-		LumpVisibility,
-		LumpEntities,
-		LumpWorldLights,
-		LumpWorldLightsHDR,
-		LumpLeafWaterData,
-		LumpOcclusion,
-		LumpMapFlags,
-		LumpPortals,
-		LumpClusters,
-		LumpPortalVerts,
-		LumpClusterPortals,
-		LumpClipPortalVerts,
-		LumpCubemaps,
-		LumpTexDataStringData,
-		LumpTexDataStringTable,
-		LumpOverlays,
-		LumpWaterOverlays,
-		LumpOverlayFades,
-		LumpPhysCollide,
-		LumpPhysDisp,
-		LumpVertNormals,
-		LumpVertNormalIndices,
-		LumpLeafMinDistToWater,
-		LumpGame,
-		LumpPakfile,
+// WriteTo emits the same bytes as MarshalBinary without staging a complete BSP.
+// Semantic validation precedes all writes. I/O errors return the actual emitted
+// byte count, and the caller retains ownership of the writer.
+func (file *File) WriteTo(writer io.Writer) (int64, error) {
+	plan, err := file.prepareExport()
+	if err != nil {
+		return 0, err
 	}
+	if writer == nil {
+		return 0, fmt.Errorf("%w: nil writer", ErrMalformed)
+	}
+	header := file.exportHeader(plan)
+	var headerBytes [HeaderSize]byte
+	encodeHeader(headerBytes[:], &header, plan.headerLayout)
+	written, err := writeChunk(writer, headerBytes[:])
+	if err != nil {
+		return written, err
+	}
+	var zeros [3]byte
+	for id, length := range plan.layout.Lengths {
+		if length == 0 {
+			continue
+		}
+		padding := int64(plan.layout.Offsets[id]) - written
+		if padding != 0 {
+			n, err := writeChunk(writer, zeros[:padding])
+			written += n
+			if err != nil {
+				return written, err
+			}
+		}
+		var n int64
+		if id == int(LumpGame) {
+			n, err = plan.game.WriteTo(writer)
+		} else {
+			n, err = writeChunk(writer, file.lumps[id].raw)
+		}
+		written += n
+		if err != nil {
+			return written, err
+		}
+	}
+	padding := int64(plan.layout.Size) - written
+	if padding != 0 {
+		n, err := writeChunk(writer, zeros[:padding])
+		written += n
+		if err != nil {
+			return written, err
+		}
+	}
+	return written, nil
+}
+
+func writeChunk(writer io.Writer, raw []byte) (int64, error) {
+	n, err := writer.Write(raw)
+	if n != len(raw) && err == nil {
+		err = io.ErrShortWrite
+	}
+	return int64(n), err
 }

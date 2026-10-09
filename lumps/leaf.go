@@ -1,91 +1,44 @@
 package lumps
 
-import (
-	"bytes"
-	"encoding/binary"
-	"fmt"
-	"github.com/galaco/bsp/primitives/common"
-	primitives "github.com/galaco/bsp/primitives/leaf"
-	"unsafe"
-)
+// MaxMapLeafs is the maximum number of leaves supported by the engine.
+const MaxMapLeafs = 65536
 
 const (
-	// MaxMapLeafs is the maximum number of leafs the engine can handle
-	MaxMapLeafs = 65536
+	LeafFlagsSky    = 0x01
+	LeafFlagsRadial = 0x02
+	LeafFlagsSky2D  = 0x04
 )
 
-const (
-	// maxBspVersionOfV0Leaf is the last bsp revision to use the old leafv0 structure
-	maxBspVersionOfV0Leaf = 19
-)
-
-// Leaf is Lump 10: Leaf
+// Leaf is a convex volume from lump 10. The descriptor version selects whether
+// LightSample is stored inline; Padding preserves the two trailing wire bytes.
 type Leaf struct {
-	Generic
-	data []primitives.Leaf
+	Contents          int32
+	Cluster           int16
+	BitField          uint16
+	Mins              [3]int16
+	Maxs              [3]int16
+	FirstLeafFace     uint16
+	NumLeafFaces      uint16
+	FirstLeafBrush    uint16
+	NumLeafBrushes    uint16
+	LeafWaterDataID   int16
+	LightSample       CompressedLightCube
+	HasInlineLighting bool
+	Padding           [2]byte
 }
 
-// Unmarshall Imports this lump from raw byte data
-func (lump *Leaf) Unmarshall(raw []byte) (err error) {
-	// There are 2 version of leaf:
-	// v0 contains a light sample
-	// v1 removes the light sample, and is padded by 2 bytes
-	structSize := int(unsafe.Sizeof(primitives.Leaf{}))
-	if lump.Version() > maxBspVersionOfV0Leaf {
-		// Correct size of v1+ leafs
-		structSize -= int(unsafe.Sizeof(common.CompressedLightCube{}))
-	}
+// Area is the unsigned nine-bit area stored in BitField.
+func (leaf *Leaf) Area() uint16 { return leaf.BitField & 0x01ff }
 
-	length := len(raw)
-	lump.data = make([]primitives.Leaf, length/structSize)
-	numLeafs := len(lump.data)
-	i := 0
+// Flags is the unsigned seven-bit flag value, never an arithmetic signed shift.
+func (leaf *Leaf) Flags() uint16 { return leaf.BitField >> 9 }
 
-	for i < numLeafs {
-		leafBuf := make([]byte, structSize)
-		copy(leafBuf, raw[(structSize * i) : (structSize*i)+structSize])
-		// Pad the raw data to the correct size of a leaf
-		if lump.Version() > maxBspVersionOfV0Leaf {
-			leafBuf = append(leafBuf, make([]byte, int(unsafe.Sizeof(common.CompressedLightCube{})))...)
-		}
-		rawLeaf := bytes.NewBuffer(leafBuf)
-		err = binary.Read(rawLeaf, binary.LittleEndian, &lump.data[i])
-		if err != nil {
-			return err
-		}
-		i++
-		if i > MaxMapLeafs {
-			return fmt.Errorf("leaf count overflows maximum allowed size of %d", MaxMapLeafs)
-		}
-	}
-	lump.SetLength(length)
-
-	return err
+// SetArea masks to nine bits and preserves every flag bit.
+func (leaf *Leaf) SetArea(area uint16) {
+	leaf.BitField = leaf.BitField&0xfe00 | area&0x01ff
 }
 
-// GetData gets internal format structure data
-func (lump *Leaf) GetData() []primitives.Leaf {
-	return lump.data
-}
-
-// Marshall dumps this lump back to raw byte data
-func (lump *Leaf) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	var err error
-
-	switch lump.Version() {
-	case 0:
-		err = binary.Write(&buf, binary.LittleEndian, lump.data)
-	default:
-		structSize := int(unsafe.Sizeof(primitives.Leaf{})) - int(unsafe.Sizeof(common.CompressedLightCube{}))
-		for _, l := range lump.data {
-			var leafBuf bytes.Buffer
-			if err = binary.Write(&leafBuf, binary.LittleEndian, l); err != nil {
-				return nil, err
-			}
-			err = binary.Write(&buf, binary.LittleEndian, leafBuf.Bytes()[0:structSize])
-		}
-	}
-
-	return buf.Bytes(), err
+// SetFlags masks to seven bits and preserves every area bit.
+func (leaf *Leaf) SetFlags(flags uint16) {
+	leaf.BitField = leaf.BitField&0x01ff | (flags&0x007f)<<9
 }

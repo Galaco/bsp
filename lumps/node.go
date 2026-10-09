@@ -1,39 +1,22 @@
 package lumps
 
-import (
-	"bytes"
-	"encoding/binary"
-	primitives "github.com/galaco/bsp/primitives/node"
-	"unsafe"
-)
-
-// Node is Lump 5: Node
+// Node is a bsp node that has 2 children, because it was splittable along a plane.
+// It represents a non-convex volume with child volumes
 type Node struct {
-	Generic
-	data []primitives.Node // MAP_MAX_NODES = 65536
-}
-
-// Unmarshall Imports this lump from raw byte data
-func (lump *Node) Unmarshall(raw []byte) (err error) {
-	length := len(raw)
-	lump.data = make([]primitives.Node, length/int(unsafe.Sizeof(primitives.Node{})))
-	err = binary.Read(bytes.NewBuffer(raw), binary.LittleEndian, &lump.data)
-	if err != nil {
-		return err
-	}
-	lump.Metadata.SetLength(length)
-
-	return err
-}
-
-// GetData gets internal format structure data
-func (lump *Node) GetData() []primitives.Node {
-	return lump.data
-}
-
-// Marshall dumps this lump back to raw byte data
-func (lump *Node) Marshall() ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, binary.LittleEndian, lump.data)
-	return buf.Bytes(), err
+	// PlaneNum is index of splitting place
+	PlaneNum int32
+	// Children are indexes of children that resulted from the split. It can reference either other Nodes or Leafs
+	Children [2]int32
+	// Mins is bounding volume min
+	Mins [3]int16
+	// Maxs is bounding volume maxs
+	Maxs [3]int16
+	// FirstFace is index into faces lump data
+	FirstFace uint16
+	// NumFaces is number of faces in this node
+	NumFaces uint16
+	// Area
+	Area int16
+	// Padding pads this structure to 4byte alignment (no other documented purpose)
+	Padding int16
 }
