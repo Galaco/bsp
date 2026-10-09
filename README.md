@@ -1,3 +1,4 @@
+[![CI](https://github.com/galaco/bsp/actions/workflows/ci.yml/badge.svg)](https://github.com/galaco/bsp/actions/workflows/ci.yml)
 
 # BSP
 Go library for handling Source Engine .bsp map files.

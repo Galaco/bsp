@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.27.1-bookworm@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66
+    env:
+      GIT_LFS_SKIP_SMUDGE: "1"
+      GOTOOLCHAIN: local
+    steps:
+      - name: Install Git LFS
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git-lfs
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Retrieve and validate bundled fixture
+        run: |
+          # The workspace is owned by the runner user, not the container's root
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git lfs install --local
+          git lfs pull origin --include="ar_baggage.bsp.gz" --exclude=""
+          gzip -t ar_baggage.bsp.gz
+      - name: Build
+        run: go build ./...
+      - name: Test
+        run: go test ./... -count=1
+      - name: Vet
+        run: go vet ./...
